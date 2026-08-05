@@ -21,6 +21,28 @@ export function SessionBoundary({
   const pending = !serverAuthenticated && clientSession.isPending;
   const query = searchParams.toString();
 
+  // 检查是否已完成首次诊断（未完成则去 /onboarding）
+  useEffect(() => {
+    if (!authenticated || pathname === "/onboarding") {
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        if (data && data.onboarded === false) {
+          router.replace("/onboarding");
+        }
+      })
+      .catch(() => {
+        /* 静默 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authenticated, pathname, router]);
+
   useEffect(() => {
     if (pending || authenticated) {
       return;

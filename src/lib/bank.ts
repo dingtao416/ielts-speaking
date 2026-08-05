@@ -103,3 +103,26 @@ export function getTopicsByYear(
 export function getYears(category: "real" | "predicted"): number[] {
   return getBankIndex()[category].years;
 }
+
+/** 相似题：同 topic 或 Part 家族（Part2 故事题可映射 Part3 讨论题） */
+export function getSimilarQuestions(question: Question): Question[] {
+  const index = getBankIndex();
+  const all = [...index.real.questions, ...index.predicted.questions];
+  return all.filter(
+    (q) =>
+      q.id !== question.id &&
+      (q.topic === question.topic ||
+        (question.part === 2 && q.part === 3) ||
+        (question.part === 3 && q.part === 2)),
+  );
+}
+
+/** 首次诊断固定题目：Part1/2/3 各选一题（保证可比性） */
+export function getDiagnosticQuestions(): Question[] {
+  const index = getBankIndex();
+  const real = index.real.questions;
+  const p1 = real.find((q) => q.part === 1 && !q.predicted);
+  const p2 = real.find((q) => q.part === 2 && !q.predicted);
+  const p3 = real.find((q) => q.part === 3 && !q.predicted);
+  return [p1, p2, p3].filter(Boolean) as Question[];
+}

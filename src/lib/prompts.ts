@@ -142,7 +142,7 @@ ${fullText.slice(0, 20000)}
   return { system, user };
 }
 
-/** 框架提取 Prompt：JSON-only 输出答题框架 */
+/** 框架提取 Prompt：JSON-only 输出答题框架（含故事素材） */
 export function getFrameworkPrompt(
   question: Question,
   fullText: string,
@@ -157,6 +157,15 @@ export function getFrameworkPrompt(
   "expressions": [
     {"phrase": "高分表达", "meaning": "含义/用法说明"}
   ],  // 回答中出现的高分短语、地道表达（最多8个）
+  "stories": [
+    {
+      "title": "故事标题（中文，简短）",
+      "characters": ["人物1", "人物2"],
+      "setting": "场景/地点一句话",
+      "events": ["事件1", "事件2", "事件3"],
+      "applyToTopics": ["可应用的话题1", "话题2"]
+    }
+  ],  // 回答中包含的个人故事素材（人物/地点/经历），最多3个
   "intro": "一句话总结这个框架适用于什么类型的题"  // 中文
 }
 
@@ -164,6 +173,7 @@ export function getFrameworkPrompt(
 - structure 用中文描述步骤（如 "开头直接表态 → 给原因 → 举例说明 → 总结"）
 - keyPoints 用英文（这是用户要背的内容）
 - expressions 的 phrase 用英文原文，meaning 用中文
+- stories 从回答中提取用户真实讲述的个人经历（不是虚构的），events 概括事件经过，applyToTopics 推测这个故事还能用于哪些雅思话题（如 帮助他人/一次难忘的经历/重要人物）
 - 只提炼真正有用的，不要凑数`;
 
   const user = `题目: ${question.question}${question.cueCard ? `\nCue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}` : ""}
@@ -191,6 +201,146 @@ export function getModelAnswerPrompt(question: Question, band = 7) {
       ? `\nCue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}`
       : ""
   }${question.followUps ? `\n追问: ${question.followUps[0]}` : ""}`;
+
+  return { system, user };
+}
+
+/** 首次诊断 Prompt：输入 Part1/2/3 三段回答，输出能力档案（JSON） */
+export function getDiagnosticPrompt(
+  answers: { part: number; question: string; text: string }[],
+  targetBand: number,
+) {
+  const answerBlock = answers
+    .map(
+      (a) =>
+        `### Part ${a.part}\n题目: ${a.question}\n回答: "${a.text.slice(0, 1500)}"`,
+    )
+    .join("\n\n");
+
+  const system = `你是雅思口语考官与能力评估专家。用户首次使用产品，回答了 3 道题（Part 1/2/3 各一道，未做准备）。请根据这 3 段回答，评估用户当前的真实口语水平（训练用途预估，非官方成绩）。
+
+只输出一个 JSON 对象，不要输出任何其他内容。JSON 结构：
+{
+  "overallBand": 5.5,
+  "dimensions": {
+    "fluency": 5.0,
+    "lexical": 5.0,
+    "grammar": 5.0,
+    "pronunciation": 5.0,
+    "overall": 5.5
+  },
+  "mainIssues": ["最主要的问题1", "最主要的问题2", "最主要的问题3"],
+  "stagePath": ["从当前到目标的第一步", "第二步", "第三步"]
+}
+
+评分要求（Band 0-9，可带 .5）：
+- fluency（流利度与连贯性）：停顿、填充词、连贯性、能否展开观点
+- lexical（词汇资源）：词汇丰富度、用词准确度、是否低分词/重复
+- grammar（语法范围与准确性）：语法错误频率、句式多样性
+- pronunciation（发音与可理解度）：语速、清晰度、自然度
+
+mainIssues 给 2-4 条当前最阻碍提分的问题（中文，具体可操作）。
+stagePath 给从 overallBand 提升到目标分 ${targetBand} 的 3 步路径（中文，每步一句话，聚焦当前差距）。
+
+注意：
+- 不要因为某段答得好就虚高，综合 3 段整体判断
+- 目标分是 ${targetBand}，但评估的是当前水平，不是目标
+- 用户可能是中文母语者用英文作答，注意语言本身的质量`;
+
+  const user = `目标分: ${targetBand}
+
+用户的三段回答：
+${answerBlock}`;
+
+  return { system, user };
+}
+
+/** 单次练习评估 Prompt：输入一次回答，输出四维 band（JSON） */
+export function getAssessPrompt(
+  fullText: string,
+  stats: { totalWords: number; fillers: number; hedges: number; vagueWords: number; chinglish: number; density: number },
+  question?: Question,
+) {
+  const system = `你是雅思口语考官。请评估用户这次回答的 Band 分数（0-9，可带 .5）。
+
+只输出一个 JSON 对象，不要输出任何其他内容：
+{
+  "fluency": 5.5,
+  "lexical": 5.0,
+  "grammar": 5.5,
+  "pronunciation": 6.0,
+  "overall": 5.5,
+  "mainIssues": ["本次最主要的问题1", "问题2"]
+}
+
+评分维度：
+- fluency（流利度与连贯性）：停顿、填充词、连贯性、能否展开
+- lexical（词汇资源）：词汇丰富度、低分词/重复情况
+- grammar（语法范围与准确性）：语法错误、句式多样性
+- pronunciation（发音与可理解度）：从文字判断语速/清晰度/自然度（不精确，给合理估计）
+- overall：四维综合
+
+mainIssues 给 1-3 条本次最需要改进的点（中文，具体）。
+
+参考统计：总词数 ${stats.totalWords}，填充词 ${stats.fillers}，犹豫词 ${stats.hedges}，低分词 ${stats.vagueWords}，中式英语 ${stats.chinglish}，表达密度 ${stats.density}%。`;
+
+  const user = `${question ? `题目: ${question.question}\n` : ""}用户的回答：
+---
+${fullText.slice(0, 6000)}
+---`;
+
+  return { system, user };
+}
+
+/** 五层目标级回答 Prompt */
+export function getFiveTierPrompt(
+  question: Question,
+  fullText: string,
+  context?: {
+    targetBand?: number;
+    currentBand?: number;
+    framework?: { structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; stories?: { title: string; events: string[] }[] } | null;
+    mainIssues?: string[];
+  },
+) {
+  const target = context?.targetBand ?? 6.5;
+  const current = context?.currentBand ?? 5.0;
+  const fwBlock = context?.framework
+    ? `
+已有的答题框架:
+- 结构: ${(context.framework.structure ?? []).join(" → ") || "无"}
+- 要点: ${(context.framework.keyPoints ?? []).join("; ") || "无"}
+- 高分表达: ${(context.framework.expressions ?? []).map((e) => e.phrase).join("; ") || "无"}
+${context.framework.stories?.length ? `- 故事素材: ${context.framework.stories.map((s) => `${s.title}(${s.events.join("/")})`).join("; ")}` : ""}`
+    : "";
+  const issuesBlock = context?.mainIssues?.length
+    ? `\n重点改进方向: ${context.mainIssues.join("; ")}`
+    : "";
+
+  const system = `你是雅思口语教练。用户当前口语水平约 ${current} 分，目标 ${target} 分。请把用户的回答升级为 5 层目标级回答（全部用英文输出）。
+
+只输出一个 JSON 对象：
+{
+  "original": "用户原文（直接引用，不改动）",
+  "structured": "结构化版本：不改变原意，但调整顺序和连接，逻辑更清晰，适合 ${current} 分水平",
+  "improvable": "可改进版本：在保持用户能理解的前提下，修正明显语法错误、补充原因和例子、替换重复低分词（不要用超出用户水平的生僻词）",
+  "target": "目标级回答：达到 ${target} 分要求的完整回答，结构清晰、有具体细节、词汇适当升级、句式有变化",
+  "steps": ["具体提升步骤1", "步骤2", "步骤3"],
+  "focus": "一句话说明本次重点（中文）"
+}
+
+关键原则：
+- 所有版本都要用用户能掌握的词汇句式，循序渐进，不硬塞生僻词
+- structured 和 improvable 的水平接近用户当前 ${current} 分，target 才接近 ${target} 分
+- 优先帮用户：减少语法错误、补充原因/例子、自然连接、替换重复词、提高完整性
+- 如果用户原文很短（<50词），所有版本都可以适度扩写，但不要编造用户没说过的事实${issuesBlock}`;
+
+  const user = `${question.part === 2 && question.cueCard ? `Cue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}\n\n` : ""}题目: ${question.question}${fwBlock}
+
+用户的回答：
+---
+${fullText.slice(0, 8000)}
+---`;
 
   return { system, user };
 }

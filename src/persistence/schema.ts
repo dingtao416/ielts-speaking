@@ -4,6 +4,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgTable,
   text,
   timestamp,
@@ -24,6 +25,11 @@ export const user = pgTable(
     image: text("image"),
     username: text("username"),
     displayUsername: text("display_username"),
+    // 雅思个性化能力档案
+    targetBand: numeric("target_band"),          // 目标分数，如 6.5
+    profile: jsonb("profile").$type<AbilityProfile>(), // 能力档案
+    onboarded: boolean("onboarded").default(false).notNull(),
+    onboardedAt: timestamp("onboarded_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -137,6 +143,10 @@ export const frameworks = pgTable(
       .$type<{ phrase: string; meaning: string }[]>()
       .notNull()
       .default(sql`'[]'::jsonb`),
+    stories: jsonb("stories")
+      .$type<StoryMaterial[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     intro: text("intro"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -164,6 +174,7 @@ export const sessionRecords = pgTable(
     durationSec: integer("duration_sec").notNull(),
     fullText: text("full_text").notNull(),
     stats: jsonb("stats").$type<TextStats>().notNull(),
+    bands: jsonb("bands").$type<BandScores>(),  // 四维 + overall band 评估
     bandEstimate: integer("band_estimate"),
     reportMarkdown: text("report_markdown"),
     frameworkId: varchar("framework_id", { length: 64 }),
@@ -188,4 +199,32 @@ export interface TextStats {
   chinglish: number;
   density: number;
   duration: number;
+}
+
+// 雅思四维评分（Band 0-9，可带 .5）
+export interface BandScores {
+  fluency: number;         // 流利度与连贯性
+  lexical: number;         // 词汇资源
+  grammar: number;         // 语法范围与准确性
+  pronunciation: number;   // 发音与可理解度
+  overall: number;         // 综合
+}
+
+// 个人能力档案
+export interface AbilityProfile {
+  overallBand: number;        // 当前综合水平
+  targetBand: number;         // 目标分数
+  dimensions: BandScores;     // 四维 band
+  mainIssues: string[];       // 当前最主要的问题
+  stagePath: string[];        // 从当前到目标的阶段路径
+  updatedAt: string;          // 最近评估时间
+}
+
+// 框架故事素材（从用户回答中提取的可复用个人故事）
+export interface StoryMaterial {
+  title: string;              // 故事标题
+  characters: string[];       // 人物
+  setting: string;            // 场景/地点
+  events: string[];           // 事件经过
+  applyToTopics: string[];    // 可应用于的话题
 }

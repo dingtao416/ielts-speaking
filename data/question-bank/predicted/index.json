@@ -233,5 +233,319 @@
         "question": "Should university education be free for everyone?"
       }
     ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19041321-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19041321-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19041321-p1-3",
+        "question": "What kind of clothes do you like to wear?"
+      },
+      {
+        "id": "19041321-p1-4",
+        "question": "Do you prefer to wear comfortable and casual clothes or smart clothes?"
+      },
+      {
+        "id": "19041321-p1-5",
+        "question": "Do you like wearing T-shirts?"
+      },
+      {
+        "id": "19041321-p1-6",
+        "question": "Do you spend a lot of time choosing clothes?"
+      },
+      {
+        "id": "19041321-p1-7",
+        "question": "Do you often use maps?"
+      },
+      {
+        "id": "19041321-p1-8",
+        "question": "Do you use paper maps?"
+      },
+      {
+        "id": "19041321-p1-9",
+        "question": "How often do you use maps on your phone?"
+      },
+      {
+        "id": "19041321-p1-10",
+        "question": "Do you have maps at home?"
+      },
+      {
+        "id": "19041321-p1-11",
+        "question": "Are robots important?"
+      },
+      {
+        "id": "19041321-p1-12",
+        "question": "Would robots affect people's lives?"
+      },
+      {
+        "id": "19041321-p1-13",
+        "question": "Have you ever watched a movie about robots?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p2-0",
+        "question": "Describe a picture/photograph of you that you like.",
+        "cueCard": [
+          "Where it was taken/drawn",
+          "When it was taken/drawn",
+          "Who took/dnew it"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p3-0",
+        "question": "Why do people take photos?"
+      },
+      {
+        "id": "19041321-p3-1",
+        "question": "What do people use to take photos these days, cameras or phones?"
+      },
+      {
+        "id": "19041321-p3-2",
+        "question": "Is it difficult for people to learn how to take good photos?"
+      },
+      {
+        "id": "19041321-p3-3",
+        "question": "How do people keep their photos?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19042193-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19042193-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19042193-p1-3",
+        "question": "Are there many small businesses near your house"
+      },
+      {
+        "id": "19042193-p1-4",
+        "question": "Do you prefer buying things in big companies or from small businesses?"
+      },
+      {
+        "id": "19042193-p1-5",
+        "question": "Do you know many small businesses"
+      },
+      {
+        "id": "19042193-p1-6",
+        "question": "On what occasions do you go shopping in big businesses?"
+      },
+      {
+        "id": "19042193-p1-7",
+        "question": "What do you usually do at weekends? What did you do last weekend?"
+      },
+      {
+        "id": "19042193-p1-8",
+        "question": "Do you like weekends?"
+      },
+      {
+        "id": "19042193-p1-9",
+        "question": "Do you think it is important to make the most of your weekend?"
+      },
+      {
+        "id": "19042193-p1-10",
+        "question": "Do you like chocolate?"
+      },
+      {
+        "id": "19042193-p1-11",
+        "question": "Did you like chocolate when you were a child?"
+      },
+      {
+        "id": "19042193-p1-12",
+        "question": "Did you give chocolate as a present to someone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p2-0",
+        "question": "Describe a bad service you received in a restaurant/shop",
+        "cueCard": [
+          "when and where it happened",
+          "what happened",
+          "how you reacted"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p3-0",
+        "question": "How do most people respond to bad services?"
+      },
+      {
+        "id": "19042193-p3-1",
+        "question": "Do you think services are better now than in the past?"
+      },
+      {
+        "id": "19042193-p3-2",
+        "question": "What kind of services are bad services?"
+      },
+      {
+        "id": "19042193-p3-3",
+        "question": "Why do some people choose to remain silent when they receive bad services?"
+      },
+      {
+        "id": "19042193-p3-4",
+        "question": "Who should be responsible for bad services?"
+      },
+      {
+        "id": "19042193-p3-5",
+        "question": "What can employers do to improve the service that their employees provide?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19042193-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19042193-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19042193-p1-3",
+        "question": "Are there many small businesses near your house"
+      },
+      {
+        "id": "19042193-p1-4",
+        "question": "Do you prefer buying things in big companies or from small businesses?"
+      },
+      {
+        "id": "19042193-p1-5",
+        "question": "Do you know many small businesses"
+      },
+      {
+        "id": "19042193-p1-6",
+        "question": "On what occasions do you go shopping in big businesses?"
+      },
+      {
+        "id": "19042193-p1-7",
+        "question": "What do you usually do at weekends? What did you do last weekend?"
+      },
+      {
+        "id": "19042193-p1-8",
+        "question": "Do you like weekends?"
+      },
+      {
+        "id": "19042193-p1-9",
+        "question": "Do you think it is important to make the most of your weekend?"
+      },
+      {
+        "id": "19042193-p1-10",
+        "question": "Do you like chocolate?"
+      },
+      {
+        "id": "19042193-p1-11",
+        "question": "Did you like chocolate when you were a child?"
+      },
+      {
+        "id": "19042193-p1-12",
+        "question": "Did you give chocolate as a present to someone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p2-0",
+        "question": "Describe a bad service you received in a restaurant/shop",
+        "cueCard": [
+          "when and where it happened",
+          "what happened",
+          "how you reacted"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p3-0",
+        "question": "How do most people respond to bad services?"
+      },
+      {
+        "id": "19042193-p3-1",
+        "question": "Do you think services are better now than in the past?"
+      },
+      {
+        "id": "19042193-p3-2",
+        "question": "What kind of services are bad services?"
+      },
+      {
+        "id": "19042193-p3-3",
+        "question": "Why do some people choose to remain silent when they receive bad services?"
+      },
+      {
+        "id": "19042193-p3-4",
+        "question": "Who should be responsible for bad services?"
+      },
+      {
+        "id": "19042193-p3-5",
+        "question": "What can employers do to improve the service that their employees provide?"
+      }
+    ]
   }
 ]

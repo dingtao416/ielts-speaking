@@ -42,6 +42,11 @@ export const auth = betterAuth({
       ...coreFields,
       username: null,
       displayUsername: null,
+      // 新用户初始状态：未 onboarding，无目标分/档案
+      targetBand: null,
+      profile: null,
+      onboarded: false,
+      onboardedAt: null,
       ...additionalFields,
       id,
     }),

@@ -1,4 +1,4 @@
-import type { FrameworkRecord } from "@/persistence/schema";
+import type { FrameworkRecord, StoryMaterial } from "@/persistence/schema";
 
 export interface FrameworkExpression {
   phrase: string;
@@ -14,6 +14,7 @@ export interface Framework {
   structure: string[];
   keyPoints: string[];
   expressions: FrameworkExpression[];
+  stories: StoryMaterial[];
   intro?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -28,6 +29,7 @@ export function toFramework(record: FrameworkRecord): Framework {
     sourceYear: record.sourceYear ?? null,
     structure: record.structure ?? [],
     keyPoints: record.keyPoints ?? [],
+    stories: record.stories ?? [],
     expressions: record.expressions ?? [],
     intro: record.intro ?? null,
     createdAt: record.createdAt.toISOString?.() ?? String(record.createdAt),

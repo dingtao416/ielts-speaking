@@ -34,7 +34,7 @@ function safeReturnTo(value: string | undefined) {
   if (!value || value.startsWith("//")) {
     return "/bank";
   }
-  if (value.startsWith("/bank") || value.startsWith("/practice") || value.startsWith("/recite") || value.startsWith("/library")) {
+  if (value.startsWith("/bank") || value.startsWith("/practice") || value.startsWith("/recite") || value.startsWith("/library") || value.startsWith("/onboarding")) {
     return value;
   }
   return "/bank";

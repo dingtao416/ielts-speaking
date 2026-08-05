@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 
 import type { Question } from "@/lib/bank";
+import { getSimilarQuestions } from "@/lib/bank";
+import type { AbilityProfile } from "@/persistence/schema";
+import { FiveTierView, type FiveTierData } from "@/components/practice/five-tier-view";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useStreamText } from "@/hooks/useStreamText";
@@ -38,6 +41,9 @@ export function PracticeSession({ question }: { question: Question }) {
   const store = usePracticeStore();
   const lastFeedbackAtRef = useRef(0);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [assessment, setAssessment] = useState<AbilityProfile | null>(null);
+  const [fiveTier, setFiveTier] = useState<FiveTierData | null>(null);
+  const [fiveTierLoading, setFiveTierLoading] = useState(false);
 
   // 显示实时反馈
   useEffect(() => {
@@ -197,7 +203,7 @@ export function PracticeSession({ question }: { question: Question }) {
 
   async function saveFramework() {
     const fw = store.framework as
-      | { topic?: string; part?: number; structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; intro?: string }
+      | { topic?: string; part?: number; structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; stories?: { title: string; characters: string[]; setting: string; events: string[]; applyToTopics: string[] }[]; intro?: string }
       | null;
     if (!fw) return;
     try {
@@ -212,6 +218,7 @@ export function PracticeSession({ question }: { question: Question }) {
           structure: fw.structure ?? [],
           keyPoints: fw.keyPoints ?? [],
           expressions: fw.expressions ?? [],
+          stories: fw.stories ?? [],
           intro: fw.intro ?? "",
         }),
       });
@@ -225,7 +232,26 @@ export function PracticeSession({ question }: { question: Question }) {
 
   async function saveSession() {
     if (!store.fullText) return;
+    let bands: Record<string, number> | undefined;
     try {
+      // 先评估（返回 bands + 更新能力档案）
+      const assessRes = await fetch("/api/assess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullText: store.fullText,
+          stats: { ...store.stats, duration: timer.elapsed },
+          questionId: question.id,
+        }),
+      });
+      if (assessRes.ok) {
+        const assessData = await assessRes.json();
+        bands = assessData.bands;
+        if (assessData.profile) {
+          setAssessment(assessData.profile);
+        }
+      }
+
       await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -237,11 +263,44 @@ export function PracticeSession({ question }: { question: Question }) {
           durationSec: timer.elapsed,
           fullText: store.fullText,
           stats: { ...store.stats, duration: timer.elapsed },
+          bands,
+          bandEstimate: bands?.overall ?? undefined,
           reportMarkdown: store.reportMarkdown,
         }),
       });
     } catch {
       /* 静默 */
+    }
+  }
+
+  async function generateFiveTier() {
+    if (!store.fullText) return;
+    setFiveTierLoading(true);
+    try {
+      const res = await fetch("/api/five-tier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questionId: question.id,
+          fullText: store.fullText,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setFiveTier({
+        original: data.original ?? store.fullText,
+        structured: data.structured ?? "",
+        improvable: data.improvable ?? "",
+        target: data.target ?? "",
+        steps: data.steps ?? [],
+        focus: data.focus ?? "",
+        targetBand: data.targetBand,
+        currentBand: data.currentBand,
+      });
+    } catch {
+      // 静默
+    } finally {
+      setFiveTierLoading(false);
     }
   }
 
@@ -538,6 +597,23 @@ export function PracticeSession({ question }: { question: Question }) {
                     )}
                   </ul>
                 </div>
+                {(store.framework as { stories?: { title: string; applyToTopics: string[] }[] })?.stories?.length ? (
+                  <div>
+                    <div className="mb-1 font-medium">故事素材</div>
+                    <div className="flex flex-col gap-1.5">
+                      {(store.framework as { stories?: { title: string; applyToTopics: string[] }[] }).stories!.map(
+                        (s, i) => (
+                          <div key={i} className="rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-secondary-text">
+                            <span className="font-medium text-foreground">{s.title}</span>
+                            {s.applyToTopics?.length ? (
+                              <span className="ml-1.5">可复用于 {s.applyToTopics.slice(0, 3).join(" / ")}</span>
+                            ) : null}
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                ) : null}
                 {saveSuccess ? (
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
                     已保存到素材本 ✓
@@ -564,6 +640,32 @@ export function PracticeSession({ question }: { question: Question }) {
             )}
           </div>
 
+          {/* 相似题提示（可复用框架） */}
+          <div className="rounded-2xl border border-border p-4">
+            <h3 className="mb-3 text-sm font-semibold text-secondary-text">
+              相似题
+            </h3>
+            <div className="flex flex-col gap-2">
+              {getSimilarQuestions(question).slice(0, 3).map((sq) => (
+                <Link
+                  key={sq.id}
+                  href={`/practice/${sq.id}`}
+                  className="rounded-lg bg-muted/40 px-3 py-2 text-sm text-secondary-text transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <span className="mr-1.5 text-xs text-tertiary-text">
+                    Part {sq.part}
+                  </span>
+                  {sq.question.slice(0, 60)}
+                </Link>
+              ))}
+              {getSimilarQuestions(question).length === 0 ? (
+                <p className="text-xs text-tertiary-text">
+                  暂无相似题，尝试练习后提炼框架
+                </p>
+              ) : null}
+            </div>
+          </div>
+
           {/* 报告 */}
           {store.reportStatus !== "idle" && (
             <div className="rounded-2xl border border-border p-4">
@@ -587,6 +689,41 @@ export function PracticeSession({ question }: { question: Question }) {
               )}
             </div>
           )}
+
+          {/* 能力档案（本次评估后更新） */}
+          {assessment ? (
+            <div className="rounded-2xl border border-border p-4">
+              <h3 className="mb-2 text-sm font-semibold text-secondary-text">
+                当前综合水平
+              </h3>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-secondary-text">预估分</span>
+                <span className="text-lg font-bold">
+                  {assessment.overallBand.toFixed(1)}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-secondary-text">目标分</span>
+                <span className="text-lg font-bold">
+                  {assessment.targetBand.toFixed(1)}
+                </span>
+              </div>
+              {assessment.mainIssues.length > 0 ? (
+                <ul className="mt-3 list-inside list-disc space-y-1 text-xs text-secondary-text">
+                  {assessment.mainIssues.slice(0, 3).map((issue, i) => (
+                    <li key={i}>{issue}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* 五层目标级回答 */}
+          <FiveTierView
+            data={fiveTier}
+            loading={fiveTierLoading}
+            onGenerate={generateFiveTier}
+          />
         </div>
       </div>
     </div>

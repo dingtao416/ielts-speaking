@@ -304,6 +304,31 @@ export function FrameworkLibrary() {
                       </ul>
                     </div>
                   ) : null}
+                  {f.stories && f.stories.length > 0 ? (
+                    <div>
+                      <div className="mb-1 text-xs font-semibold text-secondary-text">
+                        故事素材
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        {f.stories.map((s, i) => (
+                          <div
+                            key={i}
+                            className="rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs"
+                          >
+                            <div className="font-medium">{s.title}</div>
+                            {s.setting ? (
+                              <div className="text-secondary-text">{s.setting}</div>
+                            ) : null}
+                            {s.applyToTopics?.length ? (
+                              <div className="mt-0.5 text-tertiary-text">
+                                可复用于：{s.applyToTopics.join(" / ")}
+                              </div>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ),
             )}

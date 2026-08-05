@@ -157,3 +157,17 @@ export async function chatCompleteStream(
 
   return full;
 }
+
+/** 从 LLM 输出中安全提取 JSON（容忍 markdown 代码块包裹） */
+export function parseJsonFromLlm<T>(content: string): T {
+  // 去除可能的 ```json ... ``` 包裹
+  const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const raw = fenced ? fenced[1] : content;
+  // 找到第一个 { 和最后一个 } 之间的内容
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("LLM output contains no JSON object");
+  }
+  return JSON.parse(raw.slice(start, end + 1)) as T;
+}

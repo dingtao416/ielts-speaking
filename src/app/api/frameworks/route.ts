@@ -33,6 +33,16 @@ function parseFrameworkBody(body: unknown) {
         )
         .slice(0, 20)
     : [];
+  const stories = Array.isArray(b.stories)
+    ? b.stories
+        .filter(
+          (s): s is { title: string; characters: string[]; setting: string; events: string[]; applyToTopics: string[] } =>
+            typeof s === "object" &&
+            s !== null &&
+            typeof (s as { title?: unknown }).title === "string",
+        )
+        .slice(0, 5)
+    : [];
   const intro =
     typeof b.intro === "string" && b.intro.trim() ? b.intro.trim() : null;
   const sourceQuestionId =
@@ -47,6 +57,7 @@ function parseFrameworkBody(body: unknown) {
     structure,
     keyPoints,
     expressions,
+    stories,
     intro,
     sourceQuestionId,
     sourceYear,
@@ -109,6 +120,7 @@ export async function POST(request: Request) {
         structure: parsed.structure,
         keyPoints: parsed.keyPoints,
         expressions: parsed.expressions,
+        stories: parsed.stories,
         intro: parsed.intro,
         sourceQuestionId: parsed.sourceQuestionId,
         sourceYear: parsed.sourceYear,
@@ -129,6 +141,7 @@ export async function POST(request: Request) {
       structure: parsed.structure,
       keyPoints: parsed.keyPoints,
       expressions: parsed.expressions,
+      stories: parsed.stories,
       intro: parsed.intro,
       sourceQuestionId: parsed.sourceQuestionId,
       sourceYear: parsed.sourceYear,
