@@ -43,6 +43,8 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
   const onResultRef = useRef<(result: SpeechRecognitionResult) => void>(
     () => {},
   );
+  // 记录最近一次错误类型（用于 onend 重连时判断是否需要退避）
+  const lastErrorRef = useRef<string | null>(null);
   const [supported, setSupported] = useState(false);
   const [unsupportedReason, setUnsupportedReason] = useState<
     "insecure-context" | "not-supported" | null
@@ -142,17 +144,30 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
         setState("error");
         return;
       }
+      // network / service-not-allowed 等服务端问题：记录错误，交给 onend 的重连逻辑
+      // 自动重连会带退避，避免无限快速重启
+      if (event.error === "network") {
+        // onend 会触发重连；这里标记一下以便重连逻辑知道是网络问题
+        lastErrorRef.current = "network";
+        return;
+      }
       console.error("[ASR] error:", event.error);
     };
 
     recognition.onend = () => {
-      // 自动重启（仍在录音且未暂停）
+      // 仍在录音且未暂停 → 自动重连（带退避，避免 network 死循环）
       if (listeningRef.current && !pausedRef.current) {
-        try {
-          recognition.start();
-        } catch {
-          /* ignore */
-        }
+        // 网络类错误：延迟重连，逐步退避
+        const backoff = lastErrorRef.current === "network" ? 800 : 100;
+        lastErrorRef.current = null;
+        window.setTimeout(() => {
+          if (!listeningRef.current || pausedRef.current) return;
+          try {
+            recognition.start();
+          } catch {
+            /* ignore */
+          }
+        }, backoff);
       } else if (listeningRef.current && pausedRef.current) {
         // 暂停时停在 paused
       } else {
@@ -195,6 +210,7 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     setError(null);
     listeningRef.current = true;
     pausedRef.current = false;
+    lastErrorRef.current = null; // 手动开始是全新会话，重置错误标记
 
     // 每次 start 都重建实例：彻底规避"上次权限被拒后实例状态卡住"的问题。
     // 浏览器是否重新弹权限窗由它自己的缓存决定（拒绝过的站点不会重弹），
