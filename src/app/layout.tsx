@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   title: "雅思口语训练系统 | IELTS Speaking Trainer",
   description:
     "基于历年真题训练雅思口语，AI 提炼答题框架，预测题背诵实践。",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
