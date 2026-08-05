@@ -80,6 +80,20 @@ npm run dev
 # 打开 http://localhost:3000
 ```
 
+### 测试账号（免注册直接登录）
+
+内置测试账号，无需注册/邮箱验证：
+
+| 用户名 | 密码 | 邮箱 |
+|---|---|---|
+| `root` | `12345678` | `root@ielts.local` |
+
+创建测试账号：
+
+```bash
+npm run seed:test-user
+```
+
 ## 常用脚本
 
 | 命令 | 说明 |
@@ -89,6 +103,7 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript 检查 |
 | `npm run db:generate` / `db:migrate` / `db:studio` | Drizzle 迁移 / 可视化 |
+| `npm run seed:test-user` | 创建测试账号 root / 12345678 |
 
 ## 本地 OTP 邮件说明
 

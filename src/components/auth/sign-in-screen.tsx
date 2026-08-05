@@ -397,7 +397,7 @@ export function SignInScreen({
       <section className="w-full" aria-label="Account access">
         <div
           aria-label="Account action"
-          className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-border bg-muted p-1"
+          className="auth-view-tabs mb-6"
           data-active-view={view}
           role="tablist"
         >
@@ -410,6 +410,7 @@ export function SignInScreen({
                 role="tab"
                 tabIndex={view === "sign-in" ? 0 : -1}
                 type="button"
+                className="rounded-[9px] px-3 py-2 text-sm font-medium transition-all aria-selected:bg-foreground aria-selected:text-background aria-selected:shadow-sm text-secondary-text hover:text-foreground"
               >
                 {t("auth.tab.signIn")}
               </button>
@@ -422,6 +423,7 @@ export function SignInScreen({
                 role="tab"
                 tabIndex={view === "sign-up" ? 0 : -1}
                 type="button"
+                className="rounded-[9px] px-3 py-2 text-sm font-medium transition-all aria-selected:bg-foreground aria-selected:text-background aria-selected:shadow-sm text-secondary-text hover:text-foreground"
               >
                 {t("auth.tab.signUp")}
               </button>
@@ -460,6 +462,7 @@ export function SignInScreen({
                       aria-pressed={method === "password"}
                       onClick={() => selectMethod("password")}
                       type="button"
+                      className="rounded-[7px] px-3 py-1.5 text-[13px] font-medium transition-all aria-pressed:bg-muted aria-pressed:text-foreground text-secondary-text hover:text-foreground"
                     >
                       {t("auth.method.password")}
                     </button>
@@ -467,6 +470,7 @@ export function SignInScreen({
                       aria-pressed={method === "email-code"}
                       onClick={() => selectMethod("email-code")}
                       type="button"
+                      className="rounded-[7px] px-3 py-1.5 text-[13px] font-medium transition-all aria-pressed:bg-muted aria-pressed:text-foreground text-secondary-text hover:text-foreground"
                     >
                       {t("auth.method.emailCode")}
                     </button>
