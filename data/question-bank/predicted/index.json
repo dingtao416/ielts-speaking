@@ -1,0 +1,237 @@
+[
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p1-hometown-01",
+        "question": "What is the most interesting part of your hometown?"
+      },
+      {
+        "id": "p1-hometown-02",
+        "question": "Would you recommend your hometown to tourists?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p2-hometown-01",
+        "question": "Describe a change that has happened in your hometown in recent years. You should say:",
+        "cueCard": [
+          "what the change is",
+          "what caused it",
+          "how people feel about it",
+          "and explain whether you think it is a positive change"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p3-hometown-01",
+        "question": "How do governments decide which cities to invest in?"
+      },
+      {
+        "id": "p3-hometown-02",
+        "question": "Why do some people prefer to live in the countryside?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p1-tech-01",
+        "question": "What apps do you use most on your phone?"
+      },
+      {
+        "id": "p1-tech-02",
+        "question": "Do you think you spend too much time on your phone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p2-tech-01",
+        "question": "Describe an app or website that is useful for your studies or work. You should say:",
+        "cueCard": [
+          "what it is",
+          "what it does",
+          "how you use it",
+          "and explain why you find it useful"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p3-tech-01",
+        "question": "Do you think AI will change the way people learn languages?"
+      },
+      {
+        "id": "p3-tech-02",
+        "question": "What are the risks of people spending too much time online?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p1-food-01",
+        "question": "What is your favourite dish?"
+      },
+      {
+        "id": "p1-food-02",
+        "question": "Do you often try new food?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p2-food-01",
+        "question": "Describe a food you first tried that you liked. You should say:",
+        "cueCard": [
+          "what the food was",
+          "where you tried it",
+          "how you felt about it",
+          "and explain whether you would try it again"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p3-food-01",
+        "question": "Do you think people's eating habits have changed in recent decades?"
+      },
+      {
+        "id": "p3-food-02",
+        "question": "Should governments tax unhealthy food to encourage healthy eating?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p1-work-01",
+        "question": "Do you prefer working from home or in an office?"
+      },
+      {
+        "id": "p1-work-02",
+        "question": "What makes a good boss?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p2-work-01",
+        "question": "Describe a skill you would like to learn to help your career. You should say:",
+        "cueCard": [
+          "what the skill is",
+          "why you want to learn it",
+          "how you plan to learn it",
+          "and explain how it would help you"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p3-work-01",
+        "question": "Do you think AI will replace white-collar jobs?"
+      },
+      {
+        "id": "p3-work-02",
+        "question": "What skills will be most important for future jobs?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p1-edu-01",
+        "question": "Do you think schools should teach practical skills?"
+      },
+      {
+        "id": "p1-edu-02",
+        "question": "What subject do you wish you had studied at school?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p2-edu-01",
+        "question": "Describe a book that had a big impact on you. You should say:",
+        "cueCard": [
+          "what the book is",
+          "when you read it",
+          "what it is about",
+          "and explain why it had such an impact"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p3-edu-01",
+        "question": "Do you think children learn more from school or from home?"
+      },
+      {
+        "id": "p3-edu-02",
+        "question": "Should university education be free for everyone?"
+      }
+    ]
+  }
+]

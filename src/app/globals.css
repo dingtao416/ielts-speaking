@@ -2,25 +2,103 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
+  --foreground: #111111;
+  --muted: #f5f5f5;
+  --border: #e5e5e5;
+  --secondary-text: #666666;
+  --tertiary-text: #999999;
+  --accent: #111111;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* 功能高亮（训练字幕用，不是装饰） */
+  --filler-color: #dc2626;    /* 填充词 · 红 */
+  --hedge-color: #ea580c;     /* 犹豫词 · 橙 */
+  --vague-color: #a16207;     /* 笼统词 · 黄褐 */
+  --chinglish-color: #9333ea; /* 中式英语 · 紫 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --muted: #1a1a1a;
+    --border: #2a2a2a;
+    --secondary-text: #a3a3a3;
+    --tertiary-text: #737373;
+    --accent: #ededed;
   }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-secondary-text: var(--secondary-text);
+  --color-tertiary-text: var(--tertiary-text);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 训练字幕问题词高亮 */
+.hl-filler {
+  color: var(--filler-color);
+  text-decoration: underline wavy var(--filler-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-hedge {
+  color: var(--hedge-color);
+  text-decoration: underline var(--hedge-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-vague {
+  color: var(--vague-color);
+  text-decoration: underline dashed var(--vague-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-chinglish {
+  color: var(--chinglish-color);
+  text-decoration: underline double var(--chinglish-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-good {
+  color: #16a34a;
+}
+
+/* 登录抽屉动画 */
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-drawer-in {
+  animation: drawer-in 0.25s ease-out;
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }

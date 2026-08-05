@@ -1,0 +1,363 @@
+[
+  {
+    "year": 2023,
+    "part": 1,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p1-hometown-01",
+        "question": "Where is your hometown?"
+      },
+      {
+        "id": "p1-hometown-02",
+        "question": "Do you like your hometown? Why or why not?"
+      },
+      {
+        "id": "p1-hometown-03",
+        "question": "Has your hometown changed much in recent years?"
+      }
+    ]
+  },
+  {
+    "year": 2023,
+    "part": 2,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p2-hometown-01",
+        "question": "Describe a place in your hometown that you like to visit. You should say:",
+        "cueCard": [
+          "where it is",
+          "what you do there",
+          "who you go with",
+          "and explain why you like going there"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2023,
+    "part": 3,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p3-hometown-01",
+        "question": "Do you think cities are becoming more similar to each other?"
+      },
+      {
+        "id": "p3-hometown-02",
+        "question": "What are the advantages and disadvantages of living in a big city?"
+      }
+    ]
+  },
+  {
+    "year": 2023,
+    "part": 1,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p1-work-01",
+        "question": "What is your job?"
+      },
+      {
+        "id": "p1-work-02",
+        "question": "Do you like your job?"
+      },
+      {
+        "id": "p1-work-03",
+        "question": "Would you like to change your job in the future?"
+      }
+    ]
+  },
+  {
+    "year": 2023,
+    "part": 2,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p2-work-01",
+        "question": "Describe a job you would like to do in the future. You should say:",
+        "cueCard": [
+          "what the job is",
+          "what skills it requires",
+          "why you find it interesting",
+          "and explain how you plan to get it"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2023,
+    "part": 3,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p3-work-01",
+        "question": "Why do some people stay in the same job for many years?"
+      },
+      {
+        "id": "p3-work-02",
+        "question": "Do you think people should change jobs regularly?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 1,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p1-tech-01",
+        "question": "Do you use technology every day?"
+      },
+      {
+        "id": "p1-tech-02",
+        "question": "What technology do you use most often?"
+      },
+      {
+        "id": "p1-tech-03",
+        "question": "Has technology changed the way you communicate?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 2,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p2-tech-01",
+        "question": "Describe a piece of technology you find useful. You should say:",
+        "cueCard": [
+          "what it is",
+          "how you use it",
+          "how often you use it",
+          "and explain why it is useful to you"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 3,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p3-tech-01",
+        "question": "Do you think technology has made people's lives easier?"
+      },
+      {
+        "id": "p3-tech-02",
+        "question": "What are the negative effects of too much screen time?"
+      },
+      {
+        "id": "p3-tech-03",
+        "question": "Will technology replace human jobs in the future?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 1,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p1-food-01",
+        "question": "What kind of food do you like?"
+      },
+      {
+        "id": "p1-food-02",
+        "question": "Do you prefer to cook at home or eat out?"
+      },
+      {
+        "id": "p1-food-03",
+        "question": "Has your taste in food changed over the years?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 2,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p2-food-01",
+        "question": "Describe a meal you enjoyed recently. You should say:",
+        "cueCard": [
+          "what you ate",
+          "where you ate it",
+          "who you were with",
+          "and explain why you enjoyed it"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 3,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p3-food-01",
+        "question": "Do you think people are more interested in healthy food now than in the past?"
+      },
+      {
+        "id": "p3-food-02",
+        "question": "Why do you think fast food is so popular?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 1,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p1-edu-01",
+        "question": "Do you enjoy studying? Why or why not?"
+      },
+      {
+        "id": "p1-edu-02",
+        "question": "What subject did you like most at school?"
+      },
+      {
+        "id": "p1-edu-03",
+        "question": "Do you prefer studying alone or with others?"
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 2,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p2-edu-01",
+        "question": "Describe a teacher who has influenced you. You should say:",
+        "cueCard": [
+          "who the teacher is",
+          "what subject they taught",
+          "what they were like",
+          "and explain how they influenced you"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2024,
+    "part": 3,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p3-edu-01",
+        "question": "Do you think online education will replace traditional classrooms?"
+      },
+      {
+        "id": "p3-edu-02",
+        "question": "What makes a good teacher?"
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 1,
+    "topic": "Sports",
+    "questions": [
+      {
+        "id": "p1-sports-01",
+        "question": "Do you like sports? Which ones?"
+      },
+      {
+        "id": "p1-sports-02",
+        "question": "Did you play any sports as a child?"
+      },
+      {
+        "id": "p1-sports-03",
+        "question": "Would you like to try a new sport?"
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 2,
+    "topic": "Sports",
+    "questions": [
+      {
+        "id": "p2-sports-01",
+        "question": "Describe a sporting event you watched or took part in. You should say:",
+        "cueCard": [
+          "what the event was",
+          "when and where it happened",
+          "who was with you",
+          "and explain how you felt about it"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 3,
+    "topic": "Sports",
+    "questions": [
+      {
+        "id": "p3-sports-01",
+        "question": "Why do you think some people become professional athletes?"
+      },
+      {
+        "id": "p3-sports-02",
+        "question": "Should children be encouraged to take part in competitive sports?"
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 1,
+    "topic": "Travel",
+    "questions": [
+      {
+        "id": "p1-travel-01",
+        "question": "Do you like to travel?"
+      },
+      {
+        "id": "p1-travel-02",
+        "question": "Where was the last place you travelled to?"
+      },
+      {
+        "id": "p1-travel-03",
+        "question": "Do you prefer travelling alone or with others?"
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 2,
+    "topic": "Travel",
+    "questions": [
+      {
+        "id": "p2-travel-01",
+        "question": "Describe a trip you took that you remember well. You should say:",
+        "cueCard": [
+          "where you went",
+          "who you went with",
+          "what you did",
+          "and explain why you remember it so well"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "part": 3,
+    "topic": "Travel",
+    "questions": [
+      {
+        "id": "p3-travel-01",
+        "question": "Do you think travelling abroad is important for young people?"
+      },
+      {
+        "id": "p3-travel-02",
+        "question": "What are the benefits and drawbacks of the tourism industry?"
+      }
+    ]
+  }
+]
