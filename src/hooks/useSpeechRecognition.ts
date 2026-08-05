@@ -19,6 +19,7 @@ interface SpeechRecognitionApi {
   supported: boolean;
   error: string | null;
   unsupportedReason: "insecure-context" | "not-supported" | null;
+  micPermission: "prompt" | "granted" | "denied" | "unknown";
   start: () => void;
   pause: () => void;
   resume: () => void;
@@ -33,10 +34,6 @@ interface SpeechRecognitionApi {
  */
 export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
   const [state, setState] = useState<SpeechState>("idle");
-  const stateRef = useRef<SpeechState>("idle");
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const supportedRef = useRef<boolean>(false);
@@ -50,6 +47,10 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
   const [unsupportedReason, setUnsupportedReason] = useState<
     "insecure-context" | "not-supported" | null
   >(null);
+  // 麦克风权限状态（仅探测，不申请）
+  const [micPermission, setMicPermission] = useState<
+    "prompt" | "granted" | "denied" | "unknown"
+  >("unknown");
 
   // 检测浏览器支持
   useEffect(() => {
@@ -68,6 +69,18 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
       setUnsupportedReason(isSecure ? "not-supported" : "insecure-context");
     } else {
       setUnsupportedReason(null);
+
+      // 探测麦克风权限状态（不触发申请弹窗）
+      if (navigator.permissions?.query) {
+        navigator.permissions
+          .query({ name: "microphone" as PermissionName })
+          .then((status) => {
+            setMicPermission(status.state as "prompt" | "granted" | "denied");
+            status.onchange = () =>
+              setMicPermission(status.state as "prompt" | "granted" | "denied");
+          })
+          .catch(() => setMicPermission("unknown"));
+      }
     }
   }, []);
 
@@ -162,17 +175,15 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     listeningRef.current = true;
     pausedRef.current = false;
 
-    // 若上一次实例失败（如权限被拒后重建），重新创建以重新触发权限请求
-    if (!recognitionRef.current) {
-      recognitionRef.current = createRecognition();
-    } else if (stateRef.current === "error" || stateRef.current === "unsupported") {
-      try {
-        recognitionRef.current.stop();
-      } catch {
-        /* ignore */
-      }
-      recognitionRef.current = createRecognition();
+    // 每次 start 都重建实例：彻底规避"上次权限被拒后实例状态卡住"的问题。
+    // 浏览器是否重新弹权限窗由它自己的缓存决定（拒绝过的站点不会重弹），
+    // 但我们至少确保每次调用都是干净的全新实例。
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      /* ignore */
     }
+    recognitionRef.current = createRecognition();
     try {
       recognitionRef.current?.start();
       setState("listening");
@@ -236,6 +247,7 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     supported,
     error,
     unsupportedReason,
+    micPermission,
     start,
     pause,
     resume,

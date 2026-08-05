@@ -122,6 +122,8 @@ const zh: Dict = {
   "practice.micUnsupported": "您的浏览器不支持语音识别，请使用 Chrome 或 Edge",
   "practice.micInsecure": "语音识别需要 HTTPS 安全连接。当前通过 http:// 访问，浏览器禁用了语音识别。请用 https:// 访问（或部署后使用）。",
   "practice.micPermission": "无法访问麦克风，请检查浏览器权限设置",
+  "practice.micDenied": "麦克风权限已被拒绝。浏览器不会再次弹窗。请在浏览器地址栏左侧的🔒图标（或设置）中，将「麦克风」权限改为「允许」，然后点重试。",
+  "practice.micPrompt": "点击开始后，浏览器会弹出麦克风权限请求，请选择「允许」。",
   "practice.exit": "退出练习",
 
   // ===== 素材本 =====
@@ -285,6 +287,8 @@ const en: Dict = {
   "practice.micUnsupported": "Your browser does not support speech recognition. Use Chrome or Edge.",
   "practice.micInsecure": "Speech recognition requires a secure (HTTPS) connection. Accessing via http:// disables it. Please use an https:// URL (or deploy the site).",
   "practice.micPermission": "Cannot access the microphone. Check your browser permissions.",
+  "practice.micDenied": "Microphone permission is blocked. The browser will not ask again. Click the 🔒 icon next to the address bar (or browser settings), change \"Microphone\" to \"Allow\", then retry.",
+  "practice.micPrompt": "After clicking start, the browser will ask for microphone access. Please choose \"Allow\".",
   "practice.exit": "Exit practice",
 
   "library.title": "My Frameworks",

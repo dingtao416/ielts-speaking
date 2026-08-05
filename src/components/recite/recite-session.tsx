@@ -316,9 +316,15 @@ export function ReciteSession({ question }: { question: Question }) {
               <p className="text-sm text-[var(--filler-color)]">
                 {speech.error}
               </p>
-              <p className="mt-1 text-xs text-secondary-text">
-                {t("practice.micPermission")}
-              </p>
+              {speech.micPermission === "denied" ? (
+                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
+                  {t("practice.micDenied")}
+                </p>
+              ) : (
+                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
+                  {t("practice.micPrompt")}
+                </p>
+              )}
               <button
                 type="button"
                 onClick={handleStart}
