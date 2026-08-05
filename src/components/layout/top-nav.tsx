@@ -34,7 +34,7 @@ export function TopNav() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80 focus-visible:outline-2">
             <Mic className="h-5 w-5 text-foreground" aria-hidden="true" />
             <span className="text-lg font-bold tracking-tight">
               {t("brand.name")}
@@ -45,7 +45,8 @@ export function TopNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted ${linkFor(item.href)}`}
+                aria-current={pathname.startsWith(item.href) ? "page" : undefined}
+                className={`rounded-lg px-3 py-2 text-sm transition-all duration-150 hover:bg-muted active:scale-[0.98] ${linkFor(item.href)}`}
               >
                 {item.label}
               </Link>
@@ -68,8 +69,9 @@ export function TopNav() {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border text-secondary-text transition-colors hover:bg-muted hover:text-foreground"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.98]"
                 title={t("nav.signOut")}
+                aria-label={t("nav.signOut")}
               >
                 <LogOut className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -77,7 +79,7 @@ export function TopNav() {
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="inline-flex min-h-10 items-center rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
             >
               {t("nav.signIn")}
             </Link>

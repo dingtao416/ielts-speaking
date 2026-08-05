@@ -43,7 +43,8 @@ export function SettingsPanel() {
               key={l}
               type="button"
               onClick={() => setLocale(l)}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+              aria-pressed={locale === l}
+              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
                 locale === l
                   ? "bg-foreground text-background"
                   : "border border-border text-secondary-text hover:text-foreground"
@@ -67,7 +68,8 @@ export function SettingsPanel() {
               key={opt.value}
               type="button"
               onClick={() => setAsrLang(opt.value)}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+              aria-pressed={asrLang === opt.value}
+              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
                 asrLang === opt.value
                   ? "bg-foreground text-background"
                   : "border border-border text-secondary-text hover:text-foreground"

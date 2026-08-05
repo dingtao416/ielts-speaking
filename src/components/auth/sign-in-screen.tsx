@@ -435,6 +435,8 @@ export function SignInScreen({
               }
               id="auth-view-panel"
               role="tabpanel"
+              key={view}
+              className="animate-fade-in"
             >
               {verificationEmail ? (
                 <VerificationForm

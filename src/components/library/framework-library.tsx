@@ -7,6 +7,7 @@ import { BookOpen, Download, Pencil, Trash2 } from "lucide-react";
 import type { Framework } from "@/lib/frameworks";
 import { frameworkToMarkdown } from "@/lib/frameworks";
 import { useT } from "@/lib/i18n";
+import { Button } from "@/components/ui/button";
 
 export function FrameworkLibrary() {
   const { t } = useT();
@@ -89,13 +90,12 @@ export function FrameworkLibrary() {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-secondary-text">{error}</p>
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           onClick={() => void load()}
-          className="rounded-xl border border-border px-4 py-2 text-sm hover:bg-muted"
         >
           {t("common.retry")}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -207,20 +207,19 @@ export function FrameworkLibrary() {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      type="button"
+                    <Button
                       onClick={handleSaveEdit}
-                      className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background"
+                      size="sm"
                     >
                       {t("library.save")}
-                    </button>
-                    <button
-                      type="button"
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={() => setEditing(null)}
-                      className="rounded-lg border border-border px-4 py-2 text-sm"
+                      size="sm"
                     >
                       {t("library.cancel")}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
@@ -236,24 +235,27 @@ export function FrameworkLibrary() {
                       <button
                         type="button"
                         onClick={() => setEditing(f)}
-                        className="rounded-lg p-1.5 text-secondary-text transition-colors hover:bg-muted hover:text-foreground"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.95]"
                         title={t("library.edit")}
+                        aria-label={t("library.edit")}
                       >
                         <Pencil className="h-4 w-4" aria-hidden="true" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleExport(f)}
-                        className="rounded-lg p-1.5 text-secondary-text transition-colors hover:bg-muted hover:text-foreground"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.95]"
                         title={t("library.export")}
+                        aria-label={t("library.export")}
                       >
                         <Download className="h-4 w-4" aria-hidden="true" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(f.id)}
-                        className="rounded-lg p-1.5 text-secondary-text transition-colors hover:bg-muted hover:text-[var(--filler-color)]"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-[var(--filler-color)] active:scale-[0.95]"
                         title={t("library.delete")}
+                        aria-label={t("library.delete")}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>

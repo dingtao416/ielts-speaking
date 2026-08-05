@@ -6,6 +6,7 @@ import { Mic, Square } from "lucide-react";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { highlightTokens } from "@/lib/lexicon";
 import { useT } from "@/lib/i18n";
+import { Button } from "@/components/ui/button";
 
 /**
  * 轻量录音答题卡片（诊断/引导用）。
@@ -79,26 +80,24 @@ export function SpeechAnswerCard({
 
       <div className="flex items-center gap-2">
         {speech.state === "idle" || speech.state === "error" ? (
-          <button
-            type="button"
+          <Button
             onClick={handleStart}
-            className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="rounded-full"
           >
             <Mic className="h-4 w-4" aria-hidden="true" />
             {t("practice.start")}
-          </button>
+          </Button>
         ) : (
-          <button
-            type="button"
+          <Button
             onClick={() => {
               speech.stop();
               onResultRef.current(fullTextRef.current);
             }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="rounded-full"
           >
             <Square className="h-4 w-4" aria-hidden="true" />
             {t("practice.stop")}
-          </button>
+          </Button>
         )}
         {fullTextRef.current ? (
           <span className="text-xs text-tertiary-text">

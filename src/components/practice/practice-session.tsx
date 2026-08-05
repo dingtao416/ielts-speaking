@@ -18,6 +18,7 @@ import type { Question } from "@/lib/bank";
 import { getSimilarQuestions } from "@/lib/bank";
 import type { AbilityProfile } from "@/persistence/schema";
 import { FiveTierView, type FiveTierData } from "@/components/practice/five-tier-view";
+import { Button } from "@/components/ui/button";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useStreamText } from "@/hooks/useStreamText";
@@ -45,6 +46,7 @@ export function PracticeSession({ question }: { question: Question }) {
   const [fiveTier, setFiveTier] = useState<FiveTierData | null>(null);
   const [fiveTierLoading, setFiveTierLoading] = useState(false);
   const [fiveTierError, setFiveTierError] = useState<string | null>(null);
+  const [savingFramework, setSavingFramework] = useState(false);
 
   // 显示实时反馈
   useEffect(() => {
@@ -207,6 +209,8 @@ export function PracticeSession({ question }: { question: Question }) {
       | { topic?: string; part?: number; structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; stories?: { title: string; characters: string[]; setting: string; events: string[]; applyToTopics: string[] }[]; intro?: string }
       | null;
     if (!fw) return;
+    if (savingFramework) return; // 防重复点击
+    setSavingFramework(true);
     try {
       const res = await fetch("/api/frameworks", {
         method: "POST",
@@ -228,6 +232,8 @@ export function PracticeSession({ question }: { question: Question }) {
       }
     } catch {
       /* 静默 */
+    } finally {
+      setSavingFramework(false);
     }
   }
 
@@ -475,51 +481,53 @@ export function PracticeSession({ question }: { question: Question }) {
           {/* 控制按钮 */}
           <div className="flex items-center justify-center gap-3">
             {speech.state === "idle" || speech.state === "error" ? (
-              <button
-                type="button"
+              <Button
+                size="lg"
                 onClick={handleStart}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+                className="rounded-full px-8"
               >
                 <Mic className="h-5 w-5" aria-hidden="true" />
                 {t("practice.start")}
-              </button>
+              </Button>
             ) : speech.state === "listening" ? (
               <>
-                <button
-                  type="button"
+                <Button
+                  size="lg"
+                  variant="secondary"
                   onClick={() => speech.pause()}
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-base font-medium transition-colors hover:bg-muted"
+                  className="rounded-full px-6"
                 >
                   <Pause className="h-5 w-5" aria-hidden="true" />
                   {t("practice.pause")}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="lg"
                   onClick={handleStop}
-                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+                  className="rounded-full px-8"
                 >
                   <Square className="h-5 w-5" aria-hidden="true" />
                   {t("practice.stop")}
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <button
-                  type="button"
+                <Button
+                  size="lg"
+                  variant="secondary"
                   onClick={() => speech.resume()}
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-base font-medium transition-colors hover:bg-muted"
+                  className="rounded-full px-6"
                 >
                   <Play className="h-5 w-5" aria-hidden="true" />
                   {t("practice.resume")}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="lg"
                   onClick={handleStop}
-                  className="inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+                  className="rounded-full px-8"
                 >
                   <Square className="h-5 w-5" aria-hidden="true" />
                   {t("practice.stop")}
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -539,41 +547,42 @@ export function PracticeSession({ question }: { question: Question }) {
                   {t("practice.micPrompt")}
                 </p>
               )}
-              <button
-                type="button"
+              <Button
                 onClick={handleStart}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="mt-3"
               >
                 <Mic className="h-4 w-4" aria-hidden="true" />
                 {t("common.retry")}
-              </button>
+              </Button>
             </div>
           ) : null}
 
           {/* 生成报告 */}
           {store.fullText && !timer.running ? (
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 onClick={generateReport}
+                loading={store.reportStatus === "generating"}
                 disabled={store.reportStatus === "generating"}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
               >
                 <FileText className="h-4 w-4" aria-hidden="true" />
                 {store.reportStatus === "generating"
                   ? t("practice.report.generating")
                   : t("practice.generateReport")}
-              </button>
+              </Button>
               {!store.framework && (
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   onClick={extractFramework}
+                  loading={store.frameworkStatus === "extracting"}
                   disabled={store.frameworkStatus === "extracting"}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
                 >
                   <Wand2 className="h-4 w-4" aria-hidden="true" />
-                  {t("practice.frameworkEmpty")}
-                </button>
+                  {store.frameworkStatus === "extracting"
+                    ? "正在提取…"
+                    : t("practice.frameworkEmpty")}
+                </Button>
               )}
             </div>
           ) : null}
@@ -625,14 +634,14 @@ export function PracticeSession({ question }: { question: Question }) {
                     已保存到素材本 ✓
                   </p>
                 ) : (
-                  <button
-                    type="button"
+                  <Button
                     onClick={saveFramework}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                    loading={savingFramework}
+                    disabled={savingFramework}
                   >
                     <Save className="h-4 w-4" aria-hidden="true" />
-                    {t("practice.saveFramework")}
-                  </button>
+                    {savingFramework ? "保存中…" : t("practice.saveFramework")}
+                  </Button>
                 )}
               </div>
             ) : (

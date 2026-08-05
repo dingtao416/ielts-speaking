@@ -8,6 +8,7 @@ import type { Question } from "@/lib/bank";
 import { BAND_OPTIONS, DIMENSION_LABELS } from "@/lib/profile";
 import type { AbilityProfile } from "@/persistence/schema";
 import { SpeechAnswerCard } from "@/components/practice/speech-answer-card";
+import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n";
 
 type Step = "target" | "answer" | "result";
@@ -85,7 +86,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
   // ===== 步骤 1：设目标分 =====
   if (step === "target") {
     return (
-      <div className="mx-auto flex max-w-xl flex-col gap-8 py-8">
+      <div className="animate-fade-in mx-auto flex max-w-xl flex-col gap-8 py-8">
         <div className="flex flex-col gap-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background">
             <Mic className="h-6 w-6" aria-hidden="true" />
@@ -104,7 +105,8 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
                 key={b}
                 type="button"
                 onClick={() => setTargetBand(b)}
-                className={`rounded-xl px-4 py-3 text-lg font-bold transition-colors ${
+                aria-pressed={targetBand === b}
+                className={`rounded-xl px-4 py-3 text-lg font-bold transition-all duration-150 active:scale-[0.98] ${
                   targetBand === b
                     ? "bg-foreground text-background"
                     : "border border-border text-secondary-text hover:border-foreground hover:text-foreground"
@@ -140,22 +142,22 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
     );
 
     return (
-      <div className="mx-auto flex max-w-xl flex-col gap-6 py-8">
+      <div className="animate-fade-in mx-auto flex max-w-xl flex-col gap-6 py-8">
         {/* 进度 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-secondary-text">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() =>
                 currentIdx > 0
                   ? setCurrentIdx((i) => i - 1)
                   : setStep("target")
               }
-              className="inline-flex items-center gap-1 hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               {t("common.back")}
-            </button>
+            </Button>
           </div>
           <span className="text-sm text-secondary-text">
             {currentIdx + 1} / {questions.length}
@@ -241,7 +243,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
   if (step === "result" && profile) {
     const dims = profile.dimensions;
     return (
-      <div className="mx-auto flex max-w-xl flex-col gap-6 py-8">
+      <div className="animate-fade-in mx-auto flex max-w-xl flex-col gap-6 py-8">
         <div className="flex flex-col gap-2 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background">
             <Sparkles className="h-6 w-6" aria-hidden="true" />

@@ -75,7 +75,8 @@ export function BankBrowser({
         <button
           type="button"
           onClick={() => switchCategory("real")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+          aria-pressed={category === "real"}
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
             category === "real"
               ? "bg-background text-foreground shadow-sm"
               : "text-secondary-text hover:text-foreground"
@@ -86,7 +87,8 @@ export function BankBrowser({
         <button
           type="button"
           onClick={() => switchCategory("predicted")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+          aria-pressed={category === "predicted"}
+          className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
             category === "predicted"
               ? "bg-background text-foreground shadow-sm"
               : "text-secondary-text hover:text-foreground"
@@ -156,17 +158,17 @@ export function BankBrowser({
         </div>
 
         {year === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border px-5 py-8 text-center">
+          <div className="animate-fade-in rounded-2xl border border-dashed border-border px-5 py-8 text-center">
             <p className="text-sm text-tertiary-text">
               {t("bank.tier.selectYearFirst")}
             </p>
           </div>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div key={year} className="animate-fade-in flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setTopic("")}
-              className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
                 topic === ""
                   ? "bg-foreground text-background"
                   : "border border-border text-secondary-text hover:border-foreground hover:text-foreground"
@@ -179,7 +181,7 @@ export function BankBrowser({
                 key={tp}
                 type="button"
                 onClick={() => setTopic(tp === topic ? "" : tp)}
-                className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
                   topic === tp
                     ? "bg-foreground text-background"
                     : "border border-border text-secondary-text hover:border-foreground hover:text-foreground"
@@ -202,7 +204,7 @@ export function BankBrowser({
             <button
               type="button"
               onClick={() => setPart(0)}
-              className={`rounded-lg px-3 py-1 text-sm ${
+              className={`rounded-lg px-3 py-1 text-sm transition-all duration-150 active:scale-[0.98] ${
                 part === 0
                   ? "bg-foreground text-background"
                   : "text-secondary-text hover:text-foreground"
@@ -215,7 +217,7 @@ export function BankBrowser({
                 key={p}
                 type="button"
                 onClick={() => setPart(p)}
-                className={`rounded-lg px-3 py-1 text-sm ${
+                className={`rounded-lg px-3 py-1 text-sm transition-all duration-150 active:scale-[0.98] ${
                   part === p
                     ? "bg-foreground text-background"
                     : "text-secondary-text hover:text-foreground"
@@ -241,7 +243,7 @@ export function BankBrowser({
             <p className="text-sm text-secondary-text">{t("bank.empty")}</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div key={`${year}-${topic}-${part}`} className="animate-fade-in flex flex-col gap-3">
             {questions.map((q) => (
               <div
                 key={q.id}

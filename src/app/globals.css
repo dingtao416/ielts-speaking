@@ -48,6 +48,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ===== 全局交互反馈 ===== */
+/* 键盘焦点（一次修复全站） */
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 按下反馈（所有按钮/链接） */
+button:active:not(:disabled),
+a:active {
+  transform: scale(0.98);
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* 键盘导航的非交互元素避免焦点环 */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 1px;
+}
+
+
 /* 训练字幕问题词高亮 */
 .hl-filler {
   color: var(--filler-color);
@@ -77,28 +103,18 @@ body {
   color: #16a34a;
 }
 
-/* 登录抽屉动画 */
-@keyframes drawer-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
+/* 切换内容淡入动画 */
 @keyframes fade-in {
   from {
     opacity: 0;
+    transform: translateY(2px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-drawer-in {
-  animation: drawer-in 0.25s ease-out;
-}
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
 }

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 export interface FiveTierData {
   original: string;
   structured: string;
@@ -69,15 +71,15 @@ export function FiveTierView({
           <p className="text-sm text-secondary-text">
             根据你的当前水平，生成从原文到目标分的升级回答
           </p>
-          <button
-            type="button"
+          <Button
             onClick={onGenerate}
+            loading={loading}
             disabled={loading}
-            className="inline-flex w-fit items-center gap-1.5 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="w-fit"
           >
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {loading ? "生成中…" : "生成目标级回答"}
-          </button>
+          </Button>
           {error ? (
             <p className="text-sm text-[var(--filler-color)]">{error}</p>
           ) : null}
@@ -118,7 +120,7 @@ export function FiveTierView({
               <button
                 type="button"
                 onClick={() => toggle(tier.key)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left"
+                className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150 hover:bg-muted/60 active:scale-[0.99]"
               >
                 <div className="flex items-center gap-2">
                   <span className={`text-sm font-semibold ${tier.color}`}>
@@ -129,15 +131,17 @@ export function FiveTierView({
                   </span>
                 </div>
                 {isOpen ? (
-                  <ChevronUp className="h-4 w-4 text-secondary-text" aria-hidden="true" />
+                  <ChevronUp className="h-4 w-4 text-secondary-text transition-transform" aria-hidden="true" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-secondary-text" aria-hidden="true" />
+                  <ChevronDown className="h-4 w-4 text-secondary-text transition-transform" aria-hidden="true" />
                 )}
               </button>
               {isOpen && content ? (
-                <p className="whitespace-pre-wrap px-4 pb-4 text-sm leading-relaxed text-foreground">
-                  {content}
-                </p>
+                <div className="animate-fade-in px-4 pb-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                    {content}
+                  </p>
+                </div>
               ) : null}
             </div>
           );

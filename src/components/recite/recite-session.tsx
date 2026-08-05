@@ -12,6 +12,7 @@ import type { Framework } from "@/lib/frameworks";
 import { usePracticeStore } from "@/store/sessionStore";
 import { useT } from "@/lib/i18n";
 import { useSettingsStore } from "@/store/settingsStore";
+import { Button } from "@/components/ui/button";
 
 export function ReciteSession({ question }: { question: Question }) {
   const { t } = useT();
@@ -172,8 +173,14 @@ export function ReciteSession({ question }: { question: Question }) {
               <button
                 type="button"
                 onClick={() => setShowCues((v) => !v)}
-                className="rounded-lg p-1.5 text-secondary-text transition-colors hover:bg-muted hover:text-foreground"
+                aria-pressed={showCues}
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-150 active:scale-[0.95] ${
+                  showCues
+                    ? "bg-muted text-foreground"
+                    : "text-secondary-text hover:bg-muted hover:text-foreground"
+                }`}
                 title={showCues ? t("recite.hide") : t("recite.reveal")}
+                aria-label={showCues ? t("recite.hide") : t("recite.reveal")}
               >
                 {showCues ? (
                   <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -235,15 +242,15 @@ export function ReciteSession({ question }: { question: Question }) {
 
           {/* 范文对比 */}
           <div className="flex flex-col gap-3 rounded-2xl border border-border p-5">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={generateModelAnswer}
+              loading={generatingAnswer}
               disabled={generatingAnswer}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
             >
               <Wand2 className="h-4 w-4" aria-hidden="true" />
               {generatingAnswer ? t("common.loading") : t("recite.compare")}
-            </button>
+            </Button>
             {modelAnswer ? (
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-secondary-text">
                 {modelAnswer}
@@ -290,23 +297,23 @@ export function ReciteSession({ question }: { question: Question }) {
 
           <div className="flex items-center justify-center gap-3">
             {speech.state === "idle" || speech.state === "error" ? (
-              <button
-                type="button"
+              <Button
+                size="lg"
                 onClick={handleStart}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+                className="rounded-full px-8"
               >
                 <Mic className="h-5 w-5" aria-hidden="true" />
                 {t("practice.start")}
-              </button>
+              </Button>
             ) : (
-              <button
-                type="button"
+              <Button
+                size="lg"
                 onClick={handleStop}
-                className="inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+                className="rounded-full px-8"
               >
                 <Square className="h-5 w-5" aria-hidden="true" />
                 {t("practice.stop")}
-              </button>
+              </Button>
             )}
           </div>
 
@@ -325,14 +332,13 @@ export function ReciteSession({ question }: { question: Question }) {
                   {t("practice.micPrompt")}
                 </p>
               )}
-              <button
-                type="button"
+              <Button
                 onClick={handleStart}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="mt-3"
               >
                 <Mic className="h-4 w-4" aria-hidden="true" />
                 {t("common.retry")}
-              </button>
+              </Button>
             </div>
           ) : null}
 
