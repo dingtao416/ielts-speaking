@@ -18,6 +18,7 @@ interface SpeechRecognitionApi {
   state: SpeechState;
   supported: boolean;
   error: string | null;
+  unsupportedReason: "insecure-context" | "not-supported" | null;
   start: () => void;
   pause: () => void;
   resume: () => void;
@@ -42,6 +43,9 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     () => {},
   );
   const [supported, setSupported] = useState(false);
+  const [unsupportedReason, setUnsupportedReason] = useState<
+    "insecure-context" | "not-supported" | null
+  >(null);
 
   // 检测浏览器支持
   useEffect(() => {
@@ -50,6 +54,17 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
       (window.SpeechRecognition || window.webkitSpeechRecognition);
     supportedRef.current = Boolean(Recognition);
     setSupported(Boolean(Recognition));
+
+    // 区分：非安全上下文（HTTP 非 localhost）vs 浏览器真不支持
+    if (!Recognition) {
+      const isSecure =
+        typeof window !== "undefined" &&
+        (window.isSecureContext || location.protocol === "https:" ||
+          location.hostname === "localhost" || location.hostname === "127.0.0.1");
+      setUnsupportedReason(isSecure ? "not-supported" : "insecure-context");
+    } else {
+      setUnsupportedReason(null);
+    }
   }, []);
 
   // 更新 lang
@@ -208,6 +223,7 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     state,
     supported,
     error,
+    unsupportedReason,
     start,
     pause,
     resume,

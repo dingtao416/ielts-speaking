@@ -257,7 +257,9 @@ export function ReciteSession({ question }: { question: Question }) {
           <div className="min-h-[280px] rounded-2xl border border-border p-5">
             {!speech.supported ? (
               <p className="text-center text-sm text-secondary-text">
-                {t("practice.micUnsupported")}
+                {speech.unsupportedReason === "insecure-context"
+                  ? t("practice.micInsecure")
+                  : t("practice.micUnsupported")}
               </p>
             ) : store.fullText || store.interimText ? (
               <div className="space-y-3">

@@ -373,9 +373,13 @@ export function PracticeSession({ question }: { question: Question }) {
         <div className="flex flex-col gap-4">
           <div className="min-h-[260px] rounded-2xl border border-border p-5">
             {!speech.supported ? (
-              <p className="text-center text-sm text-secondary-text">
-                {t("practice.micUnsupported")}
-              </p>
+              <div className="flex flex-col items-center justify-center gap-3 text-center">
+                <p className="text-sm text-secondary-text">
+                  {speech.unsupportedReason === "insecure-context"
+                    ? t("practice.micInsecure")
+                    : t("practice.micUnsupported")}
+                </p>
+              </div>
             ) : store.fullText || store.interimText ? (
               <div className="space-y-3">
                 {store.sentences.map((s, i) => (

@@ -120,6 +120,7 @@ const zh: Dict = {
   "practice.report.failed": "报告生成失败，请稍后重试",
   "practice.report.close": "关闭",
   "practice.micUnsupported": "您的浏览器不支持语音识别，请使用 Chrome 或 Edge",
+  "practice.micInsecure": "语音识别需要 HTTPS 安全连接。当前通过 http:// 访问，浏览器禁用了语音识别。请用 https:// 访问（或部署后使用）。",
   "practice.micPermission": "无法访问麦克风，请检查浏览器权限设置",
   "practice.exit": "退出练习",
 
@@ -282,6 +283,7 @@ const en: Dict = {
   "practice.report.failed": "Failed to generate report. Try again.",
   "practice.report.close": "Close",
   "practice.micUnsupported": "Your browser does not support speech recognition. Use Chrome or Edge.",
+  "practice.micInsecure": "Speech recognition requires a secure (HTTPS) connection. Accessing via http:// disables it. Please use an https:// URL (or deploy the site).",
   "practice.micPermission": "Cannot access the microphone. Check your browser permissions.",
   "practice.exit": "Exit practice",
 
