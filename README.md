@@ -77,8 +77,21 @@ npm run db:migrate    # 应用迁移建表
 
 ```bash
 npm run dev
-# 打开 http://localhost:3000
+# 打开 https://localhost:3000   （HTTPS，语音识别可用）
+# 若不需要 HTTPS：npm run dev:http  →  http://localhost:3000
 ```
+
+> **本地 HTTPS（mkcert）**：Web Speech API 需要安全上下文（HTTPS 或 localhost）。
+> 手机通过局域网 IP 访问时，HTTP 下语音识别不可用，必须 HTTPS。
+> 首次需生成证书：
+> ```bash
+> ./tools/mkcert -install                                   # 装本地根 CA（信任）
+> ./tools/mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem \
+>   localhost 127.0.0.1 <你的局域网IP> ::1
+> cat certs/localhost.pem <mkcert根CA路径> > certs/localhost-chain.pem
+> ```
+> mkcert 根 CA 在 Windows：`%LOCALAPPDATA%\mkcert\rootCA.pem`；macOS：`~/Library/Application Support/mkcert`。
+> 手机访问 `https://<电脑IP>:3000` 需先信任该根 CA（把 rootCA.pem 发到手机并安装）。
 
 ### 测试账号（免注册直接登录）
 
