@@ -33,6 +33,10 @@ interface SpeechRecognitionApi {
  */
 export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
   const [state, setState] = useState<SpeechState>("idle");
+  const stateRef = useRef<SpeechState>("idle");
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const supportedRef = useRef<boolean>(false);
@@ -158,7 +162,15 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     listeningRef.current = true;
     pausedRef.current = false;
 
+    // 若上一次实例失败（如权限被拒后重建），重新创建以重新触发权限请求
     if (!recognitionRef.current) {
+      recognitionRef.current = createRecognition();
+    } else if (stateRef.current === "error" || stateRef.current === "unsupported") {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        /* ignore */
+      }
       recognitionRef.current = createRecognition();
     }
     try {

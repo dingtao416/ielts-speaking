@@ -310,6 +310,26 @@ export function ReciteSession({ question }: { question: Question }) {
             )}
           </div>
 
+          {/* 麦克风权限错误提示 + 重试 */}
+          {speech.error && speech.state === "error" ? (
+            <div className="mx-auto max-w-md rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 px-4 py-3 text-center">
+              <p className="text-sm text-[var(--filler-color)]">
+                {speech.error}
+              </p>
+              <p className="mt-1 text-xs text-secondary-text">
+                {t("practice.micPermission")}
+              </p>
+              <button
+                type="button"
+                onClick={handleStart}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              >
+                <Mic className="h-4 w-4" aria-hidden="true" />
+                {t("common.retry")}
+              </button>
+            </div>
+          ) : null}
+
           {/* 统计 */}
           <div className="grid grid-cols-4 gap-2">
             {[
