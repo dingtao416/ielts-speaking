@@ -16,7 +16,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       locale: "zh",
-      asrLang: "en-US",
+      asrLang: "zh-CN",
       setLocale: (locale) => set({ locale }),
       setAsrLang: (asrLang) => set({ asrLang }),
     }),

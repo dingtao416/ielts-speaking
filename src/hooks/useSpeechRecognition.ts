@@ -84,7 +84,7 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
     }
   }, []);
 
-  // 更新 lang
+  // 更新 lang（createRecognition 定义之后有对应重启逻辑）
   useEffect(() => {
     langRef.current = lang;
   }, [lang]);
@@ -162,6 +162,27 @@ export function useSpeechRecognition(lang = "en-US"): SpeechRecognitionApi {
 
     return recognition;
   }, []);
+
+  // 语言改变且正在录音时，用新语言重建实例并重启
+  useEffect(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+    if (recognition.lang === lang) return;
+    if (!listeningRef.current) return;
+    try {
+      recognition.stop();
+    } catch {
+      /* ignore */
+    }
+    recognitionRef.current = createRecognition();
+    recognitionRef.current.lang = lang;
+    try {
+      recognitionRef.current.start();
+      setState("listening");
+    } catch {
+      /* ignore */
+    }
+  }, [lang, createRecognition]);
 
   const start = useCallback(() => {
     const Recognition =
