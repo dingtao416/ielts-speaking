@@ -67,6 +67,8 @@ const zh: Dict = {
   "auth.otp.notice": "如果该邮箱有账户，六位验证码已发送",
   "auth.otp.notice2": "六位验证码已发送至你的邮箱",
   "auth.welcome": "欢迎使用雅思口语训练系统",
+  "auth.terms": "注册即表示同意我们的使用条款与隐私政策",
+  "auth.backHome": "返回首页",
 
   // ===== 题库 =====
   "bank.title": "雅思口语题库",
@@ -229,6 +231,8 @@ const en: Dict = {
   "auth.otp.notice": "If this email belongs to an account, a six-digit code is on its way.",
   "auth.otp.notice2": "A six-digit verification code is on its way.",
   "auth.welcome": "Welcome to IELTS Speaking Trainer",
+  "auth.terms": "By signing up you agree to our Terms of Service and Privacy Policy",
+  "auth.backHome": "Back to home",
 
   "bank.title": "IELTS Speaking Question Bank",
   "bank.subtitle": "Pick a question to start practicing",

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Mic } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { authClient } from "@/auth-client";
@@ -376,42 +376,31 @@ export function SignInScreen({
   }
 
   return (
-    <div className="auth-drawer-panel">
-      <div className="auth-drawer-heading">
-        <div>
-          <span className="mode-label">
-            <i aria-hidden="true" /> IELTS Speaking Trainer
+    <div className="w-full">
+      <header className="mb-8">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background">
+            <Mic className="h-5 w-5" aria-hidden="true" />
           </span>
-          <p>{t("brand.full")}</p>
+          <span className="text-lg font-bold tracking-tight">
+            {t("brand.name")}
+          </span>
         </div>
-        <Link
-          aria-label={t("common.close")}
-          className="auth-drawer-close"
-          href="/"
-        >
-          <span aria-hidden="true">×</span>
-        </Link>
-      </div>
+        <h2 id="account-access-title" className="text-2xl font-bold tracking-tight">
+          {view === "sign-in" ? t("auth.signIn.title") : t("auth.signUp.title")}
+        </h2>
+        <p className="mt-1 text-sm text-secondary-text">
+          {view === "sign-in" ? t("brand.tagline") : t("auth.create.subtitle")}
+        </p>
+      </header>
 
-      <section className="signin-shell">
-        <div className="signin-panel">
-          <header className="signin-intro">
-            <h2 id="account-access-title">
-              {view === "sign-in" ? t("auth.signIn.title") : t("auth.signUp.title")}
-            </h2>
-            <p>
-              {view === "sign-in"
-                ? t("auth.signIn.title")
-                : t("auth.create.subtitle")}
-            </p>
-          </header>
-          <section className="signin-auth" aria-label="Account access">
-            <div
-              aria-label="Account action"
-              className="auth-view-tabs"
-              data-active-view={view}
-              role="tablist"
-            >
+      <section className="w-full" aria-label="Account access">
+        <div
+          aria-label="Account action"
+          className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-border bg-muted p-1"
+          data-active-view={view}
+          role="tablist"
+        >
               <button
                 aria-controls="auth-view-panel"
                 aria-selected={view === "sign-in"}
@@ -705,8 +694,6 @@ export function SignInScreen({
               </div>
             </div>
           </section>
-        </div>
-      </section>
     </div>
   );
 }

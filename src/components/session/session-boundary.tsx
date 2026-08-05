@@ -27,9 +27,7 @@ export function SessionBoundary({
     }
 
     const returnTo = `${pathname}${query ? `?${query}` : ""}`;
-    router.replace(
-      `/?auth=signin&returnTo=${encodeURIComponent(returnTo)}`,
-    );
+    router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
   }, [authenticated, pathname, pending, query, router]);
 
   if (authenticated) {

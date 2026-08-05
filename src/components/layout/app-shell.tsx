@@ -1,6 +1,5 @@
-import { Suspense, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { AuthDrawer } from "@/components/auth/auth-drawer";
 import { TopNav } from "@/components/layout/top-nav";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -16,10 +15,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span>基于历年真题 · 提炼框架 · 预测背诵</span>
         </div>
       </footer>
-      {/* useSearchParams 需要 Suspense 边界 */}
-      <Suspense fallback={null}>
-        <AuthDrawer />
-      </Suspense>
     </>
   );
 }
