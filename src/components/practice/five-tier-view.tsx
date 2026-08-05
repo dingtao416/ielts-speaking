@@ -48,10 +48,12 @@ const TIERS = [
 export function FiveTierView({
   data,
   loading,
+  error,
   onGenerate,
 }: {
   data: FiveTierData | null;
   loading: boolean;
+  error?: string | null;
   onGenerate: () => void;
 }) {
   const [expanded, setExpanded] = useState<string | null>("target");
@@ -76,6 +78,9 @@ export function FiveTierView({
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {loading ? "生成中…" : "生成目标级回答"}
           </button>
+          {error ? (
+            <p className="text-sm text-[var(--filler-color)]">{error}</p>
+          ) : null}
         </div>
       </div>
     );

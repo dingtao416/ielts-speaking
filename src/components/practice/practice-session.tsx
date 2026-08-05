@@ -44,6 +44,7 @@ export function PracticeSession({ question }: { question: Question }) {
   const [assessment, setAssessment] = useState<AbilityProfile | null>(null);
   const [fiveTier, setFiveTier] = useState<FiveTierData | null>(null);
   const [fiveTierLoading, setFiveTierLoading] = useState(false);
+  const [fiveTierError, setFiveTierError] = useState<string | null>(null);
 
   // 显示实时反馈
   useEffect(() => {
@@ -274,7 +275,12 @@ export function PracticeSession({ question }: { question: Question }) {
   }
 
   async function generateFiveTier() {
-    if (!store.fullText) return;
+    if (!store.fullText) {
+      // 没有录音内容时给用户反馈
+      setFiveTierError("请先录制并说一段回答，再生成目标级回答");
+      return;
+    }
+    setFiveTierError(null);
     setFiveTierLoading(true);
     try {
       const res = await fetch("/api/five-tier", {
@@ -298,7 +304,7 @@ export function PracticeSession({ question }: { question: Question }) {
         currentBand: data.currentBand,
       });
     } catch {
-      // 静默
+      setFiveTierError("生成失败，请稍后重试");
     } finally {
       setFiveTierLoading(false);
     }
@@ -722,6 +728,7 @@ export function PracticeSession({ question }: { question: Question }) {
           <FiveTierView
             data={fiveTier}
             loading={fiveTierLoading}
+            error={fiveTierError}
             onGenerate={generateFiveTier}
           />
         </div>
