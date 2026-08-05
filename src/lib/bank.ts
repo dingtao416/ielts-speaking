@@ -91,6 +91,15 @@ export function getTopics(category: "real" | "predicted"): string[] {
   return getBankIndex()[category].topics;
 }
 
+/** 按年份返回该年份下的话题列表（用于层级筛选：先选年份 → 再选话题） */
+export function getTopicsByYear(
+  category: "real" | "predicted",
+  year: number,
+): string[] {
+  const questions = getQuestions(category, { year });
+  return [...new Set(questions.map((q) => q.topic))].sort();
+}
+
 export function getYears(category: "real" | "predicted"): number[] {
   return getBankIndex()[category].years;
 }

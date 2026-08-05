@@ -12,8 +12,6 @@ export default function BankPage() {
   const index = getBankIndex();
   const realYears = index.real.years;
   const predictedYears = index.predicted.years;
-  const realTopics = index.real.topics;
-  const predictedTopics = index.predicted.topics;
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,12 +22,7 @@ export default function BankPage() {
         </p>
       </div>
 
-      <BankBrowser
-        realYears={realYears}
-        predictedYears={predictedYears}
-        realTopics={realTopics}
-        predictedTopics={predictedTopics}
-      />
+      <BankBrowser realYears={realYears} predictedYears={predictedYears} />
     </div>
   );
 }
