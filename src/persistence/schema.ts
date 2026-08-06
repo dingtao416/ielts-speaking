@@ -197,6 +197,7 @@ export interface TextStats {
   hedges: number;
   vagueWords: number;
   chinglish: number;
+  grammar: number;
   density: number;
   duration: number;
 }

@@ -47,19 +47,9 @@ export function PracticeSession({ question }: { question: Question }) {
   const [fiveTierLoading, setFiveTierLoading] = useState(false);
   const [fiveTierError, setFiveTierError] = useState<string | null>(null);
   const [savingFramework, setSavingFramework] = useState(false);
+  const latestFullTextRef = useRef("");
 
-  // 显示实时反馈
-  useEffect(() => {
-    speech.setOnResult((result) => {
-      if (result.isFinal) {
-        store.appendFinal(result.text);
-      } else {
-        store.setInterim(result.text);
-      }
-    });
-  }, [speech, store]);
-
-  // 每 ~10 秒做一次实时词级分析 + AI 教练
+  // 每 ~10 秒做一次兜底分析（词级 + AI 教练限流）
   const runFeedback = useCallback(
     async (text: string) => {
       const analysis = analyzeText(text);
@@ -104,6 +94,12 @@ export function PracticeSession({ question }: { question: Question }) {
             id: `c-${Date.now()}-${word}`,
             text: `"${word}" — 中式英语，用 ${info.suggestion ?? "更地道的说法"}`,
             category: "hedge",
+          });
+        } else if (info.cat === "grammar") {
+          store.addCoachTip({
+            id: `g-${Date.now()}-${word}`,
+            text: `"${word}" — ${info.suggestion ?? "语法错误"}`,
+            category: "grammar",
           });
         }
       });
@@ -155,9 +151,24 @@ export function PracticeSession({ question }: { question: Question }) {
     return () => clearInterval(interval);
   }, [timer.running, store.fullText, runFeedback]);
 
+  // 实时纠错：每次有新的 final 结果就立即分析（本地词级+语法，毫秒级）
+  useEffect(() => {
+    speech.setOnResult((result) => {
+      if (result.isFinal) {
+        store.appendFinal(result.text);
+        const newText = `${latestFullTextRef.current} ${result.text}`.trim();
+        latestFullTextRef.current = newText;
+        void runFeedback(newText);
+      } else {
+        store.setInterim(result.text);
+      }
+    });
+  }, [speech, store, runFeedback]);
+
   function handleStart() {
     store.clearCoachTips();
     store.reset();
+    latestFullTextRef.current = "";
     timer.start();
     setSaveSuccess(false);
     speech.start();
@@ -335,6 +346,7 @@ export function PracticeSession({ question }: { question: Question }) {
     { label: t("practice.stat.hedges"), value: stats.hedges, cat: "hedge" },
     { label: t("practice.stat.vague"), value: stats.vagueWords, cat: "vague" },
     { label: t("practice.stat.chinglish"), value: stats.chinglish, cat: "chinglish" },
+    { label: t("practice.stat.grammar"), value: stats.grammar, cat: "grammar" },
     { label: t("practice.stat.density"), value: `${stats.density}%`, cat: null },
   ];
 
@@ -429,7 +441,11 @@ export function PracticeSession({ question }: { question: Question }) {
                     className={`rounded-lg px-3 py-2 text-sm leading-relaxed ${
                       tip.category === "good"
                         ? "bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300"
-                        : "bg-muted text-foreground"
+                        : tip.category === "grammar"
+                          ? "bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300"
+                          : tip.category === "filler"
+                            ? "bg-orange-50 text-orange-800 dark:bg-orange-950 dark:text-orange-300"
+                            : "bg-muted text-foreground"
                     }`}
                   >
                     {tip.text}

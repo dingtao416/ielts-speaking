@@ -99,6 +99,14 @@ select:focus-visible {
   text-decoration-thickness: 1.5px;
   text-underline-offset: 4px;
 }
+.hl-grammar {
+  color: #b91c1c;
+  text-decoration: underline var(--filler-color);
+  text-decoration-style: solid;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  background: rgba(220, 38, 38, 0.08);
+}
 .hl-good {
   color: #16a34a;
 }

@@ -7,7 +7,7 @@ import type { TextStats } from "@/lib/lexicon";
 export interface CoachTip {
   id: string;
   text: string;
-  category: "good" | "filler" | "hedge" | "vague" | "ai";
+  category: "good" | "filler" | "hedge" | "vague" | "grammar" | "ai";
 }
 
 interface PracticeState {
@@ -44,6 +44,7 @@ const emptyStats: TextStats = {
   hedges: 0,
   vagueWords: 0,
   chinglish: 0,
+  grammar: 0,
   density: 100,
   duration: 0,
 };

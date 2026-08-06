@@ -7,6 +7,7 @@ export type HighlightCategory =
   | "hedge"
   | "vague"
   | "chinglish"
+  | "grammar"
   | "good";
 
 export interface TextStats {
@@ -15,6 +16,7 @@ export interface TextStats {
   hedges: number;
   vagueWords: number;
   chinglish: number;
+  grammar: number;
   density: number; // 0-100，有效表达占比
   duration: number; // 秒
 }
@@ -169,6 +171,51 @@ export const GOOD_PATTERNS: RegExp[] = [
   /\b(whereas|while|although|even though)\b/gi,
 ];
 
+// ===== 常见语法错误检测（轻量规则）=====
+// 用于实时层，抓明显的句法/搭配错误；深度语法判断交给报告/评估
+export const GRAMMAR_PATTERNS: { pattern: RegExp; suggestion: string; label: string }[] = [
+  // 主谓不一致
+  { pattern: /\bI\s+(is|are|was)\b/gi, suggestion: "I am / I was", label: "主谓不一致" },
+  { pattern: /\b(he|she|it)\s+don't\b/gi, suggestion: "doesn't", label: "主谓不一致" },
+  { pattern: /\b(he|she|it)\s+have\b/gi, suggestion: "has", label: "主谓不一致" },
+  { pattern: /\b(we|they|you)\s+has\b/gi, suggestion: "have", label: "主谓不一致" },
+  // 时态错误
+  { pattern: /\bI\s+am\s+agree\b/gi, suggestion: "I agree", label: "时态/搭配" },
+  { pattern: /\bI\s+am\s+like\b/gi, suggestion: "I like", label: "搭配错误" },
+  { pattern: /\byesterday\s+(I\s+|we\s+)?(go|see|do|have|eat|buy|come|take|make)\b/gi, suggestion: "过去式 (went/saw/did/had/ate/bought/came/took/made)", label: "时态错误" },
+  { pattern: /\blast\s+(week|year|month|night)\s+(I\s+|we\s+)?(go|see|do|have|eat|buy|come|take|make)\b/gi, suggestion: "过去式", label: "时态错误" },
+  // 双比较/重复
+  { pattern: /\bmore\s+better\b/gi, suggestion: "better", label: "比较级重复" },
+  { pattern: /\bmore\s+(easy|good|big|happy)\b/gi, suggestion: "easier/better/bigger/happier", label: "比较级用法" },
+  { pattern: /\bvery\s+very\b/gi, suggestion: "very", label: "程度词重复" },
+  // 常见错误搭配
+  { pattern: /\bmuch\s+people\b/gi, suggestion: "many people", label: "可数/不可数" },
+  { pattern: /\bpeople\s+is\b/gi, suggestion: "people are", label: "主谓不一致" },
+  { pattern: /\bequipment\s+are\b/gi, suggestion: "equipment is", label: "不可数名词" },
+  { pattern: /\binformations?\b/gi, suggestion: "information (不可数)", label: "不可数名词" },
+  { pattern: /\badvices?\b/gi, suggestion: "advice (不可数)", label: "不可数名词" },
+  { pattern: /\benjoy\s+to\s+(play|go|do|eat|read|watch|swim)\b/gi, suggestion: "enjoy + -ing", label: "动词搭配" },
+  { pattern: /\bmake\s+me\s+to\s+do\b/gi, suggestion: "make me do (不加 to)", label: "使役动词" },
+  { pattern: /\bI\s+very\s+(like|want|enjoy|love)\b/gi, suggestion: "I really like", label: "程度副词位置" },
+  { pattern: /\bbecause\s+so\b/gi, suggestion: "because / so（二选一）", label: "连词重复" },
+  { pattern: /\balthough\s+but\b/gi, suggestion: "although / but（二选一）", label: "连词重复" },
+];
+
+/** 检测常见语法错误（实时层，返回错误片段 + 建议） */
+export function collectGrammarIssues(
+  text: string,
+): { word: string; suggestion: string; label: string }[] {
+  const issues: { word: string; suggestion: string; label: string }[] = [];
+  const lower = text.toLowerCase();
+  for (const item of GRAMMAR_PATTERNS) {
+    let m: RegExpExecArray | null;
+    while ((m = item.pattern.exec(lower)) !== null) {
+      issues.push({ word: m[0], suggestion: item.suggestion, label: item.label });
+    }
+  }
+  return issues;
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -225,10 +272,13 @@ export function analyzeText(text: string): TextStats | null {
     }
   }
 
+  const grammarMatches = collectGrammarIssues(text);
+
   const fillerCount = fillers.length;
   const hedgeCount = hedges.length;
   const vagueCount = vagueWords.length;
   const chinglishCount = chinglishMatches.length;
+  const grammarCount = grammarMatches.length;
   const meaningful = totalWords - fillerCount - hedgeCount;
   const density = totalWords > 0 ? Math.round((meaningful / totalWords) * 100) : 100;
 
@@ -238,6 +288,7 @@ export function analyzeText(text: string): TextStats | null {
     hedges: hedgeCount,
     vagueWords: vagueCount,
     chinglish: chinglishCount,
+    grammar: grammarCount,
     density,
     duration: 0,
   };
@@ -309,6 +360,19 @@ export function highlightTokens(text: string): string {
     }
   }
 
+  // 语法错误
+  for (const item of GRAMMAR_PATTERNS) {
+    let match: RegExpExecArray | null;
+    while ((match = item.pattern.exec(textLower)) !== null) {
+      spans.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        category: "grammar",
+        label: `${item.label} · ${item.suggestion}`,
+      });
+    }
+  }
+
   // 高分表达
   for (const pattern of GOOD_PATTERNS) {
     let match: RegExpExecArray | null;
@@ -331,9 +395,10 @@ export function highlightTokens(text: string): string {
   const priority: Record<HighlightCategory, number> = {
     chinglish: 0,
     vague: 1,
-    filler: 2,
-    hedge: 3,
-    good: 4,
+    grammar: 2,
+    filler: 3,
+    hedge: 4,
+    good: 5,
   };
 
   // 去除被更高优先级完全覆盖的 span
@@ -430,6 +495,12 @@ export function collectIssues(
     let m: RegExpExecArray | null;
     while ((m = regex.exec(textLower)) !== null) {
       issues.push({ category: "hedge", word: m[0] });
+    }
+  }
+  for (const item of GRAMMAR_PATTERNS) {
+    let m: RegExpExecArray | null;
+    while ((m = item.pattern.exec(textLower)) !== null) {
+      issues.push({ category: "grammar", word: m[0], suggestion: item.suggestion });
     }
   }
 

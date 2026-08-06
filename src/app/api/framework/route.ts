@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       hedges: 0,
       vagueWords: 0,
       chinglish: 0,
+      grammar: 0,
       density: 100,
       duration: 0,
     };
