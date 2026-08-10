@@ -1,0 +1,24 @@
+"use client";
+
+import type { ReactNode } from "react";
+
+import { TopNav } from "@/components/layout/top-nav";
+import { useT } from "@/lib/i18n";
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const { t } = useT();
+  return (
+    <>
+      <TopNav />
+      <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+        {children}
+      </div>
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 text-sm text-tertiary-text sm:px-6">
+          <span>IELTS Speaking Trainer</span>
+          <span>{t("appShell.tagline")}</span>
+        </div>
+      </footer>
+    </>
+  );
+}

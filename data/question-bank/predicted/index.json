@@ -1,0 +1,551 @@
+[
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p1-hometown-01",
+        "question": "What is the most interesting part of your hometown?"
+      },
+      {
+        "id": "p1-hometown-02",
+        "question": "Would you recommend your hometown to tourists?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p2-hometown-01",
+        "question": "Describe a change that has happened in your hometown in recent years. You should say:",
+        "cueCard": [
+          "what the change is",
+          "what caused it",
+          "how people feel about it",
+          "and explain whether you think it is a positive change"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Hometown",
+    "questions": [
+      {
+        "id": "p3-hometown-01",
+        "question": "How do governments decide which cities to invest in?"
+      },
+      {
+        "id": "p3-hometown-02",
+        "question": "Why do some people prefer to live in the countryside?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p1-tech-01",
+        "question": "What apps do you use most on your phone?"
+      },
+      {
+        "id": "p1-tech-02",
+        "question": "Do you think you spend too much time on your phone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p2-tech-01",
+        "question": "Describe an app or website that is useful for your studies or work. You should say:",
+        "cueCard": [
+          "what it is",
+          "what it does",
+          "how you use it",
+          "and explain why you find it useful"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Technology",
+    "questions": [
+      {
+        "id": "p3-tech-01",
+        "question": "Do you think AI will change the way people learn languages?"
+      },
+      {
+        "id": "p3-tech-02",
+        "question": "What are the risks of people spending too much time online?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p1-food-01",
+        "question": "What is your favourite dish?"
+      },
+      {
+        "id": "p1-food-02",
+        "question": "Do you often try new food?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p2-food-01",
+        "question": "Describe a food you first tried that you liked. You should say:",
+        "cueCard": [
+          "what the food was",
+          "where you tried it",
+          "how you felt about it",
+          "and explain whether you would try it again"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Food",
+    "questions": [
+      {
+        "id": "p3-food-01",
+        "question": "Do you think people's eating habits have changed in recent decades?"
+      },
+      {
+        "id": "p3-food-02",
+        "question": "Should governments tax unhealthy food to encourage healthy eating?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p1-work-01",
+        "question": "Do you prefer working from home or in an office?"
+      },
+      {
+        "id": "p1-work-02",
+        "question": "What makes a good boss?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p2-work-01",
+        "question": "Describe a skill you would like to learn to help your career. You should say:",
+        "cueCard": [
+          "what the skill is",
+          "why you want to learn it",
+          "how you plan to learn it",
+          "and explain how it would help you"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Work",
+    "questions": [
+      {
+        "id": "p3-work-01",
+        "question": "Do you think AI will replace white-collar jobs?"
+      },
+      {
+        "id": "p3-work-02",
+        "question": "What skills will be most important for future jobs?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p1-edu-01",
+        "question": "Do you think schools should teach practical skills?"
+      },
+      {
+        "id": "p1-edu-02",
+        "question": "What subject do you wish you had studied at school?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p2-edu-01",
+        "question": "Describe a book that had a big impact on you. You should say:",
+        "cueCard": [
+          "what the book is",
+          "when you read it",
+          "what it is about",
+          "and explain why it had such an impact"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Education",
+    "questions": [
+      {
+        "id": "p3-edu-01",
+        "question": "Do you think children learn more from school or from home?"
+      },
+      {
+        "id": "p3-edu-02",
+        "question": "Should university education be free for everyone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19041321-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19041321-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19041321-p1-3",
+        "question": "What kind of clothes do you like to wear?"
+      },
+      {
+        "id": "19041321-p1-4",
+        "question": "Do you prefer to wear comfortable and casual clothes or smart clothes?"
+      },
+      {
+        "id": "19041321-p1-5",
+        "question": "Do you like wearing T-shirts?"
+      },
+      {
+        "id": "19041321-p1-6",
+        "question": "Do you spend a lot of time choosing clothes?"
+      },
+      {
+        "id": "19041321-p1-7",
+        "question": "Do you often use maps?"
+      },
+      {
+        "id": "19041321-p1-8",
+        "question": "Do you use paper maps?"
+      },
+      {
+        "id": "19041321-p1-9",
+        "question": "How often do you use maps on your phone?"
+      },
+      {
+        "id": "19041321-p1-10",
+        "question": "Do you have maps at home?"
+      },
+      {
+        "id": "19041321-p1-11",
+        "question": "Are robots important?"
+      },
+      {
+        "id": "19041321-p1-12",
+        "question": "Would robots affect people's lives?"
+      },
+      {
+        "id": "19041321-p1-13",
+        "question": "Have you ever watched a movie about robots?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p2-0",
+        "question": "Describe a picture/photograph of you that you like.",
+        "cueCard": [
+          "Where it was taken/drawn",
+          "When it was taken/drawn",
+          "Who took/dnew it"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Picture",
+    "questions": [
+      {
+        "id": "19041321-p3-0",
+        "question": "Why do people take photos?"
+      },
+      {
+        "id": "19041321-p3-1",
+        "question": "What do people use to take photos these days, cameras or phones?"
+      },
+      {
+        "id": "19041321-p3-2",
+        "question": "Is it difficult for people to learn how to take good photos?"
+      },
+      {
+        "id": "19041321-p3-3",
+        "question": "How do people keep their photos?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19042193-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19042193-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19042193-p1-3",
+        "question": "Are there many small businesses near your house"
+      },
+      {
+        "id": "19042193-p1-4",
+        "question": "Do you prefer buying things in big companies or from small businesses?"
+      },
+      {
+        "id": "19042193-p1-5",
+        "question": "Do you know many small businesses"
+      },
+      {
+        "id": "19042193-p1-6",
+        "question": "On what occasions do you go shopping in big businesses?"
+      },
+      {
+        "id": "19042193-p1-7",
+        "question": "What do you usually do at weekends? What did you do last weekend?"
+      },
+      {
+        "id": "19042193-p1-8",
+        "question": "Do you like weekends?"
+      },
+      {
+        "id": "19042193-p1-9",
+        "question": "Do you think it is important to make the most of your weekend?"
+      },
+      {
+        "id": "19042193-p1-10",
+        "question": "Do you like chocolate?"
+      },
+      {
+        "id": "19042193-p1-11",
+        "question": "Did you like chocolate when you were a child?"
+      },
+      {
+        "id": "19042193-p1-12",
+        "question": "Did you give chocolate as a present to someone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p2-0",
+        "question": "Describe a bad service you received in a restaurant/shop",
+        "cueCard": [
+          "when and where it happened",
+          "what happened",
+          "how you reacted"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Bad Service",
+    "questions": [
+      {
+        "id": "19042193-p3-0",
+        "question": "How do most people respond to bad services?"
+      },
+      {
+        "id": "19042193-p3-1",
+        "question": "Do you think services are better now than in the past?"
+      },
+      {
+        "id": "19042193-p3-2",
+        "question": "What kind of services are bad services?"
+      },
+      {
+        "id": "19042193-p3-3",
+        "question": "Why do some people choose to remain silent when they receive bad services?"
+      },
+      {
+        "id": "19042193-p3-4",
+        "question": "Who should be responsible for bad services?"
+      },
+      {
+        "id": "19042193-p3-5",
+        "question": "What can employers do to improve the service that their employees provide?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 1,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p1-0",
+        "question": "What is your full name?"
+      },
+      {
+        "id": "19042193-p1-1",
+        "question": "Where are you from?"
+      },
+      {
+        "id": "19042193-p1-2",
+        "question": "Do you work or study?"
+      },
+      {
+        "id": "19042193-p1-3",
+        "question": "Are there many small businesses near your house"
+      },
+      {
+        "id": "19042193-p1-4",
+        "question": "Do you prefer buying things in big companies or from small businesses?"
+      },
+      {
+        "id": "19042193-p1-5",
+        "question": "Do you know many small businesses"
+      },
+      {
+        "id": "19042193-p1-6",
+        "question": "On what occasions do you go shopping in big businesses?"
+      },
+      {
+        "id": "19042193-p1-7",
+        "question": "What do you usually do at weekends? What did you do last weekend?"
+      },
+      {
+        "id": "19042193-p1-8",
+        "question": "Do you like weekends?"
+      },
+      {
+        "id": "19042193-p1-9",
+        "question": "Do you think it is important to make the most of your weekend?"
+      },
+      {
+        "id": "19042193-p1-10",
+        "question": "Do you like chocolate?"
+      },
+      {
+        "id": "19042193-p1-11",
+        "question": "Did you like chocolate when you were a child?"
+      },
+      {
+        "id": "19042193-p1-12",
+        "question": "Did you give chocolate as a present to someone?"
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 2,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p2-0",
+        "question": "Describe a bad service you received in a restaurant/shop",
+        "cueCard": [
+          "when and where it happened",
+          "what happened",
+          "how you reacted"
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "part": 3,
+    "topic": "Service",
+    "questions": [
+      {
+        "id": "19042193-p3-0",
+        "question": "How do most people respond to bad services?"
+      },
+      {
+        "id": "19042193-p3-1",
+        "question": "Do you think services are better now than in the past?"
+      },
+      {
+        "id": "19042193-p3-2",
+        "question": "What kind of services are bad services?"
+      },
+      {
+        "id": "19042193-p3-3",
+        "question": "Why do some people choose to remain silent when they receive bad services?"
+      },
+      {
+        "id": "19042193-p3-4",
+        "question": "Who should be responsible for bad services?"
+      },
+      {
+        "id": "19042193-p3-5",
+        "question": "What can employers do to improve the service that their employees provide?"
+      }
+    ]
+  }
+]

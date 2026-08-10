@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+  --muted: #f5f5f5;
+  --border: #e5e5e5;
+  --secondary-text: #666666;
+  --tertiary-text: #999999;
+  --accent: #111111;
+
+  /* 功能高亮（训练字幕用，不是装饰） */
+  --filler-color: #dc2626;    /* 填充词 · 红 */
+  --hedge-color: #ea580c;     /* 犹豫词 · 橙 */
+  --vague-color: #a16207;     /* 笼统词 · 黄褐 */
+  --chinglish-color: #9333ea; /* 中式英语 · 紫 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --muted: #1a1a1a;
+    --border: #2a2a2a;
+    --secondary-text: #a3a3a3;
+    --tertiary-text: #737373;
+    --accent: #ededed;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-secondary-text: var(--secondary-text);
+  --color-tertiary-text: var(--tertiary-text);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 全局交互反馈 ===== */
+/* 键盘焦点（一次修复全站） */
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 按下反馈（所有按钮/链接） */
+button:active:not(:disabled),
+a:active {
+  transform: scale(0.98);
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* 键盘导航的非交互元素避免焦点环 */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 1px;
+}
+
+
+/* 训练字幕问题词高亮 */
+.hl-filler {
+  color: var(--filler-color);
+  text-decoration: underline wavy var(--filler-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-hedge {
+  color: var(--hedge-color);
+  text-decoration: underline var(--hedge-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-vague {
+  color: var(--vague-color);
+  text-decoration: underline dashed var(--vague-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-chinglish {
+  color: var(--chinglish-color);
+  text-decoration: underline double var(--chinglish-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+.hl-grammar {
+  color: #b91c1c;
+  text-decoration: underline var(--filler-color);
+  text-decoration-style: solid;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  background: rgba(220, 38, 38, 0.08);
+}
+.hl-good {
+  color: #16a34a;
+}
+
+/* 切换内容淡入动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* ===== 认证表单（登录/注册页）===== */
+.auth-view-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.auth-view-tabs > button {
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--secondary-text);
+  transition: background 0.15s, color 0.15s;
+}
+.auth-view-tabs > button[aria-selected="true"] {
+  background: var(--foreground);
+  color: var(--background);
+}
+.auth-view-tabs > button:not([aria-selected="true"]):hover {
+  color: var(--foreground);
+}
+
+.auth-method-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.auth-method-switch > button {
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--secondary-text);
+  transition: background 0.15s, color 0.15s;
+}
+.auth-method-switch > button[aria-pressed="true"] {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.auth-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.auth-field > label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--secondary-text);
+}
+.auth-field > input {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.auth-field > input::placeholder {
+  color: var(--tertiary-text);
+}
+.auth-field > input:focus {
+  outline: none;
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+.auth-field > small {
+  font-size: 12px;
+  color: var(--tertiary-text);
+}
+.auth-field-invalid > input {
+  border-color: var(--filler-color);
+}
+.auth-field-invalid > small.auth-field-error {
+  color: var(--filler-color);
+}
+
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--secondary-text);
+  cursor: pointer;
+}
+.auth-remember > input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--foreground);
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.primary-button:hover {
+  opacity: 0.9;
+}
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.primary-button.full-width {
+  width: 100%;
+}
+
+.auth-inline-action {
+  font-size: 13px;
+  color: var(--secondary-text);
+  text-align: center;
+  transition: color 0.15s;
+}
+.auth-inline-action:hover {
+  color: var(--foreground);
+}
+.auth-secondary-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.auth-context {
+  font-size: 14px;
+  color: var(--secondary-text);
+}
+.auth-context strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tertiary-text);
+  margin-bottom: 4px;
+}
+
+.auth-feedback {
+  margin-top: 16px;
+}
+.signin-error {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--filler-color);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.signin-notice {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(22, 163, 74, 0.08);
+  color: #16a34a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.auth-verification {
+  gap: 20px;
+}
