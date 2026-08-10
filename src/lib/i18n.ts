@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useSettingsStore } from "@/store/settingsStore";
 import { t, type Locale } from "@/lib/dict";
 
@@ -9,7 +10,11 @@ export function useT() {
   return {
     locale,
     setLocale: (l: Locale) => useSettingsStore.getState().setLocale(l),
-    t: (key: string) => t(locale, key),
+    t: useCallback(
+      (key: string, vars?: Record<string, string | number>) =>
+        t(locale, key, vars),
+      [locale],
+    ),
   };
 }
 

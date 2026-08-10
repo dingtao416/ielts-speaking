@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, Mic, Sparkles } from "lucide-react";
 
 import type { Question } from "@/lib/bank";
-import { BAND_OPTIONS, DIMENSION_LABELS } from "@/lib/profile";
+import { BAND_OPTIONS, DIMENSION_LABELS, DIMENSION_LABELS_EN } from "@/lib/profile";
 import type { AbilityProfile } from "@/persistence/schema";
 import { SpeechAnswerCard } from "@/components/practice/speech-answer-card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { useT } from "@/lib/i18n";
 type Step = "target" | "answer" | "result";
 
 export function OnboardingFlow({ questions }: { questions: Question[] }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const router = useRouter();
 
   const [step, setStep] = useState<Step>("target");
@@ -47,7 +47,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
         .filter((a) => a.text.trim().length > 0);
 
       if (answerList.length < 2) {
-        setError("请至少完成 2 道题的回答");
+        setError(t("onboarding.error.minAnswers"));
         setGenerating(false);
         return;
       }
@@ -59,7 +59,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "诊断失败");
+        throw new Error(data?.error || t("onboarding.error.diagnostic"));
       }
       const data = await res.json();
       setProfile(data.profile);
@@ -77,7 +77,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
 
       setStep("result");
     } catch (e: any) {
-      setError(e?.message || "诊断失败，请稍后重试");
+      setError(e?.message || t("onboarding.error.diagnostic"));
     } finally {
       setGenerating(false);
     }
@@ -91,14 +91,14 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background">
             <Mic className="h-6 w-6" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">建立你的起点</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("onboarding.step1.title")}</h1>
           <p className="text-sm text-secondary-text">
-            先设定目标分数，再通过简短诊断了解当前水平
+            {t("onboarding.step1.desc")}
           </p>
         </div>
 
         <div className="rounded-2xl border border-border p-6">
-          <h2 className="mb-4 text-base font-semibold">你的雅思口语目标分数</h2>
+          <h2 className="mb-4 text-base font-semibold">{t("onboarding.step1.targetLabel")}</h2>
           <div className="grid grid-cols-4 gap-2">
             {BAND_OPTIONS.map((b) => (
               <button
@@ -117,7 +117,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
             ))}
           </div>
           <p className="mt-4 text-xs text-tertiary-text">
-            目标分数决定 AI 反馈的详细程度、推荐词汇难度和目标级回答的水平
+            {t("onboarding.step1.targetHint")}
           </p>
         </div>
 
@@ -126,7 +126,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
           onClick={() => setStep("answer")}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
         >
-          开始诊断
+          {t("onboarding.step1.start")}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
@@ -163,7 +163,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
             {currentIdx + 1} / {questions.length}
           </span>
           <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-secondary-text">
-            已答 {doneCount}
+            {t("onboarding.answer.answered", { done: doneCount })}
           </span>
         </div>
 
@@ -174,7 +174,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
               Part {currentQuestion.part}
             </span>
             <span className="text-xs text-tertiary-text">
-              第 {currentIdx + 1} 题 · 无需准备，自然作答
+              {t("onboarding.answer.questionIndex", { index: currentIdx + 1 })}
             </span>
           </div>
           <h1 className="text-lg font-semibold leading-relaxed">
@@ -208,12 +208,12 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
               {generating ? (
                 <>
                   <Sparkles className="h-4 w-4 animate-pulse" aria-hidden="true" />
-                  正在评估…
+                  {t("onboarding.answer.assessing")}
                 </>
               ) : (
                 <>
                   <Check className="h-4 w-4" aria-hidden="true" />
-                  完成诊断
+                  {t("onboarding.answer.finish")}
                 </>
               )}
             </button>
@@ -224,7 +224,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
               disabled={!answeredCurrent}
               className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
             >
-              下一题
+              {t("onboarding.answer.next")}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
@@ -249,23 +249,23 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
             <Sparkles className="h-6 w-6" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">
-            你的能力档案
+            {t("onboarding.result.title")}
           </h1>
           <p className="text-sm text-secondary-text">
-            这是训练用途的预估水平，不是官方成绩
+            {t("onboarding.result.desc")}
           </p>
         </div>
 
         {/* 总分对比 */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-border p-5 text-center">
-            <div className="text-xs font-medium text-tertiary-text">当前水平</div>
+            <div className="text-xs font-medium text-tertiary-text">{t("onboarding.result.current")}</div>
             <div className="mt-1 text-3xl font-bold">
               {profile.overallBand.toFixed(1)}
             </div>
           </div>
           <div className="rounded-2xl border border-foreground p-5 text-center">
-            <div className="text-xs font-medium text-tertiary-text">目标分数</div>
+            <div className="text-xs font-medium text-tertiary-text">{t("onboarding.result.target")}</div>
             <div className="mt-1 text-3xl font-bold">
               {profile.targetBand.toFixed(1)}
             </div>
@@ -274,7 +274,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
 
         {/* 四维 */}
         <div className="rounded-2xl border border-border p-6">
-          <h2 className="mb-4 text-base font-semibold">四维能力</h2>
+          <h2 className="mb-4 text-base font-semibold">{t("onboarding.result.dimensions")}</h2>
           <div className="flex flex-col gap-3">
             {([
               ["fluency", dims.fluency],
@@ -284,7 +284,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
             ] as const).map(([key, val]) => (
               <div key={key} className="flex items-center justify-between">
                 <span className="text-sm text-secondary-text">
-                  {DIMENSION_LABELS[key]}
+                  {locale === "zh" ? DIMENSION_LABELS[key] : DIMENSION_LABELS_EN[key]}
                 </span>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-40 overflow-hidden rounded-full bg-muted">
@@ -305,7 +305,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
         {/* 主要问题 */}
         {profile.mainIssues.length > 0 ? (
           <div className="rounded-2xl border border-border p-6">
-            <h2 className="mb-3 text-base font-semibold">当前最主要的问题</h2>
+            <h2 className="mb-3 text-base font-semibold">{t("onboarding.result.issues")}</h2>
             <ul className="list-inside list-disc space-y-1.5 text-sm text-secondary-text">
               {profile.mainIssues.map((issue, i) => (
                 <li key={i}>{issue}</li>
@@ -317,7 +317,9 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
         {/* 阶段路径 */}
         {profile.stagePath.length > 0 ? (
           <div className="rounded-2xl border border-border p-6">
-            <h2 className="mb-3 text-base font-semibold">通往 {profile.targetBand.toFixed(1)} 的阶段路径</h2>
+            <h2 className="mb-3 text-base font-semibold">
+              {t("onboarding.result.stagePath", { target: profile.targetBand.toFixed(1) })}
+            </h2>
             <ol className="list-inside list-decimal space-y-1.5 text-sm text-secondary-text">
               {profile.stagePath.map((step, i) => (
                 <li key={i}>{step}</li>
@@ -331,7 +333,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
           onClick={() => router.push("/bank")}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
         >
-          开始练习
+          {t("onboarding.result.startPractice")}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>

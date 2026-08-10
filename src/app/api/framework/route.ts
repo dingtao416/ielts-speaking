@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { chatComplete } from "@/lib/llm";
 import { getFrameworkPrompt } from "@/lib/prompts";
 import { getQuestionById } from "@/lib/bank";
-import { analyzeText } from "@/lib/lexicon";
+import { analyzeText, countUnits, type AnalysisLang } from "@/lib/lexicon";
 
 export const runtime = "nodejs";
 
@@ -13,6 +13,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const questionId: string = body?.questionId;
     const fullText: string = body?.fullText;
+    const lang: AnalysisLang =
+      typeof body?.lang === "string" && body.lang.startsWith("zh")
+        ? "zh"
+        : "en";
 
     if (!questionId || !fullText) {
       return NextResponse.json(
@@ -26,8 +30,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "question not found" }, { status: 404 });
     }
 
-    const stats = analyzeText(fullText) ?? {
-      totalWords: fullText.split(/\s+/).length,
+    const stats = analyzeText(fullText, lang) ?? {
+      totalWords: countUnits(fullText, lang),
       fillers: 0,
       hedges: 0,
       vagueWords: 0,

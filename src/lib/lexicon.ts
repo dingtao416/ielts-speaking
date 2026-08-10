@@ -19,6 +19,28 @@ export interface TextStats {
   grammar: number;
   density: number; // 0-100，有效表达占比
   duration: number; // 秒
+  lang?: AnalysisLang; // 本次分析的语种
+}
+
+export type AnalysisLang = "en" | "zh";
+
+/** 根据 ASR 语言设置解析分析语言 */
+export function langFromAsr(asrLang: string | undefined | null): AnalysisLang {
+  return asrLang?.toLowerCase().startsWith("zh") ? "zh" : "en";
+}
+
+/**
+ * 统计"表达单元"数：英文按空格分词，中文按"汉字数 + 混入英文词数 + 数字"。
+ * 中文没有空格，字符级统计是合理代理。
+ */
+export function countUnits(text: string, lang: AnalysisLang = "en"): number {
+  if (lang === "zh") {
+    const cjk = text.match(/[一-龥]/g)?.length ?? 0;
+    const latin = text.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g)?.length ?? 0;
+    const digits = text.match(/\d+(?:\.\d+)?/g)?.length ?? 0;
+    return cjk + latin + digits;
+  }
+  return text.split(/\s+/).filter(Boolean).length;
 }
 
 // ===== 填充词（多词短语会按词边界正则匹配）=====
@@ -201,13 +223,165 @@ export const GRAMMAR_PATTERNS: { pattern: RegExp; suggestion: string; label: str
   { pattern: /\balthough\s+but\b/gi, suggestion: "although / but（二选一）", label: "连词重复" },
 ];
 
+// ===== 中文词库（语言模式 = 中文时使用）=====
+
+// 填充词（中文口语口头禅 / 连接性口水词）
+export const FILLER_WORDS_ZH = [
+  "嗯", "呃", "啊", "诶", "哦", "额",
+  "那个", "这个", "然后", "就是", "就是说",
+  "怎么说呢", "怎么说", "怎么讲", "怎么说来着",
+  "你知道", "你知道吧", "其实", "基本上", "总之", "反正", "对吧",
+];
+
+// 犹豫词 / 立场弱化（中文）
+export const HEDGE_WORDS_ZH = [
+  "也许", "或许", "大概", "可能", "应该", "差不多", "好像", "似乎",
+  "我觉得", "我认为", "我想", "我猜", "我个人觉得", "个人而言",
+  "某种程度上", "有些", "有点", "比较", "还算", "老实说",
+];
+
+// 低分词 → 高分替代（中文雅思场景）
+export const VAGUE_TO_PRECISE_ZH: Record<string, string[]> = {
+  好: ["出色", "优异", "精彩", "令人印象深刻"],
+  很好: ["出类拔萃", "可圈可点", "叹为观止"],
+  坏: ["糟糕", "恶劣", "不尽如人意"],
+  不好: ["欠佳", "令人失望"],
+  大: ["宏大", "广阔", "壮观", "规模庞大"],
+  小: ["小巧", "精致", "袖珍"],
+  多: ["繁多", "丰富", "琳琅满目", "数不胜数"],
+  少: ["寥寥无几", "屈指可数", "稀缺"],
+  快: ["迅速", "敏捷", "高效", "飞速"],
+  慢: ["缓慢", "从容", "悠闲"],
+  开心: ["愉悦", "欣喜", "雀跃", "心花怒放"],
+  高兴: ["兴高采烈", "欢欣鼓舞", "喜出望外"],
+  难过: ["沮丧", "失落", "苦闷", "心痛"],
+  伤心: ["悲伤", "黯然神伤", "悲痛"],
+  喜欢: ["喜爱", "钟情", "酷爱", "热衷于"],
+  讨厌: ["反感", "厌恶", "避之不及"],
+  重要: ["关键", "至关重要", "举足轻重", "不可或缺"],
+  漂亮: ["美丽", "动人", "赏心悦目", "光彩夺目"],
+  有名: ["著名", "闻名遐迩", "家喻户晓", "享有盛誉"],
+  便宜: ["实惠", "划算", "物美价廉", "经济实惠"],
+  贵: ["昂贵", "不菲", "价格不菲"],
+  忙: ["忙碌", "繁忙", "马不停蹄", "应接不暇"],
+  累: ["疲惫", "筋疲力尽", "精疲力竭"],
+  生气: ["愤怒", "恼火", "愤愤不平"],
+  害怕: ["恐惧", "忐忑不安", "胆战心惊"],
+  有趣: ["妙趣横生", "引人入胜", "耐人寻味"],
+  去: ["前往", "去往", "奔赴"],
+  觉得: ["认为", "深感", "持……的看法"],
+};
+
+// 中式口语 / 口水词堆叠检测（中文）
+export const CHINGLISH_PATTERNS_ZH: { pattern: RegExp; suggestion: string }[] = [
+  { pattern: /然后\s*然后/gi, suggestion: "「接着/随后/此外」，避免重复连接词" },
+  { pattern: /就是\s*就是/gi, suggestion: "删去多余的「就是」" },
+  { pattern: /我觉得\s*我觉得/gi, suggestion: "直接陈述观点，避免重复" },
+  { pattern: /非常\s*非常/gi, suggestion: "用「极其/格外」等程度副词" },
+  { pattern: /真的\s*真的/gi, suggestion: "用「确实/的确」" },
+  { pattern: /那个\s*那个/gi, suggestion: "停顿一下，避免重复「那个」" },
+  { pattern: /然后\s*那个\s*就是/gi, suggestion: "整理好思路再开口，减少口水词连用" },
+];
+
+// 高分表达（正向强化，中文）
+export const GOOD_PATTERNS_ZH: string[] = [
+  "总而言之", "总的来说", "毋庸置疑", "显而易见", "毫无疑问",
+  "值得一提的是", "令人印象深刻的是", "归根结底", "综上所述",
+  "一方面", "另一方面", "不仅", "而且", "与此同时", "除此之外",
+];
+
+// 中文口语语法问题（轻量规则）
+export const GRAMMAR_PATTERNS_ZH: { pattern: RegExp; suggestion: string; label: string }[] = [
+  { pattern: /的\s*的/gi, suggestion: "删去重复的「的」", label: "重复字" },
+  { pattern: /了\s*了/gi, suggestion: "删去多余的「了」", label: "重复字" },
+];
+
+// ===== 语言相关词库选择 =====
+
+interface Lexicon {
+  fillers: string[];
+  hedges: string[];
+  vague: Record<string, string[]>;
+  chinglish: { pattern: RegExp; suggestion: string }[];
+  good: string[]; // zh: 词组；en: 正则源串（构造时转 RegExp）
+  grammar: { pattern: RegExp; suggestion: string; label: string }[];
+}
+
+function getLexicon(lang: AnalysisLang): Lexicon {
+  return lang === "zh"
+    ? {
+        fillers: FILLER_WORDS_ZH,
+        hedges: HEDGE_WORDS_ZH,
+        vague: VAGUE_TO_PRECISE_ZH,
+        chinglish: CHINGLISH_PATTERNS_ZH,
+        good: GOOD_PATTERNS_ZH,
+        grammar: GRAMMAR_PATTERNS_ZH,
+      }
+    : {
+        fillers: FILLER_WORDS_EN,
+        hedges: HEDGE_WORDS_EN,
+        vague: VAGUE_TO_PRECISE_EN,
+        chinglish: CHINGLISH_PATTERNS,
+        good: GOOD_PATTERNS.map((r) => r.source),
+        grammar: GRAMMAR_PATTERNS,
+      };
+}
+
+/** 中文最长优先贪婪匹配：左到右非重叠，多字词优先（中文无 \b 边界） */
+function matchChinese(
+  text: string,
+  phrases: string[],
+): { word: string; index: number }[] {
+  const sorted = [...phrases].sort((a, b) => b.length - a.length);
+  const lower = text.toLowerCase();
+  const result: { word: string; index: number }[] = [];
+  let i = 0;
+  while (i < lower.length) {
+    let matched: string | null = null;
+    for (const phrase of sorted) {
+      if (lower.startsWith(phrase, i)) {
+        matched = phrase;
+        break;
+      }
+    }
+    if (matched) {
+      result.push({ word: matched.toLowerCase(), index: i });
+      i += matched.length;
+    } else {
+      i += 1;
+    }
+  }
+  return result;
+}
+
+/** 语言感知的词组匹配入口 */
+function matchInText(
+  text: string,
+  phrases: string[],
+  lang: AnalysisLang,
+): { word: string; index: number }[] {
+  return lang === "zh"
+    ? matchChinese(text, phrases)
+    : matchWords(text.toLowerCase(), phrases);
+}
+
+/** 语言感知：中英文各自按对应规则分析；英文模式遇到中文自动降级到中文词库 */
+function resolveLang(text: string, lang: AnalysisLang): AnalysisLang {
+  if (lang === "en" && /[一-龥]/.test(text)) {
+    return "zh";
+  }
+  return lang;
+}
+
 /** 检测常见语法错误（实时层，返回错误片段 + 建议） */
 export function collectGrammarIssues(
   text: string,
+  lang: AnalysisLang = "en",
 ): { word: string; suggestion: string; label: string }[] {
+  const resolved = resolveLang(text, lang);
   const issues: { word: string; suggestion: string; label: string }[] = [];
   const lower = text.toLowerCase();
-  for (const item of GRAMMAR_PATTERNS) {
+  for (const item of getLexicon(resolved).grammar) {
     let m: RegExpExecArray | null;
     while ((m = item.pattern.exec(lower)) !== null) {
       issues.push({ word: m[0], suggestion: item.suggestion, label: item.label });
@@ -238,30 +412,40 @@ function matchWords(
 }
 
 /** 分析文本，返回统计与匹配结果 */
-export function analyzeText(text: string): TextStats | null {
+export function analyzeText(
+  text: string,
+  lang: AnalysisLang = "en",
+): TextStats | null {
   if (!text || !text.trim()) {
     return null;
   }
 
+  const resolved = resolveLang(text, lang);
+  const lexicon = getLexicon(resolved);
   const textLower = text.toLowerCase();
-  const words = text.split(/\s+/).filter((w) => w.length > 0);
-  const totalWords = words.length;
+  const totalWords = countUnits(text, resolved);
 
-  const fillers = matchWords(textLower, FILLER_WORDS_EN);
-  const hedges = matchWords(textLower, HEDGE_WORDS_EN);
+  const fillers = matchInText(textLower, lexicon.fillers, resolved);
+  const hedges = matchInText(textLower, lexicon.hedges, resolved);
   const vagueWords: string[] = [];
   const chinglishMatches: { matched: string; suggestion: string; index: number }[] = [];
 
-  for (const key of Object.keys(VAGUE_TO_PRECISE_EN)) {
-    const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(textLower)) !== null) {
-      void m;
-      vagueWords.push(key.toLowerCase());
+  for (const key of Object.keys(lexicon.vague)) {
+    if (resolved === "zh") {
+      for (const _hit of matchChinese(textLower, [key])) {
+        vagueWords.push(key.toLowerCase());
+      }
+    } else {
+      const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
+      let m: RegExpExecArray | null;
+      while ((m = regex.exec(textLower)) !== null) {
+        void m;
+        vagueWords.push(key.toLowerCase());
+      }
     }
   }
 
-  for (const item of CHINGLISH_PATTERNS) {
+  for (const item of lexicon.chinglish) {
     let match: RegExpExecArray | null;
     while ((match = item.pattern.exec(textLower)) !== null) {
       chinglishMatches.push({
@@ -272,14 +456,24 @@ export function analyzeText(text: string): TextStats | null {
     }
   }
 
-  const grammarMatches = collectGrammarIssues(text);
+  const grammarMatches = collectGrammarIssues(text, resolved);
 
   const fillerCount = fillers.length;
   const hedgeCount = hedges.length;
   const vagueCount = vagueWords.length;
   const chinglishCount = chinglishMatches.length;
   const grammarCount = grammarMatches.length;
-  const meaningful = totalWords - fillerCount - hedgeCount;
+
+  // 中文：分母按"有效字符数"（总单元减去命中的填充/犹豫词组实际字符长度）
+  let meaningful: number;
+  if (resolved === "zh") {
+    const noiseChars =
+      fillers.reduce((s, m) => s + m.word.length, 0) +
+      hedges.reduce((s, m) => s + m.word.length, 0);
+    meaningful = Math.max(0, totalWords - noiseChars);
+  } else {
+    meaningful = totalWords - fillerCount - hedgeCount;
+  }
   const density = totalWords > 0 ? Math.round((meaningful / totalWords) * 100) : 100;
 
   return {
@@ -291,6 +485,7 @@ export function analyzeText(text: string): TextStats | null {
     grammar: grammarCount,
     density,
     duration: 0,
+    lang: resolved,
   };
 }
 
@@ -298,15 +493,17 @@ export function analyzeText(text: string): TextStats | null {
  * 把文本转成高亮 HTML（按词边界，带分类优先级）。
  * 优先：chinglish > vague > filler > hedge；同时标出高分表达。
  */
-export function highlightTokens(text: string): string {
+export function highlightTokens(text: string, lang: AnalysisLang = "en"): string {
+  const resolved = resolveLang(text, lang);
+  const lexicon = getLexicon(resolved);
   const textLower = text.toLowerCase();
 
   // 收集所有匹配 span：{ start, end, category, data }
   type Span = { start: number; end: number; category: HighlightCategory; label: string };
   const spans: Span[] = [];
 
-  // 中式英语（整短语）
-  for (const item of CHINGLISH_PATTERNS) {
+  // 中式英语 / 口语堆叠（整短语，正则）
+  for (const item of lexicon.chinglish) {
     let match: RegExpExecArray | null;
     while ((match = item.pattern.exec(textLower)) !== null) {
       spans.push({
@@ -319,49 +516,52 @@ export function highlightTokens(text: string): string {
   }
 
   // 低分词 → 高分替代
-  for (const key of Object.keys(VAGUE_TO_PRECISE_EN)) {
-    const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(textLower)) !== null) {
-      spans.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        category: "vague",
-        label: VAGUE_TO_PRECISE_EN[key].slice(0, 3).join(" / "),
-      });
+  for (const key of Object.keys(lexicon.vague)) {
+    if (resolved === "zh") {
+      for (const hit of matchChinese(textLower, [key])) {
+        spans.push({
+          start: hit.index,
+          end: hit.index + key.length,
+          category: "vague",
+          label: lexicon.vague[key].slice(0, 3).join(" / "),
+        });
+      }
+    } else {
+      const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(textLower)) !== null) {
+        spans.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          category: "vague",
+          label: lexicon.vague[key].slice(0, 3).join(" / "),
+        });
+      }
     }
   }
 
   // 填充词
-  for (const word of FILLER_WORDS_EN) {
-    const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi");
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(textLower)) !== null) {
-      spans.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        category: "filler",
-        label: "填充词 · try pausing",
-      });
-    }
+  for (const hit of matchInText(textLower, lexicon.fillers, resolved)) {
+    spans.push({
+      start: hit.index,
+      end: hit.index + hit.word.length,
+      category: "filler",
+      label: "填充词 · try pausing",
+    });
   }
 
   // 犹豫词
-  for (const word of HEDGE_WORDS_EN) {
-    const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi");
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(textLower)) !== null) {
-      spans.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        category: "hedge",
-        label: "犹豫词 · be direct",
-      });
-    }
+  for (const hit of matchInText(textLower, lexicon.hedges, resolved)) {
+    spans.push({
+      start: hit.index,
+      end: hit.index + hit.word.length,
+      category: "hedge",
+      label: "犹豫词 · be direct",
+    });
   }
 
   // 语法错误
-  for (const item of GRAMMAR_PATTERNS) {
+  for (const item of lexicon.grammar) {
     let match: RegExpExecArray | null;
     while ((match = item.pattern.exec(textLower)) !== null) {
       spans.push({
@@ -374,15 +574,27 @@ export function highlightTokens(text: string): string {
   }
 
   // 高分表达
-  for (const pattern of GOOD_PATTERNS) {
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(textLower)) !== null) {
+  if (resolved === "zh") {
+    for (const hit of matchChinese(textLower, lexicon.good)) {
       spans.push({
-        start: match.index,
-        end: match.index + match[0].length,
+        start: hit.index,
+        end: hit.index + hit.word.length,
         category: "good",
         label: "高分表达",
       });
+    }
+  } else {
+    for (const source of lexicon.good) {
+      const regex = new RegExp(`\\b${source}\\b`, "gi");
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(textLower)) !== null) {
+        spans.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          category: "good",
+          label: "高分表达",
+        });
+      }
     }
   }
 
@@ -466,38 +678,39 @@ function escapeAttr(value: string) {
 /** 从高亮 HTML 提取问题词清单（用于统计面板 / 反馈） */
 export function collectIssues(
   text: string,
+  lang: AnalysisLang = "en",
 ): { category: HighlightCategory; word: string; suggestion?: string }[] {
+  const resolved = resolveLang(text, lang);
+  const lexicon = getLexicon(resolved);
   const issues: { category: HighlightCategory; word: string; suggestion?: string }[] = [];
   const textLower = text.toLowerCase();
 
-  for (const item of CHINGLISH_PATTERNS) {
+  for (const item of lexicon.chinglish) {
     let m: RegExpExecArray | null;
     while ((m = item.pattern.exec(textLower)) !== null) {
       issues.push({ category: "chinglish", word: m[0], suggestion: item.suggestion });
     }
   }
-  for (const key of Object.keys(VAGUE_TO_PRECISE_EN)) {
-    const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(textLower)) !== null) {
-      issues.push({ category: "vague", word: m[0], suggestion: VAGUE_TO_PRECISE_EN[key].slice(0, 3).join(" / ") });
+  for (const key of Object.keys(lexicon.vague)) {
+    if (resolved === "zh") {
+      for (const hit of matchChinese(textLower, [key])) {
+        issues.push({ category: "vague", word: hit.word, suggestion: lexicon.vague[key].slice(0, 3).join(" / ") });
+      }
+    } else {
+      const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
+      let m: RegExpExecArray | null;
+      while ((m = regex.exec(textLower)) !== null) {
+        issues.push({ category: "vague", word: m[0], suggestion: lexicon.vague[key].slice(0, 3).join(" / ") });
+      }
     }
   }
-  for (const word of FILLER_WORDS_EN) {
-    const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi");
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(textLower)) !== null) {
-      issues.push({ category: "filler", word: m[0] });
-    }
+  for (const hit of matchInText(textLower, lexicon.fillers, resolved)) {
+    issues.push({ category: "filler", word: hit.word });
   }
-  for (const word of HEDGE_WORDS_EN) {
-    const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi");
-    let m: RegExpExecArray | null;
-    while ((m = regex.exec(textLower)) !== null) {
-      issues.push({ category: "hedge", word: m[0] });
-    }
+  for (const hit of matchInText(textLower, lexicon.hedges, resolved)) {
+    issues.push({ category: "hedge", word: hit.word });
   }
-  for (const item of GRAMMAR_PATTERNS) {
+  for (const item of lexicon.grammar) {
     let m: RegExpExecArray | null;
     while ((m = item.pattern.exec(textLower)) !== null) {
       issues.push({ category: "grammar", word: m[0], suggestion: item.suggestion });

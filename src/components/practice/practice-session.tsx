@@ -26,6 +26,7 @@ import {
   analyzeText,
   collectIssues,
   highlightTokens,
+  langFromAsr,
   type HighlightCategory,
 } from "@/lib/lexicon";
 import { usePracticeStore } from "@/store/sessionStore";
@@ -35,6 +36,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 export function PracticeSession({ question }: { question: Question }) {
   const { t } = useT();
   const asrLang = useSettingsStore((s) => s.asrLang);
+  const analysisLang = langFromAsr(asrLang);
   const speech = useSpeechRecognition(asrLang);
   const timer = useTimer();
   const reportStream = useStreamText();
@@ -52,11 +54,11 @@ export function PracticeSession({ question }: { question: Question }) {
   // 每 ~10 秒做一次兜底分析（词级 + AI 教练限流）
   const runFeedback = useCallback(
     async (text: string) => {
-      const analysis = analyzeText(text);
+      const analysis = analyzeText(text, analysisLang);
       if (analysis) {
         store.updateStats({ ...analysis, duration: timer.elapsed });
       }
-      const issues = collectIssues(text);
+      const issues = collectIssues(text, analysisLang);
 
       // 词级反馈（本地，即时）
       const unique = new Map<string, { cat: HighlightCategory; suggestion?: string }>();
@@ -74,31 +76,40 @@ export function PracticeSession({ question }: { question: Question }) {
         if (info.cat === "filler") {
           store.addCoachTip({
             id: `f-${Date.now()}-${word}`,
-            text: `"${word}" — 填充词，试试停顿`,
+            text: t("practice.coachTip.filler", { word }),
             category: "filler",
           });
         } else if (info.cat === "hedge") {
           store.addCoachTip({
             id: `h-${Date.now()}-${word}`,
-            text: `"${word}" — 犹豫词，直接说`,
+            text: t("practice.coachTip.hedge", { word }),
             category: "hedge",
           });
         } else if (info.cat === "vague") {
           store.addCoachTip({
             id: `v-${Date.now()}-${word}`,
-            text: `"${word}" → ${info.suggestion ?? "换高分词"}`,
+            text: t("practice.coachTip.vague", {
+              word,
+              suggestion: info.suggestion ?? t("practice.coachTip.vague.default"),
+            }),
             category: "vague",
           });
         } else if (info.cat === "chinglish") {
           store.addCoachTip({
             id: `c-${Date.now()}-${word}`,
-            text: `"${word}" — 中式英语，用 ${info.suggestion ?? "更地道的说法"}`,
-            category: "hedge",
+            text: t("practice.coachTip.chinglish", {
+              word,
+              suggestion: info.suggestion ?? t("practice.coachTip.chinglish.default"),
+            }),
+            category: "chinglish",
           });
         } else if (info.cat === "grammar") {
           store.addCoachTip({
             id: `g-${Date.now()}-${word}`,
-            text: `"${word}" — ${info.suggestion ?? "语法错误"}`,
+            text: t("practice.coachTip.grammar", {
+              word,
+              suggestion: info.suggestion ?? t("practice.coachTip.grammar.default"),
+            }),
             category: "grammar",
           });
         }
@@ -117,6 +128,7 @@ export function PracticeSession({ question }: { question: Question }) {
               topic: question.topic,
               part: question.part,
               elapsedSec: timer.elapsed,
+              lang: analysisLang,
             }),
           });
           if (res.ok) {
@@ -134,7 +146,7 @@ export function PracticeSession({ question }: { question: Question }) {
         }
       }
     },
-    [store, timer.elapsed, question.topic, question.part],
+    [store, timer.elapsed, question.topic, question.part, t, analysisLang],
   );
 
   // 录制后定时分析
@@ -193,6 +205,9 @@ export function PracticeSession({ question }: { question: Question }) {
     if (reportStream.text) {
       store.setReport(reportStream.text);
     }
+    // 同步流状态到 store：done/error 都结束 generating，
+    // 只有 done 才触发 saveSession（把 bands + 报告一起入库）。
+    store.setReportStatus(reportStream.status === "done" ? "done" : "error");
   }
 
   async function extractFramework() {
@@ -204,6 +219,7 @@ export function PracticeSession({ question }: { question: Question }) {
         body: JSON.stringify({
           questionId: question.id,
           fullText: store.fullText,
+          lang: analysisLang,
         }),
       });
       if (!res.ok) throw new Error();
@@ -294,7 +310,7 @@ export function PracticeSession({ question }: { question: Question }) {
   async function generateFiveTier() {
     if (!store.fullText) {
       // 没有录音内容时给用户反馈
-      setFiveTierError("请先录制并说一段回答，再生成目标级回答");
+      setFiveTierError(t("practice.error.noRecording"));
       return;
     }
     setFiveTierError(null);
@@ -321,7 +337,7 @@ export function PracticeSession({ question }: { question: Question }) {
         currentBand: data.currentBand,
       });
     } catch {
-      setFiveTierError("生成失败，请稍后重试");
+      setFiveTierError(t("practice.error.generate"));
     } finally {
       setFiveTierLoading(false);
     }
@@ -395,7 +411,7 @@ export function PracticeSession({ question }: { question: Question }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-secondary-text">
-              实时统计
+              {t("practice.liveStats")}
             </h3>
             <div className="flex flex-col gap-2.5">
               {statItems.map((item) => (
@@ -473,14 +489,14 @@ export function PracticeSession({ question }: { question: Question }) {
                   <p
                     key={i}
                     className="text-lg leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightTokens(s) }}
+                    dangerouslySetInnerHTML={{ __html: highlightTokens(s, analysisLang) }}
                   />
                 ))}
                 {store.interimText ? (
                   <p
                     className="text-lg leading-relaxed opacity-60"
                     dangerouslySetInnerHTML={{
-                      __html: highlightTokens(store.interimText),
+                      __html: highlightTokens(store.interimText, analysisLang),
                     }}
                   />
                 ) : null}
@@ -596,7 +612,7 @@ export function PracticeSession({ question }: { question: Question }) {
                 >
                   <Wand2 className="h-4 w-4" aria-hidden="true" />
                   {store.frameworkStatus === "extracting"
-                    ? "正在提取…"
+                    ? t("practice.framework.extracting")
                     : t("practice.frameworkEmpty")}
                 </Button>
               )}
@@ -613,7 +629,7 @@ export function PracticeSession({ question }: { question: Question }) {
             {store.framework ? (
               <div className="flex flex-col gap-3 text-sm">
                 <div>
-                  <div className="mb-1 font-medium">结构</div>
+                  <div className="mb-1 font-medium">{t("practice.framework.structure")}</div>
                   <ol className="list-inside list-decimal space-y-1 text-secondary-text">
                     {(store.framework as { structure?: string[] }).structure?.map(
                       (s, i) => <li key={i}>{s}</li>,
@@ -621,7 +637,7 @@ export function PracticeSession({ question }: { question: Question }) {
                   </ol>
                 </div>
                 <div>
-                  <div className="mb-1 font-medium">要点</div>
+                  <div className="mb-1 font-medium">{t("practice.framework.keyPoints")}</div>
                   <ul className="list-inside list-disc space-y-1 text-secondary-text">
                     {(store.framework as { keyPoints?: string[] }).keyPoints?.map(
                       (k, i) => <li key={i}>{k}</li>,
@@ -630,14 +646,14 @@ export function PracticeSession({ question }: { question: Question }) {
                 </div>
                 {(store.framework as { stories?: { title: string; applyToTopics: string[] }[] })?.stories?.length ? (
                   <div>
-                    <div className="mb-1 font-medium">故事素材</div>
+                    <div className="mb-1 font-medium">{t("practice.framework.stories")}</div>
                     <div className="flex flex-col gap-1.5">
                       {(store.framework as { stories?: { title: string; applyToTopics: string[] }[] }).stories!.map(
                         (s, i) => (
                           <div key={i} className="rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs text-secondary-text">
                             <span className="font-medium text-foreground">{s.title}</span>
                             {s.applyToTopics?.length ? (
-                              <span className="ml-1.5">可复用于 {s.applyToTopics.slice(0, 3).join(" / ")}</span>
+                              <span className="ml-1.5">{t("practice.framework.storiesApply", { topics: s.applyToTopics.slice(0, 3).join(" / ") })}</span>
                             ) : null}
                           </div>
                         ),
@@ -647,7 +663,7 @@ export function PracticeSession({ question }: { question: Question }) {
                 ) : null}
                 {saveSuccess ? (
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                    已保存到素材本 ✓
+                    {t("practice.framework.saved")}
                   </p>
                 ) : (
                   <Button
@@ -656,16 +672,16 @@ export function PracticeSession({ question }: { question: Question }) {
                     disabled={savingFramework}
                   >
                     <Save className="h-4 w-4" aria-hidden="true" />
-                    {savingFramework ? "保存中…" : t("practice.saveFramework")}
+                    {savingFramework ? t("practice.framework.saving") : t("practice.saveFramework")}
                   </Button>
                 )}
               </div>
             ) : (
               <p className="text-xs text-tertiary-text">
                 {store.frameworkStatus === "extracting"
-                  ? "正在提取框架…"
+                  ? t("practice.framework.extractingLong")
                   : store.frameworkStatus === "error"
-                    ? "提取失败，请重试"
+                    ? t("practice.framework.error")
                     : t("practice.frameworkEmpty")}
               </p>
             )}
@@ -674,7 +690,7 @@ export function PracticeSession({ question }: { question: Question }) {
           {/* 相似题提示（可复用框架） */}
           <div className="rounded-2xl border border-border p-4">
             <h3 className="mb-3 text-sm font-semibold text-secondary-text">
-              相似题
+              {t("practice.similar.title")}
             </h3>
             <div className="flex flex-col gap-2">
               {getSimilarQuestions(question).slice(0, 3).map((sq) => (
@@ -691,7 +707,7 @@ export function PracticeSession({ question }: { question: Question }) {
               ))}
               {getSimilarQuestions(question).length === 0 ? (
                 <p className="text-xs text-tertiary-text">
-                  暂无相似题，尝试练习后提炼框架
+                  {t("practice.similar.empty")}
                 </p>
               ) : null}
             </div>
@@ -725,16 +741,16 @@ export function PracticeSession({ question }: { question: Question }) {
           {assessment ? (
             <div className="rounded-2xl border border-border p-4">
               <h3 className="mb-2 text-sm font-semibold text-secondary-text">
-                当前综合水平
+                {t("practice.assessment.overall")}
               </h3>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-secondary-text">预估分</span>
+                <span className="text-secondary-text">{t("practice.assessment.estimate")}</span>
                 <span className="text-lg font-bold">
                   {assessment.overallBand.toFixed(1)}
                 </span>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm">
-                <span className="text-secondary-text">目标分</span>
+                <span className="text-secondary-text">{t("practice.assessment.target")}</span>
                 <span className="text-lg font-bold">
                   {assessment.targetBand.toFixed(1)}
                 </span>

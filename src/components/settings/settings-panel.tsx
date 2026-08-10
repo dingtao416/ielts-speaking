@@ -56,9 +56,10 @@ export function SettingsPanel() {
         </div>
       </div>
 
-      {/* 语音识别语言 */}
+      {/* 语言模式（语音识别 + 词级分析） */}
       <div className={section}>
-        <h2 className="mb-4 text-base font-semibold">{t("settings.asr")}</h2>
+        <h2 className="mb-1 text-base font-semibold">{t("settings.asr")}</h2>
+        <p className="mb-4 text-xs text-tertiary-text">{t("settings.asr.desc")}</p>
         <div className="flex gap-2">
           {[
             { value: "en-US", label: "English (en-US)" },

@@ -309,7 +309,7 @@ export function FrameworkLibrary() {
                   {f.stories && f.stories.length > 0 ? (
                     <div>
                       <div className="mb-1 text-xs font-semibold text-secondary-text">
-                        故事素材
+                        {t("library.stories")}
                       </div>
                       <div className="flex flex-col gap-1.5">
                         {f.stories.map((s, i) => (
@@ -323,7 +323,7 @@ export function FrameworkLibrary() {
                             ) : null}
                             {s.applyToTopics?.length ? (
                               <div className="mt-0.5 text-tertiary-text">
-                                可复用于：{s.applyToTopics.join(" / ")}
+                                {t("library.storiesApply", { topics: s.applyToTopics.join(" / ") })}
                               </div>
                             ) : null}
                           </div>

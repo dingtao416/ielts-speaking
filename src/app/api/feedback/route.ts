@@ -20,6 +20,7 @@ export async function POST(request: Request) {
       part: body?.part,
       previousPoints: body?.previousPoints,
       mode: body?.mode,
+      lang: body?.lang,
     });
 
     const content = await chatComplete(

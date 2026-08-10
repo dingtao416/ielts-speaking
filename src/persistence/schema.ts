@@ -175,7 +175,7 @@ export const sessionRecords = pgTable(
     fullText: text("full_text").notNull(),
     stats: jsonb("stats").$type<TextStats>().notNull(),
     bands: jsonb("bands").$type<BandScores>(),  // 四维 + overall band 评估
-    bandEstimate: integer("band_estimate"),
+    bandEstimate: numeric("band_estimate", { precision: 3, scale: 1 }),
     reportMarkdown: text("report_markdown"),
     frameworkId: varchar("framework_id", { length: 64 }),
     createdAt: timestamp("created_at", { withTimezone: true })

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n";
 
 export interface FiveTierData {
   original: string;
@@ -16,37 +17,6 @@ export interface FiveTierData {
   currentBand?: number;
 }
 
-const TIERS = [
-  {
-    key: "original",
-    title: "① 你的原文",
-    subtitle: "Original",
-    color: "text-secondary-text",
-    bg: "bg-muted/40",
-  },
-  {
-    key: "structured",
-    title: "② 结构化",
-    subtitle: "Structured",
-    color: "text-foreground",
-    bg: "bg-muted/40",
-  },
-  {
-    key: "improvable",
-    title: "③ 可改进版",
-    subtitle: "Improve & fix",
-    color: "text-foreground",
-    bg: "bg-muted/40",
-  },
-  {
-    key: "target",
-    title: "④ 目标级回答",
-    subtitle: "Target band",
-    color: "text-green-700 dark:text-green-400",
-    bg: "bg-green-50 dark:bg-green-950/40",
-  },
-] as const;
-
 export function FiveTierView({
   data,
   loading,
@@ -58,7 +28,39 @@ export function FiveTierView({
   error?: string | null;
   onGenerate: () => void;
 }) {
+  const { t } = useT();
   const [expanded, setExpanded] = useState<string | null>("target");
+
+  const TIERS = [
+    {
+      key: "original",
+      title: t("fiveTier.tier.original"),
+      subtitle: "Original",
+      color: "text-secondary-text",
+      bg: "bg-muted/40",
+    },
+    {
+      key: "structured",
+      title: t("fiveTier.tier.structured"),
+      subtitle: "Structured",
+      color: "text-foreground",
+      bg: "bg-muted/40",
+    },
+    {
+      key: "improvable",
+      title: t("fiveTier.tier.improvable"),
+      subtitle: "Improve & fix",
+      color: "text-foreground",
+      bg: "bg-muted/40",
+    },
+    {
+      key: "target",
+      title: t("fiveTier.tier.target"),
+      subtitle: "Target band",
+      color: "text-green-700 dark:text-green-400",
+      bg: "bg-green-50 dark:bg-green-950/40",
+    },
+  ] as const;
 
   if (!data) {
     return (
@@ -66,10 +68,10 @@ export function FiveTierView({
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-foreground" aria-hidden="true" />
-            <h3 className="text-base font-semibold">目标级回答</h3>
+            <h3 className="text-base font-semibold">{t("fiveTier.title")}</h3>
           </div>
           <p className="text-sm text-secondary-text">
-            根据你的当前水平，生成从原文到目标分的升级回答
+            {t("fiveTier.desc")}
           </p>
           <Button
             onClick={onGenerate}
@@ -78,7 +80,7 @@ export function FiveTierView({
             className="w-fit"
           >
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            {loading ? "生成中…" : "生成目标级回答"}
+            {loading ? t("fiveTier.generating") : t("fiveTier.generate")}
           </Button>
           {error ? (
             <p className="text-sm text-[var(--filler-color)]">{error}</p>
@@ -96,10 +98,13 @@ export function FiveTierView({
       <div className="mb-4 flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-foreground" aria-hidden="true" />
-          <h3 className="text-base font-semibold">目标级回答</h3>
+          <h3 className="text-base font-semibold">{t("fiveTier.title")}</h3>
           {data.currentBand !== undefined && data.targetBand !== undefined ? (
             <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-secondary-text">
-              当前 {data.currentBand.toFixed(1)} → 目标 {data.targetBand.toFixed(1)}
+              {t("fiveTier.band", {
+                current: data.currentBand.toFixed(1),
+                target: data.targetBand.toFixed(1),
+              })}
             </span>
           ) : null}
         </div>
@@ -149,7 +154,7 @@ export function FiveTierView({
 
         {/* 提升步骤 */}
         <div className="rounded-xl border border-border bg-muted/40 p-4">
-          <div className="mb-2 text-sm font-semibold">⑤ 提升步骤</div>
+          <div className="mb-2 text-sm font-semibold">{t("fiveTier.steps")}</div>
           <ol className="list-inside list-decimal space-y-1 text-sm text-secondary-text">
             {data.steps.map((step, i) => (
               <li key={i}>{step}</li>

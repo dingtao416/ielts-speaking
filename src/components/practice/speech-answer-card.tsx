@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react";
 import { Mic, Square } from "lucide-react";
 
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
-import { highlightTokens } from "@/lib/lexicon";
+import { countUnits, highlightTokens, langFromAsr } from "@/lib/lexicon";
 import { useT } from "@/lib/i18n";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -20,7 +21,8 @@ export function SpeechAnswerCard({
   onResult: (text: string) => void;
 }) {
   const { t } = useT();
-  const speech = useSpeechRecognition("en-US");
+  const asrLang = useSettingsStore((s) => s.asrLang);
+  const speech = useSpeechRecognition(asrLang);
   const fullTextRef = useRef("");
   const interimRef = useRef("");
   const onResultRef = useRef(onResult);
@@ -59,14 +61,15 @@ export function SpeechAnswerCard({
               dangerouslySetInnerHTML={{
                 __html: highlightTokens(
                   `${fullTextRef.current}${interimRef.current ? " " + interimRef.current : ""}`,
+                  langFromAsr(asrLang),
                 ),
               }}
             />
           ) : (
             <p className="text-sm text-tertiary-text">
               {speech.state === "listening"
-                ? "正在聆听…"
-                : "点击下方按钮开始作答"}
+                ? t("practice.speechCard.listening")
+                : t("practice.speechCard.startHint")}
             </p>
           )
         ) : (
@@ -101,7 +104,7 @@ export function SpeechAnswerCard({
         )}
         {fullTextRef.current ? (
           <span className="text-xs text-tertiary-text">
-            {fullTextRef.current.split(/\s+/).length} {t("common.words")}
+            {countUnits(fullTextRef.current, langFromAsr(asrLang))} {t("common.words")}
           </span>
         ) : null}
       </div>

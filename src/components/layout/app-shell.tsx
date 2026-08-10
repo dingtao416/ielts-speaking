@@ -1,8 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { TopNav } from "@/components/layout/top-nav";
+import { useT } from "@/lib/i18n";
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { t } = useT();
   return (
     <>
       <TopNav />
@@ -12,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 text-sm text-tertiary-text sm:px-6">
           <span>IELTS Speaking Trainer</span>
-          <span>基于历年真题 · 提炼框架 · 预测背诵</span>
+          <span>{t("appShell.tagline")}</span>
         </div>
       </footer>
     </>

@@ -7,7 +7,7 @@ import type { TextStats } from "@/lib/lexicon";
 export interface CoachTip {
   id: string;
   text: string;
-  category: "good" | "filler" | "hedge" | "vague" | "grammar" | "ai";
+  category: "good" | "filler" | "hedge" | "vague" | "chinglish" | "grammar" | "ai";
 }
 
 interface PracticeState {

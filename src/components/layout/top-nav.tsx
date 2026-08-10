@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpenText, LogOut, Mic, Settings2 } from "lucide-react";
+import { BookOpenText, LogOut, Mic, Settings2, TrendingUp } from "lucide-react";
 
 import { authClient } from "@/auth-client";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
@@ -17,7 +17,9 @@ export function TopNav() {
 
   const navItems = [
     { href: "/bank", label: t("nav.bank"), icon: BookOpenText },
-    { href: "/library", label: t("nav.library"), icon: Settings2 },
+    { href: "/library", label: t("nav.library"), icon: BookOpenText },
+    { href: "/progress", label: t("nav.progress"), icon: TrendingUp },
+    { href: "/settings", label: t("nav.settings"), icon: Settings2 },
   ];
 
   function linkFor(href: string) {
@@ -40,15 +42,16 @@ export function TopNav() {
               {t("brand.name")}
             </span>
           </Link>
-          <nav className="hidden items-center gap-1 sm:flex">
+          <nav className="flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={pathname.startsWith(item.href) ? "page" : undefined}
-                className={`rounded-lg px-3 py-2 text-sm transition-all duration-150 hover:bg-muted active:scale-[0.98] ${linkFor(item.href)}`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-all duration-150 hover:bg-muted active:scale-[0.98] ${linkFor(item.href)}`}
               >
-                {item.label}
+                <item.icon className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{item.label}</span>
               </Link>
             ))}
           </nav>

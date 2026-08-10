@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { getBankIndex } from "@/lib/bank";
 import { BankBrowser } from "@/components/bank/bank-browser";
+import { BankPageHeader } from "@/components/bank/bank-page-header";
 
 export const metadata: Metadata = {
   title: "题库 | 雅思口语训练",
@@ -15,12 +16,7 @@ export default function BankPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">雅思口语题库</h1>
-        <p className="text-sm text-secondary-text">
-          历年真题训练 · 预测题背诵
-        </p>
-      </div>
+      <BankPageHeader />
 
       <BankBrowser realYears={realYears} predictedYears={predictedYears} />
     </div>

@@ -1,7 +1,7 @@
 // 雅思口语 LLM Prompt 构建器
 // 从旧 lib/prompts.js 移植并雅思化。
 
-import type { TextStats } from "@/lib/lexicon";
+import type { AnalysisLang, TextStats } from "@/lib/lexicon";
 import type { Question } from "@/lib/bank";
 
 export interface RealtimeContext {
@@ -10,6 +10,7 @@ export interface RealtimeContext {
   part?: number;
   previousPoints?: string[];
   mode?: "train" | "recite";
+  lang?: AnalysisLang;
 }
 
 /** 实时教练 Prompt：输出 1 条 ≤8 字的提示 */
@@ -21,6 +22,8 @@ export function getRealtimePrompt(
   const elapsedMin = Math.floor(elapsed / 60);
   const topic = context.topic ?? "";
   const prevPoints = context.previousPoints ?? [];
+  const lang = context.lang ?? "en";
+  const lowBandSample = lang === "zh" ? "好/开心/多" : "good/bad/very";
 
   let contextBlock = "";
   if (elapsedMin > 0) contextBlock += `[已说${elapsedMin}分钟] `;
@@ -30,7 +33,7 @@ export function getRealtimePrompt(
     contextBlock += `[已说过的要点: ${prevPoints.join(";")}]`;
 
   return {
-    system: `你是雅思口语陪练教练。用户在用英语回答雅思口语题。每次只输出1条提示，不超过8个汉字或10个英文单词，不加标点，不解释。
+    system: `你是雅思口语陪练教练。用户正在${lang === "zh" ? "用中文（普通话）回答雅思口语题" : "用英语回答雅思口语题"}。每次只输出1条提示，不超过8个汉字或10个英文单词，不加标点，不解释。
 
 你的职责：根据最新这段话，判断是否触发以下任一规则。触发了输出对应提示。都没触发输出空行。
 
@@ -47,7 +50,7 @@ export function getRealtimePrompt(
 9. 抽象→具象：连续抽象概念没给具体→输出「给个例子 / Be specific」
 10. 主题漂移：明显偏离题目→输出「跑题 / Off-topic」
 11. 背诵痕迹：语速均匀无停顿、像背书→输出「慢一点像聊天 / Natural tone」
-12. 低分词：刚出现 good/bad/very 等低分词→输出「换高分词 / Upgrade」
+12. 低分词：刚出现 ${lowBandSample} 等低分词→输出「换高分词 / Upgrade」
 
 ## 硬性约束
 - 只输出提示文本本身，什么都不要多说
@@ -73,7 +76,14 @@ export function getReportPrompt(
       }`
     : "";
 
-  const system = `你是资深雅思口语考官与教练（考过 IELTS，熟悉官方评分标准）。请根据用户的英文口语回答，生成一份详细的雅思口语练习报告，用 Markdown 格式输出。
+  const lang = stats.lang ?? "en";
+  const answerLang = lang === "zh" ? "中文（普通话）" : "英文";
+  const lowBandSample = lang === "zh" ? "好/开心/多" : "good/bad/very";
+  const countLabel = lang === "zh" ? "总字数" : "总词数";
+  const lowBandLabel = lang === "zh" ? "低分/口语化词" : "低分词";
+  const chinglishTitle = lang === "zh" ? "## 🌏 口语化/冗余表达专项" : "## 🌏 中式英语专项";
+
+  const system = `你是资深雅思口语考官与教练（考过 IELTS，熟悉官方评分标准）。请根据用户的${answerLang}口语回答，生成一份详细的雅思口语练习报告，用 Markdown 格式输出。
 
 # 雅思口语练习报告
 
@@ -98,18 +108,18 @@ export function getReportPrompt(
 >
 > 原因: XXX
 
-优先改进：低分词（good/bad/very 等）、中式英语、重复、跑题、缺乏细节。
+优先改进：低分词（${lowBandSample} 等）、中式英语、重复、跑题、缺乏细节。
 
 ## 💎 用词升级（词汇资源）
 
 列一个表格，把用户用到的低分词升级为高分词：
 | 原词 | 高分替换 | 说明 |
 
-## 🌏 地道度专项（中式英语）
+${chinglishTitle}
 
-列出检测到的中式英语/不地道表达，给出更自然的英文：
-- 中式表达: "XXX"
-- 更地道: "XXX"
+列出检测到的不地道/冗余表达，给出更自然的说法：
+- 原表达: "XXX"
+- 更自然: "XXX"
 - 说明: XXX
 
 ## 📋 数据
@@ -117,11 +127,11 @@ export function getReportPrompt(
 | 指标 | 数值 |
 |---|---|
 | 时长 | ${stats.duration}秒 |
-| 总词数 | ${stats.totalWords} |
+| ${countLabel} | ${stats.totalWords} |
 | 填充词 | ${stats.fillers}次 |
 | 犹豫词 | ${stats.hedges}次 |
-| 低分词 | ${stats.vagueWords}次 |
-| 中式英语 | ${stats.chinglish}次 |
+| ${lowBandLabel} | ${stats.vagueWords}次 |
+| 口语化/中式表达 | ${stats.chinglish}次 |
 | 表达密度 | ${stats.density}% |
 
 ## 🎯 下次练习重点
@@ -129,15 +139,15 @@ export function getReportPrompt(
 只给1条最关键的改进方向 + 具体怎么练。
 
 ---
-语气：直接、专业、有建设性。像严格但真心的考官。用中文写报告，引用英文原文。`;
+语气：直接、专业、有建设性。像严格但真心的考官。用中文写报告，引用${answerLang}原文。`;
 
-  const user = `以下是用户的英文口语回答：
+  const user = `以下是用户的${answerLang}口语回答：
 ${questionBlock}
 
 ---
 ${fullText.slice(0, 20000)}
 ---
-数据: ${stats.duration}秒 | ${stats.totalWords}词 | 填充词${stats.fillers} | 犹豫词${stats.hedges} | 低分词${stats.vagueWords} | 中式英语${stats.chinglish}`;
+数据: ${stats.duration}秒 | ${countLabel} ${stats.totalWords} | 填充词${stats.fillers} | 犹豫词${stats.hedges} | ${lowBandLabel}${stats.vagueWords} | 口语化表达${stats.chinglish}`;
 
   return { system, user };
 }
@@ -258,9 +268,13 @@ ${answerBlock}`;
 /** 单次练习评估 Prompt：输入一次回答，输出四维 band（JSON） */
 export function getAssessPrompt(
   fullText: string,
-  stats: { totalWords: number; fillers: number; hedges: number; vagueWords: number; chinglish: number; density: number },
+  stats: { totalWords: number; fillers: number; hedges: number; vagueWords: number; chinglish: number; density: number; lang?: AnalysisLang },
   question?: Question,
 ) {
+  const lang = stats.lang ?? "en";
+  const countLabel = lang === "zh" ? "总字数" : "总词数";
+  const lowBandLabel = lang === "zh" ? "低分/口语化词" : "低分词";
+
   const system = `你是雅思口语考官。请评估用户这次回答的 Band 分数（0-9，可带 .5）。
 
 只输出一个 JSON 对象，不要输出任何其他内容：
@@ -282,7 +296,7 @@ export function getAssessPrompt(
 
 mainIssues 给 1-3 条本次最需要改进的点（中文，具体）。
 
-参考统计：总词数 ${stats.totalWords}，填充词 ${stats.fillers}，犹豫词 ${stats.hedges}，低分词 ${stats.vagueWords}，中式英语 ${stats.chinglish}，表达密度 ${stats.density}%。`;
+参考统计：${countLabel} ${stats.totalWords}，填充词 ${stats.fillers}，犹豫词 ${stats.hedges}，${lowBandLabel} ${stats.vagueWords}，口语化/中式表达 ${stats.chinglish}，表达密度 ${stats.density}%。`;
 
   const user = `${question ? `题目: ${question.question}\n` : ""}用户的回答：
 ---

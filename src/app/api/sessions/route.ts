@@ -57,7 +57,10 @@ export async function POST(request: Request) {
       fullText: body.fullText.slice(0, 20000),
       stats: body.stats,
       bands: body.bands ?? null,
-      bandEstimate: body.bandEstimate ?? null,
+      bandEstimate:
+        typeof body.bandEstimate === "number"
+          ? String(body.bandEstimate)
+          : null,
       reportMarkdown: body.reportMarkdown?.slice(0, 30000) ?? null,
       frameworkId: body.frameworkId ?? null,
     })

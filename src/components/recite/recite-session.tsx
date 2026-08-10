@@ -7,16 +7,18 @@ import { ArrowLeft, Eye, EyeOff, Mic, Square, Wand2 } from "lucide-react";
 import type { Question } from "@/lib/bank";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
-import { analyzeText, highlightTokens } from "@/lib/lexicon";
+import { analyzeText, highlightTokens, langFromAsr } from "@/lib/lexicon";
 import type { Framework } from "@/lib/frameworks";
 import { usePracticeStore } from "@/store/sessionStore";
 import { useT } from "@/lib/i18n";
 import { useSettingsStore } from "@/store/settingsStore";
+import { getModelAnswerPrompt } from "@/lib/prompts";
 import { Button } from "@/components/ui/button";
 
 export function ReciteSession({ question }: { question: Question }) {
   const { t } = useT();
   const asrLang = useSettingsStore((s) => s.asrLang);
+  const analysisLang = langFromAsr(asrLang);
   const speech = useSpeechRecognition(asrLang);
   const timer = useTimer();
   const store = usePracticeStore();
@@ -54,7 +56,7 @@ export function ReciteSession({ question }: { question: Question }) {
     speech.setOnResult((result) => {
       if (result.isFinal) {
         store.appendFinal(result.text);
-        const analysis = analyzeText(store.fullText + " " + result.text);
+        const analysis = analyzeText(store.fullText + " " + result.text, analysisLang);
         if (analysis) {
           store.updateStats({ ...analysis, duration: timer.elapsed });
         }
@@ -62,7 +64,7 @@ export function ReciteSession({ question }: { question: Question }) {
         store.setInterim(result.text);
       }
     });
-  }, [speech, store, timer.elapsed]);
+  }, [speech, store, timer.elapsed, analysisLang]);
 
   const saveSessionRef = useRef<() => void>(() => {});
   saveSessionRef.current = () => {
@@ -96,24 +98,14 @@ export function ReciteSession({ question }: { question: Question }) {
   async function generateModelAnswer() {
     setGeneratingAnswer(true);
     try {
+      const prompt = getModelAnswerPrompt(question);
       const res = await fetch("/api/llm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [
-            {
-              role: "system",
-              content:
-                "你是雅思口语考官，根据题目生成一个 Band 7 水平的示范回答（英文，约120-180词）。要求：结构清晰、使用高分词汇、自然有交流感。最后用中文一句话点评。",
-            },
-            {
-              role: "user",
-              content: `Part ${question.part} 题目: ${question.question}${
-                question.cueCard
-                  ? `\nCue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}`
-                  : ""
-              }`,
-            },
+            { role: "system", content: prompt.system },
+            { role: "user", content: prompt.user },
           ],
           maxTokens: 600,
         }),
@@ -151,7 +143,7 @@ export function ReciteSession({ question }: { question: Question }) {
       <div className="rounded-2xl border border-border p-6">
         <div className="mb-2 flex items-center gap-2">
           <span className="rounded-md bg-foreground px-2 py-0.5 text-xs font-semibold text-background">
-            Part {question.part} · 预测题
+            Part {question.part} · {t("recite.predicted")}
           </span>
           <span className="text-xs font-medium text-tertiary-text">
             {question.topic} · {question.year}
@@ -199,7 +191,7 @@ export function ReciteSession({ question }: { question: Question }) {
                 {cues.length > 0 ? (
                   <div>
                     <div className="mb-1.5 text-xs font-semibold text-secondary-text">
-                      要点提示
+                      {t("recite.cues")}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {cues.map((cue, i) => (
@@ -216,7 +208,7 @@ export function ReciteSession({ question }: { question: Question }) {
                 {expressions.length > 0 ? (
                   <div>
                     <div className="mb-1.5 text-xs font-semibold text-secondary-text">
-                      高分表达
+                      {t("recite.expressions")}
                     </div>
                     <div className="flex flex-col gap-1.5">
                       {expressions.map((e, i) => (
@@ -235,7 +227,7 @@ export function ReciteSession({ question }: { question: Question }) {
               <p className="text-sm text-tertiary-text">{t("recite.hint")}</p>
             ) : (
               <p className="text-sm text-tertiary-text">
-                还没有这个话题的框架，先去题库练一道题生成框架吧。
+                {t("recite.noFramework")}
               </p>
             )}
           </div>
@@ -274,14 +266,14 @@ export function ReciteSession({ question }: { question: Question }) {
                   <p
                     key={i}
                     className="text-lg leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightTokens(s) }}
+                    dangerouslySetInnerHTML={{ __html: highlightTokens(s, analysisLang) }}
                   />
                 ))}
                 {store.interimText ? (
                   <p
                     className="text-lg leading-relaxed opacity-60"
                     dangerouslySetInnerHTML={{
-                      __html: highlightTokens(store.interimText),
+                      __html: highlightTokens(store.interimText, analysisLang),
                     }}
                   />
                 ) : null}
