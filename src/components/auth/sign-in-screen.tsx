@@ -244,7 +244,6 @@ export function SignInScreen({
 
     setSignupFieldErrors({});
     setBusy(true);
-    rememberVerificationEmail(normalizedEmail);
 
     try {
       const response = await authClient.signUp.email({
@@ -265,6 +264,7 @@ export function SignInScreen({
         return;
       }
 
+      rememberVerificationEmail(normalizedEmail);
       setNotice(
         "Enter the six-digit code sent to your email to activate the account.",
       );

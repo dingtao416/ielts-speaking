@@ -312,10 +312,21 @@ export function resolveAuthTrustedOrigins(environment: ServerEnvironment) {
     const baseUrl = new URL(environment.baseUrl);
 
     if (baseUrl.hostname === "localhost" || baseUrl.hostname === "127.0.0.1") {
-      const loopbackAlias = new URL(baseUrl);
-      loopbackAlias.hostname =
+      // hostname 别名：localhost ↔ 127.0.0.1
+      const hostnameAlias = new URL(baseUrl);
+      hostnameAlias.hostname =
         baseUrl.hostname === "localhost" ? "127.0.0.1" : "localhost";
-      origins.add(loopbackAlias.origin);
+      origins.add(hostnameAlias.origin);
+
+      // 协议别名：http ↔ https（本地 HTTPS dev server 常见，避免登出 403）
+      const protocolAlias = new URL(baseUrl);
+      protocolAlias.protocol = baseUrl.protocol === "https:" ? "http:" : "https:";
+      origins.add(protocolAlias.origin);
+      // 组合：协议 + hostname 都换
+      const both = new URL(protocolAlias);
+      both.hostname =
+        baseUrl.hostname === "localhost" ? "127.0.0.1" : "localhost";
+      origins.add(both.origin);
     }
   }
 

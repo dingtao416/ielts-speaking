@@ -44,29 +44,53 @@ function resolveEndpoint() {
   return null;
 }
 
+/** 给 fetch 加超时：超时抛出明确错误，避免前端无限等待 */
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = 20_000,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(`LLM request timed out after ${timeoutMs}ms`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function chatComplete(
   messages: LlmMessage[],
-  options?: { maxTokens?: number; temperature?: number },
+  options?: { maxTokens?: number; temperature?: number; timeoutMs?: number },
 ): Promise<string> {
   const config = resolveEndpoint();
   if (!config) {
     throw new Error("LLM provider is not configured on the server.");
   }
 
-  const response = await fetch(config.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.key}`,
+  const response = await fetchWithTimeout(
+    config.url,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.key}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages,
+        max_tokens: options?.maxTokens ?? 1024,
+        temperature: options?.temperature ?? environment.llm.temperature,
+        stream: false,
+      }),
     },
-    body: JSON.stringify({
-      model: config.model,
-      messages,
-      max_tokens: options?.maxTokens ?? 1024,
-      temperature: options?.temperature ?? environment.llm.temperature,
-      stream: false,
-    }),
-  });
+    options?.timeoutMs ?? 20_000,
+  );
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -75,8 +99,12 @@ export async function chatComplete(
 
   const data = await response.json();
   const message = data?.choices?.[0]?.message;
+  // DeepSeek 的 message 可能含 reasoning_content(思考)和 content(正式回答)。
+  // 优先取 content，只有 content 完全缺失时才回退到 reasoning_content。
   const content: string | undefined =
-    message?.content || message?.reasoning_content;
+    typeof message?.content === "string" && message.content
+      ? message.content
+      : message?.reasoning_content;
   if (!content) {
     throw new Error("LLM returned empty content.");
   }
@@ -91,6 +119,7 @@ export async function chatCompleteStream(
     temperature?: number;
     onChunk: (text: string) => void;
     signal?: AbortSignal;
+    timeoutMs?: number;
   },
 ): Promise<string> {
   const config = resolveEndpoint();
@@ -98,21 +127,25 @@ export async function chatCompleteStream(
     throw new Error("LLM provider is not configured on the server.");
   }
 
-  const response = await fetch(config.url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.key}`,
+  const response = await fetchWithTimeout(
+    config.url,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${config.key}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages,
+        max_tokens: options?.maxTokens ?? 2048,
+        temperature: options?.temperature ?? environment.llm.temperature,
+        stream: true,
+      }),
+      signal: options?.signal,
     },
-    body: JSON.stringify({
-      model: config.model,
-      messages,
-      max_tokens: options?.maxTokens ?? 2048,
-      temperature: options?.temperature ?? environment.llm.temperature,
-      stream: true,
-    }),
-    signal: options?.signal,
-  });
+    options?.timeoutMs ?? 20_000,
+  );
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -142,9 +175,10 @@ export async function chatCompleteStream(
       if (payload === "[DONE]") continue;
       try {
         const parsed = JSON.parse(payload);
-        const delta =
-          parsed?.choices?.[0]?.delta?.content ||
-          parsed?.choices?.[0]?.delta?.reasoning_content;
+        const d = parsed?.choices?.[0]?.delta ?? {};
+        // DeepSeek 流式先输出 reasoning_content(思考)再输出 content(正式回答)。
+        // 这里只透传 content，避免把思考过程当答案流式输出给用户。
+        const delta = typeof d.content === "string" ? d.content : "";
         if (delta) {
           full += delta;
           options?.onChunk(delta);
@@ -162,12 +196,15 @@ export async function chatCompleteStream(
 export function parseJsonFromLlm<T>(content: string): T {
   // 去除可能的 ```json ... ``` 包裹
   const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const raw = fenced ? fenced[1] : content;
+  let raw = fenced ? fenced[1] : content;
   // 找到第一个 { 和最后一个 } 之间的内容
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
   if (start === -1 || end === -1 || end <= start) {
     throw new Error("LLM output contains no JSON object");
   }
-  return JSON.parse(raw.slice(start, end + 1)) as T;
+  raw = raw.slice(start, end + 1);
+  // 容错：去掉尾随逗号（LLM 常见错误），并修复数组/对象间缺逗号的情况
+  raw = raw.replace(/,\s*([}\]])/g, "$1");
+  return JSON.parse(raw) as T;
 }

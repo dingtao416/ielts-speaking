@@ -664,6 +664,91 @@ export function highlightTokens(text: string, lang: AnalysisLang = "en"): string
   return parts.join("");
 }
 
+/** 标黄词汇的匹配结果（供单题反馈的词汇联动交互使用） */
+export interface VagueHit {
+  start: number;
+  end: number;
+  original: string;
+  suggestion: string;
+}
+
+/**
+ * 收集文本中可提升的词汇表达（仅低分词，PRD 实时区"仅黄色·仅词汇"）。
+ * 返回匹配位置与建议，供录制实时区 / 单题反馈使用。
+ */
+export function collectVagueHits(
+  text: string,
+  lang: AnalysisLang = "en",
+): VagueHit[] {
+  const resolved = resolveLang(text, lang);
+  const lexicon = getLexicon(resolved);
+  const textLower = text.toLowerCase();
+  const hits: VagueHit[] = [];
+
+  for (const key of Object.keys(lexicon.vague)) {
+    const suggestion = lexicon.vague[key].slice(0, 3).join(" / ");
+    if (resolved === "zh") {
+      for (const hit of matchChinese(textLower, [key])) {
+        hits.push({
+          start: hit.index,
+          end: hit.index + key.length,
+          original: text.slice(hit.index, hit.index + key.length),
+          suggestion,
+        });
+      }
+    } else {
+      const regex = new RegExp(`\\b${escapeRegExp(key)}\\b`, "gi");
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(textLower)) !== null) {
+        hits.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          original: match[0],
+          suggestion,
+        });
+      }
+    }
+  }
+
+  // 按位置排序
+  hits.sort((a, b) => a.start - b.start);
+  return hits;
+}
+
+/**
+ * 只标黄色词汇的转写 HTML（PRD 实时区克制原则：实时区仅标可提升的词汇表达）。
+ * 与 collectVagueHits 配对使用：同一个文本的两个视角（统计 + 渲染）。
+ */
+export function highlightVagueOnly(
+  text: string,
+  lang: AnalysisLang = "en",
+): string {
+  const hits = collectVagueHits(text, lang);
+  if (hits.length === 0) {
+    return escapeHtml(text);
+  }
+
+  const parts: string[] = [];
+  let cursor = 0;
+  for (const hit of hits) {
+    if (hit.start < cursor) continue;
+    if (hit.start > cursor) {
+      parts.push(escapeHtml(text.slice(cursor, hit.start)));
+    }
+    const raw = text.slice(hit.start, hit.end);
+    const title = escapeAttr(hit.suggestion);
+    parts.push(
+      `<mark class="hl-vague" title="${title}" data-vague="${escapeAttr(hit.original)}" data-suggestion="${title}">${escapeHtml(raw)}</mark>`,
+    );
+    cursor = hit.end;
+  }
+  if (cursor < text.length) {
+    parts.push(escapeHtml(text.slice(cursor)));
+  }
+
+  return parts.join("");
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")

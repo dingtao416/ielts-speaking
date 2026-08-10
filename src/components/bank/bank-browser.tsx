@@ -24,8 +24,9 @@ export function BankBrowser({
 
   // 层级 1：真题/预测题
   const [category, setCategory] = useState<"real" | "predicted">("real");
-  // 层级 2：年份（选中后，话题随之联动）
-  const [year, setYear] = useState<number>(0);
+  // 层级 2：年份（默认选中最新年份，话题随之联动）
+  const initialYear = category === "real" ? (realYears[0] ?? 0) : (predictedYears[0] ?? 0);
+  const [year, setYear] = useState<number>(initialYear);
   // 层级 3：话题（依赖所选年份）
   const [topic, setTopic] = useState<string>("");
   // Part 小筛选
@@ -50,19 +51,21 @@ export function BankBrowser({
 
   function switchCategory(next: "real" | "predicted") {
     setCategory(next);
-    setYear(0);
+    // 切换分类后默认选中该分类的最新年份
+    setYear(next === "real" ? (realYears[0] ?? 0) : (predictedYears[0] ?? 0));
     setTopic("");
     setPart(0);
   }
 
   function selectYear(y: number) {
-    setYear(y === year ? 0 : y); // 再点一次取消
+    setYear(y);
     setTopic("");
     setPart(0);
   }
 
   function practiceHref(q: Question) {
-    return `/practice/${q.id}`;
+    // PRD：按话题进入 AI 逐题会话练习
+    return `/practice/topic/${encodeURIComponent(q.topic)}`;
   }
   function reciteHref(q: Question) {
     return `/recite/${q.id}`;
@@ -110,17 +113,6 @@ export function BankBrowser({
           </h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => selectYear(0)}
-            className={`rounded-xl px-5 py-3 text-base font-semibold transition-colors ${
-              year === 0
-                ? "bg-foreground text-background"
-                : "border border-border text-secondary-text hover:border-foreground hover:text-foreground"
-            }`}
-          >
-            {t("bank.year.all")}
-          </button>
           {years.map((y) => (
             <button
               key={y}

@@ -91,9 +91,12 @@ export function createAuthEmailSender({
           subject,
           text,
         });
-      } catch {
+      } catch (error) {
+        // 透传底层错误便于排查（连接/认证/收件人被拒等）
+        const detail =
+          error instanceof Error ? error.message : String(error);
         throw new Error(
-          "Authentication email delivery failed through SMTP.",
+          `Authentication email delivery failed through SMTP. ${detail}`,
         );
       }
       return;

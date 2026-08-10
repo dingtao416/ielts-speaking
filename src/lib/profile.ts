@@ -94,3 +94,38 @@ export function buildStagePath(current: number, target: number): string[] {
   steps.push(`冲刺 ${target} 分：使用更复杂句式，主动组织结构，应对追问时展开观点。`);
   return steps;
 }
+
+/**
+ * 规划阶段目标（activeStageBand）：
+ * 从当前水平到最终目标的中间档位，首个为当前训练目标。
+ * 例：当前 5.0、目标 8.0 → [6.5, 7.0, 8.0]（PRD 5.1）
+ * 当前 5.0、目标 6.5 → [6.0, 6.5]
+ * 差距 ≤ 0.5 时直接取最终目标。
+ */
+export function planStageBands(current: number, finalGoal: number): number[] {
+  const gap = finalGoal - current;
+  if (gap <= 0.5) {
+    return [roundHalf(finalGoal)];
+  }
+  // 首档：从当前到目标的中位档（如 5.0→8.0 取 6.5）
+  const first = roundHalf(current + gap / 2);
+  const stages: number[] = [first];
+  // 剩余档位：从 first 以 0.5 步进到 finalGoal
+  let band = roundHalf(first + 0.5);
+  while (band < finalGoal) {
+    stages.push(roundHalf(band));
+    band = roundHalf(band + 0.5);
+  }
+  stages.push(roundHalf(finalGoal));
+  return [...new Set(stages)];
+}
+
+/** 取当前训练目标（阶段目标第一个档位） */
+export function activeStageBand(
+  current: number | undefined,
+  finalGoal: number | undefined,
+): number {
+  if (typeof finalGoal !== "number") return 6.5;
+  if (typeof current !== "number") return roundHalf(finalGoal);
+  return planStageBands(current, finalGoal)[0];
+}

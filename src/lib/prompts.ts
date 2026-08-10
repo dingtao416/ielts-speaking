@@ -306,55 +306,105 @@ ${fullText.slice(0, 6000)}
   return { system, user };
 }
 
-/** 五层目标级回答 Prompt */
-export function getFiveTierPrompt(
-  question: Question,
-  fullText: string,
-  context?: {
-    targetBand?: number;
-    currentBand?: number;
-    framework?: { structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; stories?: { title: string; events: string[] }[] } | null;
-    mainIssues?: string[];
-  },
-) {
-  const target = context?.targetBand ?? 6.5;
-  const current = context?.currentBand ?? 5.0;
-  const fwBlock = context?.framework
-    ? `
-已有的答题框架:
-- 结构: ${(context.framework.structure ?? []).join(" → ") || "无"}
-- 要点: ${(context.framework.keyPoints ?? []).join("; ") || "无"}
-- 高分表达: ${(context.framework.expressions ?? []).map((e) => e.phrase).join("; ") || "无"}
-${context.framework.stories?.length ? `- 故事素材: ${context.framework.stories.map((s) => `${s.title}(${s.events.join("/")})`).join("; ")}` : ""}`
-    : "";
-  const issuesBlock = context?.mainIssues?.length
-    ? `\n重点改进方向: ${context.mainIssues.join("; ")}`
-    : "";
+/** AI 逐题追问 Prompt：生成当前话题的下一道英文 Part 1 问题 */
+export function getFollowUpQuestionPrompt(params: {
+  topic: string;
+  year?: number;
+  currentQuestion?: string;
+  lastAnswer?: string;
+  round: number; // 1-3 当前是第几问
+  stageBand?: number; // 当前训练目标
+}) {
+  const {
+    topic,
+    year,
+    currentQuestion,
+    lastAnswer,
+    round,
+    stageBand,
+  } = params;
 
-  const system = `你是雅思口语教练。用户当前口语水平约 ${current} 分，目标 ${target} 分。请把用户的回答升级为 5 层目标级回答（全部用英文输出）。
+  const isFollowUp = round > 1 && lastAnswer?.trim();
 
-只输出一个 JSON 对象：
-{
-  "original": "用户原文（直接引用，不改动）",
-  "structured": "结构化版本：不改变原意，但调整顺序和连接，逻辑更清晰，适合 ${current} 分水平",
-  "improvable": "可改进版本：在保持用户能理解的前提下，修正明显语法错误、补充原因和例子、替换重复低分词（不要用超出用户水平的生僻词）",
-  "target": "目标级回答：达到 ${target} 分要求的完整回答，结构清晰、有具体细节、词汇适当升级、句式有变化",
-  "steps": ["具体提升步骤1", "步骤2", "步骤3"],
-  "focus": "一句话说明本次重点（中文）"
+  const system = `你是雅思口语考官。用户在练习雅思口语 Part 1，话题是「${topic}」。${year ? `考季 ${year}。` : ""}你负责用英文逐题提问，模拟真实 Part 1 面试节奏。
+
+要求：
+- 只输出一道英文问题（JSON），不要任何解释。
+- 输出格式：{"question": "..."}
+- 问题必须符合 Part 1 风格：关于熟悉、日常的话题，简短、直接、自然。
+- 不提前给出答案，不把用户没说过的事实写进问题。
+- 所有问题必须围绕「${topic}」这一话题，不跳到其他话题。
+- 保持问题的多样性和递进感，避免重复问同一件事。${stageBand ? `用户当前训练目标是 ${stageBand} 分，问题难度匹配该水平。` : ""}`;
+
+  const user = isFollowUp
+    ? `当前是第 ${round} 问。上一题: "${currentQuestion}"\n用户上一轮的回答: "${lastAnswer?.slice(0, 600)}"\n\n请基于以上内容,提出下一道与话题「${topic}」相关的英文问题。若用户回答信息不足以自然衔接，可提一道针对性追问；否则换一个新角度。`
+    : `当前是第 1 问。请提出话题「${topic}」的第一道英文 Part 1 问题。`;
+
+  return { system, user };
 }
 
-关键原则：
-- 所有版本都要用用户能掌握的词汇句式，循序渐进，不硬塞生僻词
-- structured 和 improvable 的水平接近用户当前 ${current} 分，target 才接近 ${target} 分
-- 优先帮用户：减少语法错误、补充原因/例子、自然连接、替换重复词、提高完整性
-- 如果用户原文很短（<50词），所有版本都可以适度扩写，但不要编造用户没说过的事实${issuesBlock}`;
+/** 推荐回答流式 Prompt：只生成阶段匹配的推荐回答（精简，加快输出） */
+export function getRecommendedAnswerPrompt(params: {
+  topic: string;
+  question: string;
+  transcript: string;
+  stageBand?: number;
+}) {
+  const { topic, question, transcript, stageBand } = params;
+  const band = stageBand ?? 6.5;
 
-  const user = `${question.part === 2 && question.cueCard ? `Cue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}\n\n` : ""}题目: ${question.question}${fwBlock}
+  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」）。请生成一段符合用户当前训练目标（${band} 分）的推荐回答。
 
-用户的回答：
+要求：
+- 直接输出英文推荐回答本身，不要任何解释、引号或 markdown 标记。
+- 保留用户原意和主要信息，结构清晰、有具体细节、词汇适当升级，但不超出 ${band} 分水平。
+- 控制在 60-100 词左右，一段话。
+- 不做单题评分。`;
+
+  const user = `题目: ${question}
+
+用户的回答:
 ---
-${fullText.slice(0, 8000)}
+${transcript.slice(0, 2000)}
 ---`;
+
+  return { system, user };
+}
+
+/** 单题表达反馈 Prompt：生成阶段匹配的推荐回答 + 词汇建议（不做单题判分） */
+export function getSingleResponseFeedbackPrompt(params: {
+  topic: string;
+  question: string;
+  transcript: string;
+  stageBand?: number;
+}) {
+  const { topic, question, transcript, stageBand } = params;
+  const band = stageBand ?? 6.5;
+
+  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」）。请生成符合用户当前训练目标（${band} 分）的单题表达反馈。
+
+必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释、不要尾随逗号）：
+{
+  "recommendedAnswer": "...",
+  "vocabularyHighlights": [
+    {"original": "...", "suggestion": "...", "note": "..."}
+  ],
+  "grammarNotes": "...",
+  "naturalRewrite": "..."
+}
+
+字段要求：
+- recommendedAnswer: 按 ${band} 分水平生成的推荐回答，保留用户原意和主要信息，结构清晰、有具体细节、词汇适当升级，但不超出该水平
+- vocabularyHighlights: 从用户转录稿中挑选 2-5 个可提升的词汇表达，数组每个元素必须是 {"original","suggestion","note"} 三键，键名和值都必须是双引号字符串，元素间用逗号分隔
+- grammarNotes: 语法与句子结构建议(中文，简要)
+- naturalRewrite: 保留原意的自然改写（整句，英文）
+
+关键原则：
+- recommendedAnswer 保留用户原回答的意图和主要信息，不是从零写高分范文
+- 不输出单题分数、四维评分或"优点/优先改进"卡片
+- 所有字段都要有内容，不要空字符串`;
+
+  const user = `题目: ${question}\n\n用户的回答:\n---\n${transcript.slice(0, 2000)}\n---`;
 
   return { system, user };
 }
