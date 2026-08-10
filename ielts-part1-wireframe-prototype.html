@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IELTS Part 1 AI Coach Wireframe</title>
+  <style>
+    :root {
+      --canvas: #f3f4f6;
+      --surface: #ffffff;
+      --surface-soft: #f8f9fb;
+      --ink: #171a1f;
+      --muted: #5e6672;
+      --line: #cdd2da;
+      --line-strong: #8d96a3;
+      --primary: #20252c;
+      --primary-text: #ffffff;
+      --yellow: #f3d65f;
+      --yellow-deep: #755a00;
+      --red: #a52b2b;
+      --green: #24663c;
+      --focus: #0b63ce;
+      --shadow: 0 1px 2px rgb(23 26 31 / 8%);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --radius: 5px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--canvas); }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--canvas);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 10px 16px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 180ms ease-out, border-color 180ms ease-out, transform 180ms ease-out;
+    }
+
+    button:hover { background: #eef0f3; }
+    button:active { transform: translateY(1px); }
+    button:focus-visible, select:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .button-primary { color: var(--primary-text); background: var(--primary); border-color: var(--primary); }
+    .button-primary:hover { background: #363c45; }
+    .button-danger { color: var(--red); border-color: #d7a3a3; white-space: nowrap; }
+    .button-quiet { border-color: transparent; background: transparent; }
+    .button-quiet:hover { background: #e9ecf0; }
+
+    .shell { min-height: 100dvh; display: grid; grid-template-columns: 224px minmax(0, 1fr); }
+
+    .side {
+      padding: var(--space-5) var(--space-3);
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .brand { display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-2); font-weight: 700; }
+    .brand-mark { width: 24px; height: 24px; border: 2px solid var(--ink); display: grid; place-items: center; font-size: 12px; line-height: 1; }
+
+    .side nav { display: grid; gap: var(--space-1); }
+    .side nav button { min-height: 44px; text-align: left; border: 0; border-left: 3px solid transparent; border-radius: 0; background: transparent; }
+    .side nav button:hover { background: var(--surface-soft); }
+    .side nav button[aria-current="page"] { font-weight: 700; border-left-color: var(--ink); background: #edf0f3; }
+
+    .learner-status { margin-top: auto; padding: var(--space-4); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); }
+    .learner-status p { margin: 0 0 var(--space-2); color: var(--muted); font-size: 13px; }
+    .level-row { display: flex; justify-content: space-between; gap: var(--space-2); padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
+    .level-row strong { font-variant-numeric: tabular-nums; }
+
+    .app { min-width: 0; display: flex; flex-direction: column; }
+    .topbar { min-height: 72px; padding: 0 var(--space-6); border-bottom: 1px solid var(--line); background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .eyebrow { margin: 0; color: var(--muted); font-size: 13px; }
+    .topbar h1 { margin: 0; font-size: 20px; line-height: 1.25; }
+    .top-status { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+    main { width: min(1080px, 100%); margin: 0 auto; padding: 40px var(--space-6) 56px; }
+    .page-head { margin-bottom: var(--space-6); }
+    .page-head h2 { max-width: 760px; margin: 0 0 var(--space-2); font-size: 30px; line-height: 1.24; }
+    .page-head p { max-width: 680px; margin: 0; color: var(--muted); }
+
+    .section-label { margin: 0 0 var(--space-3); color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    .year-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+    .year-tab { min-width: 68px; padding: 8px 12px; font-variant-numeric: tabular-nums; }
+    .year-tab[aria-pressed="true"] { color: var(--primary-text); background: var(--primary); border-color: var(--primary); }
+    .part-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+    .part-tab { min-width: 116px; min-height: 56px; padding: 8px 12px; text-align: left; }
+    .part-tab span { display: block; }
+    .part-tab .part-name { font-size: 16px; font-weight: 700; }
+    .part-tab .part-status { margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .part-tab[aria-pressed="true"] { color: var(--primary-text); background: var(--primary); border-color: var(--primary); }
+    .part-tab[aria-pressed="true"] .part-status { color: var(--primary-text); }
+    .topic-list { display: grid; border-top: 1px solid var(--line); }
+    .topic-row { min-height: 86px; padding: var(--space-3) var(--space-4); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+    .topic-row:hover { background: var(--surface); }
+    .topic-row strong, .topic-row span { display: block; }
+    .topic-row strong { font-size: 18px; }
+    .topic-row span { color: var(--muted); font-size: 14px; }
+    .topic-row .row-action { color: var(--ink); font-weight: 700; white-space: nowrap; }
+
+    .split { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: var(--space-6); align-items: start; }
+    .panel { padding: var(--space-5); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .panel h3 { margin: 0 0 var(--space-3); font-size: 18px; }
+    .panel p { margin: 0; color: var(--muted); }
+    .panel + .panel { margin-top: var(--space-4); }
+
+    .session-steps { padding: 0; margin: var(--space-4) 0 0; list-style: none; }
+    .session-steps li { position: relative; padding: 0 0 var(--space-4) 28px; color: var(--muted); }
+    .session-steps li::before { position: absolute; left: 0; top: 2px; width: 16px; height: 16px; content: ""; border: 1px solid var(--line-strong); background: var(--surface); }
+    .session-steps li:last-child { padding-bottom: 0; }
+    .session-steps .complete::before { border-color: var(--ink); background: var(--ink); }
+
+    .action-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-5); }
+    .action-row .push { margin-left: auto; }
+    .notice { margin-top: var(--space-4); padding: 12px; border-left: 3px solid var(--line-strong); background: var(--surface-soft); color: var(--muted); }
+    .notice strong { color: var(--ink); }
+
+    .question-shell { min-height: 460px; display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-6); }
+    .question-meta { display: flex; flex-wrap: wrap; gap: var(--space-2); color: var(--muted); font-size: 14px; }
+    .question-meta span { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; }
+    .question-text { max-width: 760px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 34px; font-weight: 400; line-height: 1.25; }
+    .question-prompt { margin: var(--space-3) 0 0; color: var(--muted); }
+
+    .record-zone { padding: var(--space-5); border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); }
+    .record-zone-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+    .record-zone h3 { margin: 0; font-size: 16px; }
+    .timer { color: var(--ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .record-state { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .wave { height: 52px; margin: var(--space-4) 0; display: flex; align-items: center; gap: 5px; }
+    .wave span { width: 4px; background: var(--ink); opacity: .75; }
+    .wave span:nth-child(1) { height: 14px; } .wave span:nth-child(2) { height: 28px; } .wave span:nth-child(3) { height: 40px; }
+    .wave span:nth-child(4) { height: 22px; } .wave span:nth-child(5) { height: 48px; } .wave span:nth-child(6) { height: 32px; }
+    .wave span:nth-child(7) { height: 18px; } .wave span:nth-child(8) { height: 44px; } .wave span:nth-child(9) { height: 26px; }
+    .wave span:nth-child(10) { height: 38px; } .wave span:nth-child(11) { height: 16px; } .wave span:nth-child(12) { height: 30px; }
+    .transcript { min-height: 138px; padding: var(--space-4); border: 1px solid var(--line); background: var(--surface-soft); font-size: 17px; line-height: 1.7; }
+    mark { padding: 1px 2px; background: var(--yellow); color: var(--ink); }
+    .suggestion { margin-top: var(--space-3); padding: 10px 12px; border-left: 3px solid var(--yellow-deep); background: #fff8d7; color: #463600; }
+    .suggestion strong { font-weight: 700; }
+    .recording-actions { margin-top: var(--space-4); display: flex; align-items: center; gap: var(--space-3); }
+    .recording-dot { display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; background: var(--red); }
+
+    .answer-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+    .answer-panel { min-height: 240px; padding: var(--space-5); border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+    .answer-panel h3, .answer-panel h4 { margin: 0 0 var(--space-2); font-size: 18px; }
+    .answer-panel .panel-note { margin: 0 0 var(--space-4); color: var(--muted); font-size: 14px; }
+    .answer-text { margin: 0; font-size: 17px; line-height: 1.8; }
+    .answer-panel.recommended { border-color: var(--line-strong); background: #fafbfc; }
+    .answer-panel.recommended .answer-text { color: #2d343e; }
+    .topic-evaluation { margin-bottom: var(--space-6); padding: var(--space-5); border-left: 4px solid var(--ink); background: var(--surface); }
+    .topic-evaluation h3 { margin: 0 0 var(--space-2); font-size: 20px; }
+    .topic-evaluation h4 { margin: var(--space-4) 0 var(--space-1); font-size: 15px; }
+    .topic-evaluation p { max-width: 780px; margin: 0; color: var(--muted); }
+    .topic-summary-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-5); }
+    .topic-summary-copy { min-width: 0; }
+    .topic-summary-copy h2 { max-width: 760px; }
+    .topic-summary-copy > p { max-width: 680px; }
+    .topic-estimate { flex: 0 0 auto; display: grid; gap: 2px; min-width: 148px; padding-left: var(--space-4); border-left: 1px solid var(--line-strong); }
+    .topic-estimate span, .topic-estimate small { color: var(--muted); font-size: 13px; }
+    .topic-estimate strong { color: var(--ink); font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .topic-review-list { border-top: 2px solid var(--ink); }
+    .topic-review { padding: 32px 0; border-bottom: 1px solid var(--line-strong); }
+    .topic-review-head { display: flex; justify-content: space-between; align-items: start; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .topic-review-head h3 { max-width: 760px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 400; line-height: 1.3; }
+    .topic-review-meta { flex: 0 0 auto; margin: 2px 0 0; color: var(--muted); font-size: 14px; white-space: nowrap; }
+    .topic-review .recording-wrap { margin-bottom: var(--space-5); }
+    .topic-review .recording-wrap h4 { margin: 0 0 var(--space-2); font-size: 15px; }
+    .vocab-trigger {
+      display: inline;
+      min-height: 0;
+      padding: 1px 3px;
+      color: var(--ink);
+      background: var(--yellow);
+      border: 0;
+      border-bottom: 2px solid var(--yellow-deep);
+      border-radius: 0;
+      font: inherit;
+      font-weight: 700;
+      line-height: inherit;
+      text-decoration: none;
+    }
+    .vocab-trigger:hover, .vocab-trigger:focus-visible { background: #f8df7b; }
+    .vocab-trigger:focus-visible { outline-offset: 3px; }
+    .vocab-summary { margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--line); }
+    .vocab-summary h3 { margin: 0 0 var(--space-2); font-size: 18px; }
+    .vocab-summary > p { margin: 0 0 var(--space-3); color: var(--muted); font-size: 14px; }
+    .vocab-list { display: grid; gap: var(--space-2); }
+    .vocab-item { display: grid; grid-template-columns: minmax(120px, .8fr) minmax(0, 1.4fr) minmax(0, 1.8fr); gap: var(--space-3); align-items: center; padding: var(--space-4); border: 1px solid var(--line); background: var(--surface); transition: background-color 180ms ease-out, border-color 180ms ease-out, box-shadow 180ms ease-out; }
+    .vocab-item.is-linked { border-color: var(--yellow-deep); background: #fff9df; box-shadow: 0 0 0 3px rgb(243 214 95 / 60%), inset 4px 0 0 var(--yellow); }
+    .vocab-item.is-linked .vocab-suggestion { text-decoration: underline; }
+    .vocab-item p { margin: 0; }
+    .vocab-original { font-weight: 700; }
+    .vocab-suggestion { color: var(--green); font-weight: 700; }
+    .vocab-use { color: var(--muted); font-size: 14px; }
+
+    .summary-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); }
+    .summary-table th, .summary-table td { padding: 14px var(--space-4); text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    .summary-table th { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .summary-table tr:last-child td { border-bottom: 0; }
+    .summary-table button { min-height: 38px; padding: 6px 10px; }
+
+    .review-block { padding: var(--space-5); border-top: 1px solid var(--line); }
+    .review-block:first-of-type { border-top: 0; }
+    .review-block h3 { margin: 0 0 var(--space-3); font-size: 17px; }
+    .recording-bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--line); background: var(--surface-soft); }
+    .recording-bar button { min-height: 38px; padding: 6px 10px; }
+    .recording-track { flex: 1; height: 7px; background: #d9dde3; }
+    .recording-track i { display: block; width: 46%; height: 100%; background: var(--ink); }
+    .transcript-final { margin: 0; padding: var(--space-4); border-left: 3px solid var(--line-strong); background: var(--surface-soft); line-height: 1.8; }
+    .feedback-list { margin: 0; padding-left: 20px; }
+    .feedback-list li + li { margin-top: 10px; }
+    .history-list { display: grid; gap: var(--space-2); }
+    .history-row { width: 100%; min-height: 76px; padding: var(--space-3) var(--space-4); display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); text-align: left; border-color: var(--line); }
+    .history-row:hover { border-color: var(--ink); background: var(--surface); }
+    .history-row strong, .history-row span { display: block; }
+    .history-row span { color: var(--muted); font-size: 14px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+    .field label { display: block; margin-bottom: 7px; font-weight: 700; }
+    .field select { width: 100%; min-height: 44px; padding: 0 10px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); }
+    .topic-toggles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+    .topic-toggle { min-height: 54px; text-align: left; }
+    .topic-toggle[aria-pressed="true"] { color: var(--primary-text); background: var(--primary); border-color: var(--primary); }
+
+    .path { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
+    .path span { padding: 7px 10px; border: 1px solid var(--line); background: var(--surface); font-variant-numeric: tabular-nums; }
+    .path .current { border-color: var(--ink); font-weight: 700; }
+    .path-arrow { color: var(--muted); }
+    .stage-result { padding: var(--space-5); border: 2px solid var(--ink); background: var(--surface); }
+    .stage-result strong { display: block; margin: 8px 0; font-size: 52px; line-height: 1; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: var(--space-4); background: rgb(23 26 31 / 58%); }
+    .topic-modal { width: min(620px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 40px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); box-shadow: 0 18px 48px rgb(23 26 31 / 28%); animation: modal-in 180ms ease-out; }
+    .topic-modal h2 { margin: 0 0 var(--space-3); font-size: 30px; line-height: 1.24; }
+    .topic-modal > p { margin: 0; color: var(--muted); }
+    .next-topic-preview { margin-top: var(--space-5); padding: var(--space-5); border: 2px solid var(--ink); background: var(--surface-soft); }
+    .next-topic-preview span, .next-topic-preview small { display: block; color: var(--muted); font-size: 14px; }
+    .next-topic-preview strong { display: block; margin: 6px 0; font-size: 28px; line-height: 1.25; }
+    .topic-modal .action-row { margin-top: var(--space-5); }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 900px) {
+      .split { grid-template-columns: 1fr; }
+      .answer-compare { grid-template-columns: 1fr; }
+      .vocab-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .vocab-use { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 700px) {
+      .shell { display: block; }
+      .side { position: static; padding: var(--space-3) var(--space-4); border-right: 0; border-bottom: 1px solid var(--line); gap: var(--space-3); }
+      .brand { padding: 0; }
+      .side nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+      .side nav button { min-height: 44px; padding: 8px 4px; text-align: center; border-left: 0; border-bottom: 3px solid transparent; font-size: 14px; }
+      .side nav button[aria-current="page"] { border-left: 0; border-bottom-color: var(--ink); }
+      .learner-status { display: none; }
+      .topbar { min-height: 64px; padding: 0 var(--space-4); }
+      .top-status { display: none; }
+      main { padding: 28px var(--space-4) 44px; }
+      .page-head h2 { font-size: 26px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .topic-row { padding: var(--space-3); }
+      .question-text { font-size: 29px; }
+      .question-shell { min-height: auto; }
+      .topic-evaluation { padding: var(--space-4); }
+      .topic-summary-header { display: block; }
+      .topic-estimate { width: fit-content; margin-top: var(--space-4); padding: var(--space-3) 0 0; border-top: 1px solid var(--line-strong); border-left: 0; }
+      .topic-review { padding: var(--space-5) 0; }
+      .topic-review-head { display: block; }
+      .topic-review-head h3 { font-size: 22px; }
+      .topic-review-meta { margin-top: var(--space-2); white-space: normal; }
+      .answer-panel { min-height: auto; padding: var(--space-4); }
+      .vocab-item { grid-template-columns: 1fr; gap: var(--space-2); }
+      .vocab-use { grid-column: auto; }
+      .topic-modal { padding: var(--space-5); }
+      .topic-modal h2 { font-size: 26px; }
+      .summary-table thead { display: none; }
+      .summary-table, .summary-table tbody, .summary-table tr, .summary-table td { display: block; width: 100%; }
+      .summary-table tr { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); }
+      .summary-table td { padding: 4px 0; border: 0; }
+      .summary-table td::before { display: inline-block; width: 74px; color: var(--muted); font-size: 13px; }
+      .summary-table td:nth-child(1)::before { content: "Question"; }
+      .summary-table td:nth-child(2)::before { content: "Record"; }
+      .summary-table td:nth-child(3) { margin-top: var(--space-2); }
+      .action-row .push { margin-left: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="announcer" class="sr-only" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const practiceQuestions = [
+        "What kinds of music do you enjoy listening to?",
+        "How does listening to music affect your mood?",
+        "Do you think your taste in music has changed in recent years?"
+      ];
+
+      const practiceQuestionsByTopic = {
+        "Music": practiceQuestions,
+        "Hometown": [
+          "What do you like most about your hometown?",
+          "Is there anything you would like to change about your hometown?",
+          "Do you often meet your friends in your hometown?"
+        ],
+        "Work or studies": [
+          "Do you work or are you a student?",
+          "What do you enjoy most about your work or studies?",
+          "Is there anything you would like to change about your daily routine?"
+        ],
+        "Outdoor activities": [
+          "What outdoor activities do you enjoy?",
+          "Do you often spend time outdoors?",
+          "Did you spend more time outdoors when you were a child?"
+        ],
+        "Films": [
+          "Do you often watch films?",
+          "What kinds of films do you enjoy?",
+          "Do you prefer watching films at home or in a cinema?"
+        ]
+      };
+
+      const diagnosticQuestions = [
+        "What kinds of music do you enjoy listening to?",
+        "When do you usually listen to music?",
+        "Do you prefer listening to music alone or with other people?",
+        "Has your taste in music changed since you were younger?",
+        "What do you like most about your hometown?",
+        "Is there anything you would like to change about your hometown?",
+        "Do you often meet your friends in your hometown?",
+        "Do you think you will continue to live there in the future?"
+      ];
+
+      const staticHistory = {
+        id: "history-2026-03",
+        question: "What kinds of music do you enjoy listening to?",
+        topic: "Music",
+        transcript: "Well, I really like pop music because it can make me feel relaxed after a busy day. I often listen to it on my way home from school.",
+        timestamp: "2026-08-03 20:14",
+        year: "2026",
+        isSeasonNew: true
+      };
+
+      const topicsByYear = {
+        "2026": [
+          { topic: "Music", detail: "当季新题 · 3 次历史训练" },
+          { topic: "Hometown", detail: "当季新题 · 1 次历史训练" },
+          { topic: "Work or studies", detail: "当季新题 · 尚未练习" },
+          { topic: "Sharing things", detail: "当季新题 · 尚未练习" }
+        ],
+        "2025": [
+          { topic: "Outdoor activities", detail: "历年题目 · 2 次历史训练" },
+          { topic: "Daily routine", detail: "历年题目 · 4 次历史训练" },
+          { topic: "Borrowing and lending", detail: "历年题目 · 尚未练习" }
+        ],
+        "2024": [
+          { topic: "Jewellery", detail: "历年题目 · 1 次历史训练" },
+          { topic: "Teachers", detail: "历年题目 · 尚未练习" },
+          { topic: "Films", detail: "历年题目 · 2 次历史训练" }
+        ],
+        "2023": [
+          { topic: "Social media", detail: "历年题目 · 1 次历史训练" },
+          { topic: "Meeting new people", detail: "历年题目 · 尚未练习" }
+        ],
+        "2022": [
+          { topic: "Chocolate", detail: "历年题目 · 2 次历史训练" },
+          { topic: "Science", detail: "历年题目 · 尚未练习" }
+        ],
+        "2021": [
+          { topic: "Keeping things", detail: "历年题目 · 1 次历史训练" },
+          { topic: "Singing", detail: "历年题目 · 尚未练习" }
+        ],
+        "2020": [
+          { topic: "Art", detail: "历年题目 · 2 次历史训练" },
+          { topic: "Names", detail: "历年题目 · 尚未练习" }
+        ]
+      };
+
+      const historyRecords = [
+        staticHistory,
+        {
+          id: "history-2026-02",
+          question: "How does listening to music affect your mood?",
+          topic: "Music",
+          transcript: "Music normally makes me feel calmer, especially when I listen to it after classes. It helps me stop thinking about small problems for a while.",
+          timestamp: "2026-07-30 19:48",
+          year: "2026",
+          isSeasonNew: true
+        },
+        {
+          id: "history-2026-01",
+          question: "What do you like most about your hometown?",
+          topic: "Hometown",
+          transcript: "What I like most is that my hometown is convenient and my family live close to me. I can see them almost every weekend.",
+          timestamp: "2026-07-18 21:05",
+          year: "2026",
+          isSeasonNew: true
+        },
+        {
+          id: "history-2025-02",
+          question: "What outdoor activities do you enjoy?",
+          topic: "Outdoor activities",
+          transcript: "I enjoy walking in a park with my friends because it is simple and I do not need to prepare many things.",
+          timestamp: "2025-12-21 20:36",
+          year: "2025",
+          isSeasonNew: false
+        },
+        {
+          id: "history-2024-01",
+          question: "Do you often watch films?",
+          topic: "Films",
+          transcript: "Yes, I usually watch a film at home at weekends. It is a good way to relax with my family.",
+          timestamp: "2024-10-05 18:20",
+          year: "2024",
+          isSeasonNew: false
+        }
+      ];
+
+      const state = {
+        view: "practice",
+        session: "practice",
+        phase: "ready",
+        topic: "Music",
+        practiceYear: "2026",
+        practicePart: "1",
+        questionIndex: 0,
+        topicQuestionIndex: 0,
+        targetedFollowUpUsed: false,
+        practiceTopics: ["Music"],
+        topicTransition: "",
+        pendingNextTopic: null,
+        showTopicTransitionModal: false,
+        topicTransitionSource: "diagnosis",
+        topicSummarySource: "session",
+        seconds: 30,
+        responses: [],
+        currentResponse: null,
+        reviewIndex: null,
+        reviewSource: "session",
+        timerId: null,
+        historyRetry: false,
+        diagnosticGoal: "8.0",
+        diagnosticTopics: ["Music", "Hometown"],
+        stageTarget: "6.5",
+        playingRecordingKey: null,
+        historyYear: "all",
+        historyScope: "all",
+        historyRecord: null,
+        historyTopic: null,
+        historyQuestion: null,
+        activeVocabId: null
+      };
+
+      const app = document.getElementById("app");
+      const announcer = document.getElementById("announcer");
+
+      function labelForView() {
+        const labels = {
+          practice: "练习",
+          "diagnostic-setup": "首次诊断",
+          question: "Part 1 练习",
+          recording: "Part 1 练习",
+          diagnosis: "本题反馈",
+          "topic-summary": "话题总结",
+          summary: "本次复盘",
+          review: "逐题复盘",
+          history: "历史训练",
+          goals: "目标",
+          "diagnostic-result": "诊断结果"
+        };
+        return labels[state.view] || "Practice";
+      }
+
+      function currentQuestion() {
+        if (state.historyRetry && state.historyQuestion) return state.historyQuestion;
+        if (state.session === "diagnostic") return diagnosticQuestions[state.questionIndex];
+        return currentTopicQuestions()[state.topicQuestionIndex];
+      }
+
+      function baseQuestionsForTopic(topic) {
+        return practiceQuestionsByTopic[topic] || [
+          `What do you enjoy most about ${topic}?`,
+          `How often do you think about ${topic}?`,
+          `Has your opinion about ${topic} changed in recent years?`
+        ];
+      }
+
+      function currentTopicQuestions() {
+        const questions = [...baseQuestionsForTopic(state.topic)];
+        if (state.targetedFollowUpUsed) questions.push("Could you tell me a little more about why you feel that way?");
+        return questions;
+      }
+
+      function shouldSwitchTopicAfterCurrentResponse() {
+        return state.session === "practice"
+          && state.topicQuestionIndex === currentTopicQuestions().length - 1
+          && !state.currentResponse?.requiresTargetedFollowUp;
+      }
+
+      function nextPracticeTopic() {
+        const topics = (topicsByYear[state.practiceYear] || []).map(item => item.topic);
+        const currentIndex = topics.indexOf(state.topic);
+        return topics[(currentIndex + 1) % topics.length] || state.topic;
+      }
+
+      function moveToNextPracticeTopic() {
+        const previousTopic = state.topic;
+        const nextTopic = state.pendingNextTopic || nextPracticeTopic();
+        state.topic = nextTopic;
+        state.topicQuestionIndex = 0;
+        state.targetedFollowUpUsed = false;
+        state.pendingNextTopic = null;
+        state.showTopicTransitionModal = false;
+        state.topicTransitionSource = "diagnosis";
+        state.topicSummarySource = "session";
+        state.topicTransition = `${previousTopic} 已完成。现在进入 ${nextTopic}。`;
+        if (!state.practiceTopics.includes(nextTopic)) state.practiceTopics.push(nextTopic);
+      }
+
+      function questionTotal() {
+        return state.session === "diagnostic" ? 8 : null;
+      }
+
+      function currentRoundText() {
+        if (state.session === "diagnostic") {
+          const topicRound = state.questionIndex < 4 ? state.questionIndex + 1 : state.questionIndex - 3;
+          return `首次诊断 ${state.questionIndex + 1} / 8 · 话题第 ${topicRound} 问 / 4`;
+        }
+        return state.targetedFollowUpUsed
+          ? "针对性追问 4 / 4"
+          : `话题第 ${state.topicQuestionIndex + 1} 问 / 3`;
+      }
+
+      function setAnnouncement(message) {
+        announcer.textContent = message;
+      }
+
+      function navButton(view, text) {
+        const active = ["question", "recording", "diagnosis", "topic-summary", "summary", "review", "diagnostic-setup", "diagnostic-result"].includes(state.view)
+          ? view === "practice"
+          : state.view === view;
+        return `<button type="button" data-action="navigate" data-view="${view}" ${active ? 'aria-current="page"' : ""}>${text}</button>`;
+      }
+
+      function layout(content) {
+        return `
+          <div class="shell">
+            <aside class="side" aria-label="Main navigation">
+              <div class="brand"><span class="brand-mark" aria-hidden="true">S</span><span>Speak Step</span></div>
+              <nav>
+                ${navButton("practice", "练习")}
+                ${navButton("history", "历史")}
+                ${navButton("goals", "目标")}
+              </nav>
+              <section class="learner-status" aria-label="Current learning targets">
+                <p>当前学习计划</p>
+                <div class="level-row"><span>当前水平</span><strong>5.0</strong></div>
+                <div class="level-row"><span>训练目标</span><strong>${state.stageTarget}</strong></div>
+                <div class="level-row"><span>最终目标</span><strong>8.0</strong></div>
+              </section>
+            </aside>
+            <div class="app">
+              <header class="topbar">
+                <div><p class="eyebrow">IELTS Speaking</p><h1>${labelForView()}</h1></div>
+                <div class="top-status">文字教官</div>
+              </header>
+              <main id="main-content">${content}</main>
+            </div>
+          </div>`;
+      }
+
+      function renderPractice() {
+        const topics = topicsByYear[state.practiceYear] || [];
+        const isCurrentSeason = state.practiceYear === "2026";
+        const activePart = state.practicePart;
+        const partSelector = `<div class="part-tabs" role="group" aria-label="选择雅思口语 Part">
+          ${["1", "2", "3"].map(part => {
+            const available = part === "1";
+            return `<button type="button" class="part-tab" data-action="select-practice-part" data-part="${part}" aria-pressed="${activePart === part}"><span class="part-name">Part ${part}</span><span class="part-status">${available ? "已开放" : "暂未开放"}</span></button>`;
+          }).join("")}
+        </div>`;
+        return layout(`
+          <section class="page-head">
+            <h2>练习</h2>
+            <p>按年份和口语 Part 选择题目。进入话题后，教官会一次提出一道英文问题。</p>
+          </section>
+          <section aria-labelledby="topic-heading">
+            <p id="topic-heading" class="section-label">练习年份</p>
+            <div class="year-tabs" role="group" aria-label="选择练习年份">
+              ${["2026", "2025", "2024", "2023", "2022", "2021", "2020"].map(year => `<button type="button" class="year-tab" data-action="select-practice-year" data-year="${year}" aria-pressed="${state.practiceYear === year}">${year}</button>`).join("")}
+            </div>
+            <p class="section-label">口语 Part</p>
+            ${partSelector}
+            ${activePart === "1"
+              ? `<p class="section-label">${state.practiceYear} / Part 1 / ${isCurrentSeason ? "当季新题" : "历年题目"}</p>
+                <div class="topic-list">
+                  ${topics.map(({ topic, detail }) => `<button type="button" class="topic-row" data-action="choose-topic" data-topic="${topic}" data-year="${state.practiceYear}"><span><strong>${topic}</strong><span>${detail}</span></span><span class="row-action">开始练习</span></button>`).join("")}
+                </div>`
+              : `<div class="notice" role="status"><strong>Part ${activePart} 即将开放。</strong> 当前 MVP 仅提供 Part 1 练习。</div>`}
+          </section>`);
+      }
+
+      function renderDiagnosticSetup() {
+        const topics = ["Music", "Hometown", "Work or studies", "Home and accommodation"];
+        return layout(`
+          <section class="page-head">
+            <h2>设置目标后开始诊断</h2>
+            <p>选择两个熟悉话题。八道问题只会在诊断过程中逐题出现。</p>
+          </section>
+          <section class="panel">
+            <div class="form-grid">
+              <div class="field">
+                <label for="diagnostic-goal">最终目标分</label>
+                <select id="diagnostic-goal" data-field="diagnostic-goal">
+                  ${["6.5", "7.0", "7.5", "8.0"].map(score => `<option value="${score}" ${state.diagnosticGoal === score ? "selected" : ""}>${score}</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <p class="section-label">Part 1 诊断</p>
+                <p>两个话题，约八道有效回答，参考时长为 4-5 分钟。</p>
+              </div>
+            </div>
+            <div style="margin-top: 24px;">
+              <p class="section-label">选择两个话题</p>
+              <div class="topic-toggles">
+                ${topics.map(topic => `<button type="button" class="topic-toggle" data-action="toggle-diagnostic-topic" data-topic="${topic}" aria-pressed="${state.diagnosticTopics.includes(topic)}">${topic}</button>`).join("")}
+              </div>
+            </div>
+            <div class="action-row">
+              <button type="button" class="button-quiet" data-action="navigate" data-view="practice">返回</button>
+              <button type="button" class="button-primary push" data-action="start-diagnostic" ${state.diagnosticTopics.length === 2 ? "" : "disabled"}>开始诊断</button>
+            </div>
+          </section>`);
+      }
+
+      function renderQuestion() {
+        const total = questionTotal();
+        const previousNote = state.historyRetry ? `<div class="notice"><strong>已查看历史训练。</strong> 现在可以开始这道题的新回答。</div>` : "";
+        const topicTransition = state.topicTransition ? `<div class="notice"><strong>话题切换。</strong> ${state.topicTransition}</div>` : "";
+        return layout(`
+          <section class="question-shell">
+            <div>
+              <div class="question-meta"><span>${state.practiceYear}</span><span>${state.topic}</span><span>${currentRoundText()}</span>${total ? `<span>${total} questions required</span>` : ""}</div>
+              ${previousNote}
+              ${topicTransition}
+              <p class="section-label" style="margin-top: 32px;">教官提问</p>
+              <h2 class="question-text">${currentQuestion()}</h2>
+              <p class="question-prompt">思考后再开始回答。</p>
+            </div>
+            <section class="record-zone" aria-label="Recording ready">
+              <div class="record-zone-top"><h3>准备开始</h3><span class="timer">00:30</span></div>
+              <p class="record-state">点击开始录音后，倒计时才会启动。</p>
+              <div class="action-row"><button type="button" class="button-primary" data-action="start-recording">开始录音</button>${state.session === "diagnostic" ? `<button type="button" class="button-quiet" data-action="save-diagnostic-exit">保存并离开</button>` : ""}</div>
+            </section>
+          </section>`);
+      }
+
+      function simulatedTranscript() {
+        const elapsed = 30 - state.seconds;
+        if (elapsed < 3) return "Well, I...";
+        if (elapsed < 7) return "Well, I really like pop music because...";
+        if (elapsed < 13) return "Well, I <mark>really like</mark> pop music because it makes me feel relaxed after a busy day.";
+        if (elapsed < 20) return "Well, I <mark>really like</mark> pop music because it makes me feel relaxed after a busy day. I often listen to it on my way home from school.";
+        return "Well, I <mark>really like</mark> pop music because it makes me feel relaxed after a busy day. I often listen to it on my way home from school, especially when I need a short break.";
+      }
+
+      function renderRecording() {
+        const elapsed = 30 - state.seconds;
+        const hasSuggestion = elapsed >= 7;
+        return layout(`
+          <section class="question-shell">
+            <div>
+              <div class="question-meta"><span>${state.practiceYear}</span><span>${state.topic}</span><span>${currentRoundText()}</span><span>正在录音</span></div>
+              <p class="section-label" style="margin-top: 32px;">教官提问</p>
+              <h2 class="question-text">${currentQuestion()}</h2>
+            </div>
+            <section class="record-zone" aria-label="Active recording and live transcript">
+              <div class="record-zone-top"><h3><span class="recording-dot" aria-hidden="true"></span>正在录音</h3><span class="timer">00:${String(state.seconds).padStart(2, "0")}</span></div>
+              <p class="record-state">稳定识别的内容会持续更新到实时转写中。</p>
+              <div class="wave" aria-hidden="true">${"<span></span>".repeat(12)}</div>
+              <div class="transcript" aria-live="polite">${simulatedTranscript()}</div>
+              ${hasSuggestion ? `<div class="suggestion"><strong>词汇建议</strong><br><mark>really like</mark> 可替换为 <strong>be really into</strong>。</div>` : ""}
+              <div class="recording-actions"><button type="button" class="button-danger" data-action="end-recording">结束回答</button><span class="record-state">倒计时至 00:00 时自动结束录音。</span></div>
+            </section>
+          </section>`);
+      }
+
+      const vocabularyEntries = [
+        {
+          key: "really-like",
+          source: "really like",
+          suggestion: "be really into",
+          use: "表达强烈偏好时使用：I am really into pop music."
+        },
+        {
+          key: "feel-relaxed",
+          source: "feel relaxed",
+          suggestion: "unwind",
+          use: "表达放松时使用：Listening to music helps me unwind after a busy day."
+        }
+      ];
+
+      function vocabularyTrigger(entry, match, scope = "current") {
+        return `<button type="button" class="vocab-trigger" data-vocab-key="${entry.key}" data-vocab-scope="${scope}" aria-controls="vocabulary-summary-${scope}" aria-label="查看 ${match} 的词汇建议" title="查看 ${entry.suggestion} 的建议">${match}</button>`;
+      }
+
+      function transcriptWithVocabularyLinks(transcript, scope = "current") {
+        return vocabularyEntries.reduce((markup, entry) => markup.replace(new RegExp(entry.source, "gi"), match => vocabularyTrigger(entry, match, scope)), transcript);
+      }
+
+      function vocabularySummary(scope = "current") {
+        const activeEntry = vocabularyEntries.find(entry => state.activeVocabId === `${scope}-${entry.key}`) || null;
+        const entries = activeEntry ? [activeEntry] : vocabularyEntries;
+        const helperText = activeEntry
+          ? `当前查看：${activeEntry.source}。移开标黄表达后恢复全部建议。`
+          : "悬停、聚焦或点击转录稿中的黄色表达，可单独查看对应建议。";
+        return `
+          <section id="vocabulary-summary-${scope}" class="vocab-summary" aria-labelledby="vocabulary-summary-heading-${scope}">
+            <h3 id="vocabulary-summary-heading-${scope}">标黄词汇汇总</h3>
+            <p>${helperText}</p>
+            <div class="vocab-list">
+              ${entries.map(entry => `<article id="vocab-${scope}-${entry.key}" class="vocab-item${state.activeVocabId === `${scope}-${entry.key}` ? " is-linked" : ""}" tabindex="-1">
+                <p class="vocab-original"><mark>${entry.source}</mark></p>
+                <p class="vocab-suggestion">${entry.suggestion}</p>
+                <p class="vocab-use">${entry.use}</p>
+              </article>`).join("")}
+            </div>
+          </section>`;
+      }
+
+      function refreshVocabularySummary(scope) {
+        const summary = document.getElementById(`vocabulary-summary-${scope}`);
+        if (summary) summary.outerHTML = vocabularySummary(scope);
+      }
+
+      function showVocabulary(key, scope = "current") {
+        const vocabId = `${scope}-${key}`;
+        if (state.activeVocabId === vocabId) return;
+        state.activeVocabId = vocabId;
+        refreshVocabularySummary(scope);
+        setAnnouncement("Showing one vocabulary suggestion.");
+      }
+
+      function clearVocabulary(scope = "current") {
+        if (!state.activeVocabId?.startsWith(`${scope}-`)) return;
+        state.activeVocabId = null;
+        refreshVocabularySummary(scope);
+        setAnnouncement("Showing all vocabulary suggestions.");
+      }
+
+      function recommendationFor(response) {
+        const question = response.question || "";
+        if (/mood|affect/i.test(question)) return "Listening to pop music usually helps me unwind after a busy day. It clears my mind for a while, especially on my way home from school.";
+        if (/taste.*changed/i.test(question)) return "My taste in music has changed a little in recent years. I used to listen to whatever was popular, but now I am really into calmer pop music because it helps me unwind.";
+        if (/hometown/i.test(question)) return "What I appreciate most about my hometown is that it is convenient and my family live nearby. I can see them at weekends, which makes me feel connected to home.";
+        if (/outdoor/i.test(question)) return "I am really into taking walks in a park with my friends. It is an easy way to unwind, and I do not need to prepare much in advance.";
+        if (/film/i.test(question)) return "I am really into watching films at home at weekends because it helps me unwind with my family after a busy week.";
+        return "I am really into this because it helps me unwind after a busy day. For example, I usually make time for it when I need a short break.";
+      }
+
+      function recordingKeyFor(response, scope) {
+        return `${scope}-${response.id || response.timestamp || response.question}`.replace(/[^a-zA-Z0-9_-]/g, "-");
+      }
+
+      function renderRecordingBar(response, scope) {
+        const key = recordingKeyFor(response, scope);
+        const isPlaying = state.playingRecordingKey === key;
+        const seconds = Math.max(1, Number(response.duration) || 24);
+        return `<div class="recording-bar"><button type="button" data-action="toggle-recording" data-recording-key="${key}" aria-pressed="${isPlaying}">${isPlaying ? "停止播放" : "播放录音"}</button><div class="recording-track" aria-hidden="true"><i style="width: ${isPlaying ? "72" : "46"}%"></i></div><span>00:${String(seconds).padStart(2, "0")}</span></div>`;
+      }
+
+      function topicTransitionModal() {
+        const nextTopic = state.pendingNextTopic || nextPracticeTopic();
+        const returnLabel = state.topicTransitionSource === "topic-summary" ? "返回话题总结" : "返回本题反馈";
+        return `
+          <div class="modal-backdrop">
+            <section class="topic-modal" role="dialog" aria-modal="true" aria-labelledby="topic-transition-title" aria-describedby="topic-transition-description">
+              <p class="section-label">下一话题确认</p>
+              <h2 id="topic-transition-title">${state.topic} 已完成</h2>
+              <p id="topic-transition-description">你已完成这个话题的 ${state.topicQuestionIndex + 1} 道回答。确认后将开始下一个话题的第一问。</p>
+              <div class="next-topic-preview"><span>下一话题</span><strong>${nextTopic}</strong><small>${state.practiceYear} · Part 1 · 从第 1 问开始</small></div>
+              <div class="action-row">
+                <button type="button" class="button-quiet" data-action="cancel-topic-transition">${returnLabel}</button>
+                <button type="button" class="button-danger" data-action="end-session">结束本次练习</button>
+                <button type="button" class="button-primary push" data-action="confirm-next-topic">开始 ${nextTopic}</button>
+              </div>
+            </section>
+          </div>`;
+      }
+
+      function renderDiagnosis() {
+        const isFinalDiagnostic = state.session === "diagnostic" && state.questionIndex === 7;
+        const continueLabel = isFinalDiagnostic
+          ? "查看诊断结果"
+          : state.session === "diagnostic"
+            ? "继续诊断"
+            : shouldSwitchTopicAfterCurrentResponse()
+              ? "完成话题练习"
+              : "下一题";
+        const response = state.currentResponse || staticHistory;
+        return layout(`
+          <section class="page-head">
+            <p class="section-label">本题反馈</p>
+            <h2>这道题已保存。</h2>
+            <p>先对照自己的表达和当前训练阶段的推荐回答，再决定继续或结束本次练习。</p>
+          </section>
+          <section class="answer-compare" aria-label="转录稿与推荐回答对照">
+            <article class="answer-panel">
+              <h3>转录稿</h3>
+              <p class="panel-note">黄色标记为可提升的词汇表达。</p>
+              <p class="answer-text">${transcriptWithVocabularyLinks(response.transcript, "current")}</p>
+            </article>
+            <article class="answer-panel recommended">
+              <h3>推荐回答</h3>
+              <p class="panel-note">保留你的原意，按 ${state.stageTarget} 训练目标调整表达。</p>
+              <p class="answer-text">I am really into pop music because it helps me unwind after a busy day. I usually listen to it on my way home from school, especially when I need to take a short break.</p>
+            </article>
+          </section>
+          ${vocabularySummary("current")}
+          <div class="action-row">
+            ${state.session === "diagnostic" ? `<button type="button" class="button-quiet" data-action="save-diagnostic-exit">保存并离开</button>` : `<button type="button" class="button-quiet" data-action="end-session">结束本次练习</button>`}
+            <button type="button" class="button-primary push" data-action="next-question">${continueLabel}</button>
+          </div>
+          ${state.showTopicTransitionModal ? topicTransitionModal() : ""}`);
+      }
+
+      function topicSummaryResponses() {
+        if (state.topicSummarySource === "history") return state.historyTopic?.records || [];
+        return state.responses.filter(response => response.topic === state.topic);
+      }
+
+      function topicSummaryTitle() {
+        return state.topicSummarySource === "history"
+          ? `${state.historyTopic?.topic || state.topic} · 历史训练`
+          : `${state.topic} 话题总结`;
+      }
+
+      function topicSummaryMeta(rows) {
+        if (state.topicSummarySource === "history") {
+          const historyTopic = state.historyTopic;
+          return `${historyTopic?.year || state.practiceYear} · ${historyTopic?.isSeasonNew ? "当季新题" : "历年题目"} · 最近一次练习 ${historyTopic?.latestTimestamp || ""}`;
+        }
+        return `${state.practiceYear} · Part 1 · 已完成 ${rows.length} 道追问`;
+      }
+
+      function topicEstimatedScore() {
+        return "5.5";
+      }
+
+      function sessionTopicGroups() {
+        const groups = new Map();
+        state.responses.forEach(response => {
+          if (!groups.has(response.topic)) groups.set(response.topic, []);
+          groups.get(response.topic).push(response);
+        });
+        return [...groups.entries()].map(([topic, responses]) => ({ topic, responses }));
+      }
+
+      function renderTopicSummary() {
+        const rows = topicSummaryResponses();
+        const mode = state.topicSummarySource;
+        const summaryTitle = topicSummaryTitle();
+        const evaluation = mode === "history"
+          ? "这次历史训练的预估为 5.5。你能围绕问题表达清楚主要意思，也给出了个人经历；但常用表达重复、信息展开不足，因此表现还没有稳定到 6.0。"
+          : `你已完成 ${rows.length} 道围绕 ${state.topic} 的追问。本话题训练预估为 5.5：你能围绕问题表达清楚主要意思，也给出了个人经历；但常用表达重复、信息展开不足，因此表现还没有稳定到 6.0。`;
+        return layout(`
+          <section class="page-head">
+            <div class="topic-summary-header">
+              <div class="topic-summary-copy"><p class="section-label">${mode === "history" ? "历史话题复盘" : "话题练习完成"}</p><h2>${summaryTitle}</h2><p>${topicSummaryMeta(rows)}</p></div>
+              <div class="topic-estimate" aria-label="话题训练预估 ${topicEstimatedScore()} 分"><span>话题训练预估</span><strong>${topicEstimatedScore()}</strong><small>训练用途，非官方成绩</small></div>
+            </div>
+          </section>
+          <section class="topic-evaluation" aria-labelledby="topic-evaluation-heading">
+            <h3 id="topic-evaluation-heading">话题汇总评价</h3>
+            <p>${evaluation}</p>
+            <h4>为什么是 5.5</h4>
+            <p>回答整体可理解，有基本的原因和例子；但 “really like” 和 “feel relaxed” 等表达重复出现，部分回答停在简单陈述，缺少更具体的原因或细节。</p>
+            <h4>下次尝试优化</h4>
+            <p>每题先替换一个重复表达，再补充一个具体细节。例如用 “be really into” 表达偏好、用 “unwind” 表达放松，并说明何时或为什么会有这种感受。</p>
+          </section>
+          <section class="topic-review-list" aria-labelledby="topic-questions-heading">
+            <p id="topic-questions-heading" class="section-label">分问题解析</p>
+            ${rows.map((response, index) => {
+              const scope = `${mode === "history" ? "history" : "topic"}-${index}`;
+              return `<article class="topic-review" aria-labelledby="topic-question-${scope}">
+                <div class="topic-review-head"><div><p class="section-label">追问 ${index + 1}</p><h3 id="topic-question-${scope}">${response.question}</h3></div><p class="topic-review-meta">${response.timestamp || "刚刚保存"}</p></div>
+                <div class="recording-wrap"><h4>原始录音</h4>${renderRecordingBar(response, scope)}</div>
+                <section class="answer-compare" aria-label="第 ${index + 1} 题转录稿与推荐回答对照">
+                  <article class="answer-panel"><h4>转录稿</h4><p class="panel-note">黄色标记为可提升的词汇表达。</p><p class="answer-text">${transcriptWithVocabularyLinks(response.transcript, scope)}</p></article>
+                  <article class="answer-panel recommended"><h4>推荐回答</h4><p class="panel-note">保留你的原意，按 ${state.stageTarget} 训练目标调整表达。</p><p class="answer-text">${recommendationFor(response)}</p></article>
+                </section>
+                ${vocabularySummary(scope)}
+              </article>`;
+            }).join("") || `<div class="notice"><strong>还没有可汇总的回答。</strong> 完成至少一道回答后，会在这里生成话题复盘。</div>`}
+          </section>
+          <div class="action-row">
+            ${mode === "history"
+              ? `<button type="button" class="button-quiet" data-action="back-from-history-topic">返回历史训练</button><button type="button" class="button-primary push" data-action="retry-history-topic">重新练习这个话题</button>`
+              : `<button type="button" class="button-quiet" data-action="end-session">结束本次练习</button><button type="button" class="button-primary push" data-action="open-next-topic-transition">进入下一话题</button>`}
+          </div>
+          ${state.showTopicTransitionModal ? topicTransitionModal() : ""}`);
+      }
+
+      function renderSummary() {
+        const topicGroups = sessionTopicGroups();
+        const responseCount = state.responses.length;
+        const singleTopic = topicGroups.length <= 1;
+        const completedTopic = topicGroups[0]?.topic || state.topic;
+
+        if (singleTopic) {
+          return layout(`
+            <section class="page-head">
+              <p class="section-label">练习已结束</p>
+              <h2>本次练习已保存</h2>
+              <p>${completedTopic} 话题共保存 ${responseCount} 道回答。</p>
+            </section>
+            <section class="panel">
+              <h3>话题总结已生成</h3>
+              <p>刚刚的话题总结已包含训练预估、判定依据和分问题解析。本次结束页不重复展示这些内容。</p>
+            </section>
+            <div class="action-row">
+              <button type="button" class="button-quiet" data-action="review-session-topic" data-topic="${completedTopic}">查看话题总结</button>
+              <button type="button" class="button-primary push" data-action="navigate" data-view="practice">选择其他话题</button>
+              <button type="button" class="button-quiet" data-action="navigate" data-view="history">查看历史训练</button>
+            </div>`);
+        }
+
+        return layout(`
+          <section class="page-head">
+            <p class="section-label">练习完成</p>
+            <h2>本次练习已保存</h2>
+            <p>已完成 ${topicGroups.length} 个话题、${responseCount} 道回答。以下结论只针对跨话题的共同表现。</p>
+          </section>
+          <div class="split">
+            <section class="stage-result"><span>本次练习训练预估</span><strong>5.5</strong><p>基于跨 ${topicGroups.length} 个话题的 ${responseCount} 道回答得出，仅用于训练，不代表官方雅思成绩。</p></section>
+            <section class="panel"><h3>下一次训练重点</h3><p>多个话题中都出现了常用表达重复、回答展开不足的情况。下一次每题先替换一个重复表达，再补充一个具体原因或例子。</p></section>
+          </div>
+          <section style="margin-top: 32px;" aria-labelledby="topics-heading">
+            <p id="topics-heading" class="section-label">已完成话题</p>
+            <div class="topic-list">
+              ${topicGroups.map(({ topic, responses }) => `<button type="button" class="topic-row" data-action="review-session-topic" data-topic="${topic}"><span><strong>${topic}</strong><span>已保存 ${responses.length} 道回答</span></span><span class="row-action">查看话题总结</span></button>`).join("")}
+            </div>
+          </section>
+          <div class="action-row"><button type="button" class="button-quiet" data-action="navigate" data-view="practice">选择其他话题</button><button type="button" class="button-primary push" data-action="navigate" data-view="history">查看历史训练</button></div>`);
+      }
+
+      function responseForReview() {
+        if (state.reviewSource === "history") return state.historyRecord || staticHistory;
+        return state.responses[state.reviewIndex] || state.currentResponse || staticHistory;
+      }
+
+      function renderReview() {
+        const response = responseForReview();
+        const backLabel = state.reviewSource === "history" ? "返回历史训练" : "返回总评";
+        return layout(`
+          <section class="page-head">
+            <p class="section-label">${response.topic || state.topic} / Question record</p>
+            <h2>${response.question}</h2>
+            <p>Recorded ${response.timestamp || "just now"}. 这道题只保留表达反馈，不单独判分。</p>
+          </section>
+          <section class="panel" style="padding: 0;">
+            <article class="review-block">
+              <h3>原始录音</h3>
+              ${renderRecordingBar(response, "review")}
+            </article>
+            <article class="review-block"><h3>最终转写</h3><p class="transcript-final">${transcriptWithVocabularyLinks(response.transcript, "review")}</p></article>
+            <article class="review-block">${vocabularySummary("review")}</article>
+            <article class="review-block"><h3>语法与句子结构</h3><ul class="feedback-list"><li>将原因和例子分成两句简洁完整的话。</li><li>给例子前使用清晰连接词：“For example” 或 “especially when”。</li><li>自然改写：“I am really into pop music because it helps me relax after a busy day.”</li></ul></article>
+          </section>
+          <div class="action-row">
+            <button type="button" class="button-quiet" data-action="back-from-review">${backLabel}</button>
+            ${state.reviewSource === "history" ? `<button type="button" class="button-primary push" data-action="retry-history-question">再次回答这道题</button>` : ""}
+          </div>`);
+      }
+
+      function filteredHistoryRecords() {
+        return historyRecords
+          .filter(record => state.historyYear === "all" || record.year === state.historyYear)
+          .filter(record => state.historyScope === "all" || record.isSeasonNew)
+          .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+      }
+
+      function groupedHistoryTopics(records) {
+        const groups = new Map();
+        records.forEach(record => {
+          const key = `${record.year}::${record.topic}::${record.isSeasonNew ? "season" : "past"}`;
+          if (!groups.has(key)) {
+            groups.set(key, { key, year: record.year, topic: record.topic, isSeasonNew: record.isSeasonNew, records: [] });
+          }
+          groups.get(key).records.push(record);
+        });
+        return [...groups.values()]
+          .map(group => ({ ...group, latestTimestamp: group.records[0]?.timestamp || "" }))
+          .sort((a, b) => b.latestTimestamp.localeCompare(a.latestTimestamp));
+      }
+
+      function renderHistory() {
+        const topics = groupedHistoryTopics(filteredHistoryRecords());
+        return layout(`
+          <section class="page-head"><h2>历史训练</h2><p>默认展示全部历史训练，按话题的最近练习时间由新到旧排序。</p></section>
+          <section class="panel">
+            <div class="form-grid">
+              <div class="field"><label for="history-year">练习年份</label><select id="history-year" data-field="history-year"><option value="all" ${state.historyYear === "all" ? "selected" : ""}>全部年份</option>${["2026", "2025", "2024", "2023", "2022", "2021", "2020"].map(year => `<option value="${year}" ${state.historyYear === year ? "selected" : ""}>${year}</option>`).join("")}</select></div>
+              <div class="field"><label for="history-scope">题目范围</label><select id="history-scope" data-field="history-scope"><option value="all" ${state.historyScope === "all" ? "selected" : ""}>全部题目</option><option value="season-new" ${state.historyScope === "season-new" ? "selected" : ""}>仅当季新题</option></select></div>
+            </div>
+          </section>
+          <section style="margin-top: 24px;" aria-labelledby="history-list-heading">
+            <p id="history-list-heading" class="section-label">${topics.length} 个历史话题</p>
+            <div class="history-list">
+              ${topics.length ? topics.map(topic => `<button type="button" class="history-row" data-action="history-topic-summary" data-history-topic-key="${topic.key}"><span><strong>${topic.topic}</strong><span>${topic.year} · ${topic.isSeasonNew ? "当季新题" : "历年题目"} · ${topic.records.length} 道已保存回答 · 最近 ${topic.latestTimestamp}</span></span><span>查看话题复盘</span></button>`).join("") : `<div class="notice"><strong>暂无匹配记录。</strong> 调整筛选条件后再查看。</div>`}
+            </div>
+          </section>
+          <div class="notice"><strong>按话题保存。</strong> 打开后可连续回看这个话题下每道追问的录音、转写、推荐回答和词汇建议。</div>`);
+      }
+
+      function renderGoals() {
+        return layout(`
+          <section class="page-head"><h2>目标与训练阶段</h2><p>建议按当前训练阶段生成，不会直接按最终目标分给出。</p></section>
+          <section class="panel">
+            <div class="form-grid">
+              <div class="field"><label for="current-level">当前水平</label><select id="current-level" disabled><option>5.0</option></select></div>
+              <div class="field"><label for="stage-target">当前训练目标</label><select id="stage-target" data-field="stage-target">${["5.5", "6.0", "6.5", "7.0", "7.5", "8.0"].map(score => `<option value="${score}" ${state.stageTarget === score ? "selected" : ""}>${score}</option>`).join("")}</select></div>
+            </div>
+            <div style="margin-top: 24px;"><p class="section-label">阶段路径</p><div class="path"><span>5.0</span><span class="path-arrow">-></span><span class="current">${state.stageTarget}</span><span class="path-arrow">-></span><span>7.0</span><span class="path-arrow">-></span><span>8.0</span></div></div>
+            <div class="action-row"><button type="button" class="button-primary" data-action="save-stage">保存训练目标</button></div>
+          </section>`);
+      }
+
+      function renderDiagnosticResult() {
+        return layout(`
+          <section class="page-head"><p class="section-label">首次诊断完成</p><h2>你的当前训练计划已生成。</h2><p>当前综合水平来自完整诊断，不由单题表现决定。</p></section>
+          <div class="split">
+            <section class="stage-result"><span>当前综合水平</span><strong>5.0</strong><p>你的第一阶段训练目标是 ${state.stageTarget}。建议会先保持在这一难度，直到你准备好进入下一阶段。</p></section>
+            <section class="panel"><h3>阶段路径</h3><div class="path"><span class="current">5.0</span><span class="path-arrow">-></span><span>${state.stageTarget}</span><span class="path-arrow">-></span><span>7.0</span><span class="path-arrow">-></span><span>${state.diagnosticGoal}</span></div><p style="margin-top: 16px;">之后可在“目标”中修改训练阶段。</p></section>
+          </div>
+          <div class="action-row"><button type="button" class="button-primary" data-action="navigate" data-view="practice">开始话题练习</button></div>`);
+      }
+
+      function render() {
+        const views = {
+          practice: renderPractice,
+          "diagnostic-setup": renderDiagnosticSetup,
+          question: renderQuestion,
+          recording: renderRecording,
+          diagnosis: renderDiagnosis,
+          "topic-summary": renderTopicSummary,
+          summary: renderSummary,
+          review: renderReview,
+          history: renderHistory,
+          goals: renderGoals,
+          "diagnostic-result": renderDiagnosticResult
+        };
+        app.innerHTML = views[state.view]();
+        if (state.showTopicTransitionModal) {
+          requestAnimationFrame(() => app.querySelector("[data-action='confirm-next-topic']")?.focus());
+        }
+      }
+
+      function clearTimer() {
+        if (state.timerId) {
+          clearInterval(state.timerId);
+          state.timerId = null;
+        }
+      }
+
+      function startRecording() {
+        clearTimer();
+        state.phase = "recording";
+        state.seconds = 30;
+        state.view = "recording";
+        setAnnouncement("Recording started. Thirty seconds remaining.");
+        state.timerId = setInterval(() => {
+          if (state.seconds <= 1) {
+            state.seconds = 0;
+            stopRecording(true);
+            return;
+          }
+          state.seconds -= 1;
+          render();
+        }, 1000);
+        render();
+      }
+
+      function stopRecording(automatic) {
+        if (state.view !== "recording") return;
+        clearTimer();
+        const question = currentQuestion();
+        const response = {
+          question,
+          topic: state.topic,
+          transcript: "Well, I really like pop music because it makes me feel relaxed after a busy day. I often listen to it on my way home from school, especially when I need a short break.",
+          timestamp: "Just now",
+          duration: 30 - state.seconds,
+          requiresTargetedFollowUp: false
+        };
+        state.responses.push(response);
+        state.currentResponse = response;
+        state.activeVocabId = null;
+        state.phase = "diagnosis";
+        state.view = "diagnosis";
+        setAnnouncement(automatic ? "Time is up. Your response has been saved and feedback is ready." : "Your response has been saved and feedback is ready.");
+        render();
+      }
+
+      function nextQuestion() {
+        if (state.session === "diagnostic" && state.questionIndex === 7) {
+          state.view = "diagnostic-result";
+          setAnnouncement("Initial diagnostic complete. Your training plan is ready.");
+        } else if (state.session === "diagnostic") {
+          state.questionIndex += 1;
+          if (state.questionIndex === 4) state.topic = state.diagnosticTopics[1] || state.topic;
+          state.phase = "ready";
+          state.view = "question";
+          setAnnouncement("Next diagnostic question is ready.");
+        } else if (state.topicQuestionIndex === 2 && !state.targetedFollowUpUsed && state.currentResponse?.requiresTargetedFollowUp) {
+          state.targetedFollowUpUsed = true;
+          state.topicQuestionIndex = 3;
+          state.topicTransition = "";
+          state.phase = "ready";
+          state.view = "question";
+          setAnnouncement("One targeted follow-up is ready.");
+        } else if (shouldSwitchTopicAfterCurrentResponse()) {
+          state.topicSummarySource = "session";
+          state.pendingNextTopic = null;
+          state.showTopicTransitionModal = false;
+          state.phase = "topic-summary";
+          state.view = "topic-summary";
+          state.playingRecordingKey = null;
+          setAnnouncement("Topic practice complete. Your topic summary is ready.");
+        } else {
+          state.topicQuestionIndex += 1;
+          state.topicTransition = "";
+          state.phase = "ready";
+          state.view = "question";
+          state.historyRetry = false;
+          setAnnouncement("Next coach question is ready.");
+        }
+        render();
+      }
+
+      function chooseTopic(topic, year) {
+        clearTimer();
+        state.session = "practice";
+        state.topic = topic;
+        state.practiceYear = year || state.practiceYear;
+        state.questionIndex = 0;
+        state.topicQuestionIndex = 0;
+        state.targetedFollowUpUsed = false;
+        state.practiceTopics = [topic];
+        state.topicTransition = "";
+        state.pendingNextTopic = null;
+        state.showTopicTransitionModal = false;
+        state.topicTransitionSource = "diagnosis";
+        state.topicSummarySource = "session";
+        state.responses = [];
+        state.currentResponse = null;
+        state.activeVocabId = null;
+        state.playingRecordingKey = null;
+        state.historyTopic = null;
+        state.historyRetry = false;
+        state.historyQuestion = null;
+        state.phase = "ready";
+        state.view = "question";
+        setAnnouncement(`${topic} topic selected. The first question is ready.`);
+        render();
+      }
+
+      function toggleDiagnosticTopic(topic) {
+        if (state.diagnosticTopics.includes(topic)) {
+          state.diagnosticTopics = state.diagnosticTopics.filter(item => item !== topic);
+        } else if (state.diagnosticTopics.length < 2) {
+          state.diagnosticTopics = [...state.diagnosticTopics, topic];
+        }
+        render();
+      }
+
+      function startDiagnostic() {
+        if (state.diagnosticTopics.length !== 2) return;
+        state.session = "diagnostic";
+        state.topic = state.diagnosticTopics[0];
+        state.questionIndex = 0;
+        state.topicQuestionIndex = 0;
+        state.targetedFollowUpUsed = false;
+        state.topicTransition = "";
+        state.pendingNextTopic = null;
+        state.showTopicTransitionModal = false;
+        state.topicTransitionSource = "diagnosis";
+        state.topicSummarySource = "session";
+        state.responses = [];
+        state.currentResponse = null;
+        state.activeVocabId = null;
+        state.playingRecordingKey = null;
+        state.phase = "ready";
+        state.view = "question";
+        setAnnouncement("Initial diagnostic started. Question one of eight is ready.");
+        render();
+      }
+
+      function handleAction(action, element) {
+        switch (action) {
+          case "navigate":
+            clearTimer();
+            state.view = element.dataset.view;
+            state.playingRecordingKey = null;
+            state.pendingNextTopic = null;
+            state.showTopicTransitionModal = false;
+            setAnnouncement(`${labelForView()} opened.`);
+            render();
+            break;
+          case "select-practice-year": state.practiceYear = element.dataset.year; render(); break;
+          case "select-practice-part": state.practicePart = element.dataset.part; render(); break;
+          case "choose-topic": chooseTopic(element.dataset.topic, element.dataset.year); break;
+          case "open-diagnostic": state.view = "diagnostic-setup"; render(); break;
+          case "toggle-diagnostic-topic": toggleDiagnosticTopic(element.dataset.topic); break;
+          case "start-diagnostic": startDiagnostic(); break;
+          case "start-recording": startRecording(); break;
+          case "end-recording": stopRecording(false); break;
+          case "next-question": nextQuestion(); break;
+          case "open-next-topic-transition":
+            state.pendingNextTopic = nextPracticeTopic();
+            state.topicTransitionSource = "topic-summary";
+            state.showTopicTransitionModal = true;
+            state.phase = "topic-transition";
+            setAnnouncement(`Next topic confirmation is ready. ${state.pendingNextTopic} will begin after confirmation.`);
+            render();
+            break;
+          case "confirm-next-topic":
+            moveToNextPracticeTopic();
+            state.phase = "ready";
+            state.view = "question";
+            state.historyRetry = false;
+            setAnnouncement(`Topic changed to ${state.topic}. The first question is ready.`);
+            render();
+            break;
+          case "cancel-topic-transition":
+            state.pendingNextTopic = null;
+            state.showTopicTransitionModal = false;
+            state.phase = state.topicTransitionSource === "topic-summary" ? "topic-summary" : "diagnosis";
+            state.view = state.topicTransitionSource === "topic-summary" ? "topic-summary" : "diagnosis";
+            setAnnouncement(state.topicTransitionSource === "topic-summary" ? "Returned to the topic summary." : "Returned to the response feedback.");
+            render();
+            break;
+          case "end-session":
+            clearTimer();
+            state.pendingNextTopic = null;
+            state.showTopicTransitionModal = false;
+            state.playingRecordingKey = null;
+            state.view = "summary";
+            setAnnouncement("Practice complete. Your session summary is ready.");
+            render();
+            break;
+          case "review-session-topic":
+            state.topic = element.dataset.topic;
+            state.topicSummarySource = "session";
+            state.activeVocabId = null;
+            state.playingRecordingKey = null;
+            state.view = "topic-summary";
+            setAnnouncement(`${state.topic} topic summary opened.`);
+            render();
+            break;
+          case "save-diagnostic-exit": clearTimer(); state.session = "practice"; state.view = "practice"; setAnnouncement("Diagnostic progress saved. A formal level will be available after all required responses are complete."); render(); break;
+          case "review-response": state.reviewIndex = Number(element.dataset.index); state.reviewSource = "session"; state.view = "review"; state.playingRecordingKey = null; render(); break;
+          case "history-review":
+            state.historyRecord = historyRecords.find(record => record.id === element.dataset.recordId) || staticHistory;
+            state.reviewSource = "history";
+            state.view = "review";
+            state.playingRecordingKey = null;
+            render();
+            break;
+          case "history-topic-summary":
+            state.historyTopic = groupedHistoryTopics(filteredHistoryRecords()).find(topic => topic.key === element.dataset.historyTopicKey) || null;
+            state.topicSummarySource = "history";
+            state.activeVocabId = null;
+            state.playingRecordingKey = null;
+            state.view = "topic-summary";
+            setAnnouncement("Historical topic summary opened.");
+            render();
+            break;
+          case "back-from-history-topic": state.view = "history"; state.playingRecordingKey = null; render(); break;
+          case "retry-history-topic":
+            if (state.historyTopic) chooseTopic(state.historyTopic.topic, state.historyTopic.year);
+            break;
+          case "back-from-review": state.view = state.reviewSource === "history" ? "history" : "summary"; state.playingRecordingKey = null; render(); break;
+          case "retry-history-question":
+            clearTimer();
+            state.session = "practice";
+            state.topic = state.historyRecord ? state.historyRecord.topic : "Music";
+            state.practiceYear = state.historyRecord ? state.historyRecord.year : "2026";
+            state.questionIndex = 0;
+            state.topicQuestionIndex = 0;
+            state.targetedFollowUpUsed = false;
+            state.practiceTopics = [state.topic];
+            state.topicTransition = "";
+            state.pendingNextTopic = null;
+            state.showTopicTransitionModal = false;
+            state.topicTransitionSource = "diagnosis";
+            state.topicSummarySource = "session";
+            state.responses = [];
+            state.currentResponse = null;
+            state.historyRetry = true;
+            state.historyQuestion = state.historyRecord ? state.historyRecord.question : staticHistory.question;
+            state.phase = "ready";
+            state.view = "question";
+            state.playingRecordingKey = null;
+            setAnnouncement("Historical record reviewed. You can now start a new recording for this question.");
+            render();
+            break;
+          case "toggle-recording":
+            state.playingRecordingKey = state.playingRecordingKey === element.dataset.recordingKey ? null : element.dataset.recordingKey;
+            setAnnouncement(state.playingRecordingKey ? "Recording playing." : "Recording stopped.");
+            render();
+            break;
+          case "save-stage": setAnnouncement(`Training target ${state.stageTarget} saved.`); render(); break;
+          default: break;
+        }
+      }
+
+      document.addEventListener("click", event => {
+        const vocabularyTrigger = event.target.closest("[data-vocab-key]");
+        if (vocabularyTrigger) {
+          event.preventDefault();
+          const { vocabKey, vocabScope } = vocabularyTrigger.dataset;
+          showVocabulary(vocabKey, vocabScope);
+          return;
+        }
+        const control = event.target.closest("[data-action]");
+        if (control && !control.disabled) handleAction(control.dataset.action, control);
+      });
+
+      document.addEventListener("pointerover", event => {
+        const vocabularyTrigger = event.target.closest("[data-vocab-key]");
+        if (vocabularyTrigger) showVocabulary(vocabularyTrigger.dataset.vocabKey, vocabularyTrigger.dataset.vocabScope);
+      });
+
+      document.addEventListener("pointerout", event => {
+        const vocabularyTrigger = event.target.closest("[data-vocab-key]");
+        if (vocabularyTrigger) clearVocabulary(vocabularyTrigger.dataset.vocabScope);
+      });
+
+      document.addEventListener("focusin", event => {
+        const vocabularyTrigger = event.target.closest("[data-vocab-key]");
+        if (vocabularyTrigger) showVocabulary(vocabularyTrigger.dataset.vocabKey, vocabularyTrigger.dataset.vocabScope);
+      });
+
+      document.addEventListener("focusout", event => {
+        const vocabularyTrigger = event.target.closest("[data-vocab-key]");
+        if (vocabularyTrigger) clearVocabulary(vocabularyTrigger.dataset.vocabScope);
+      });
+
+      document.addEventListener("keydown", event => {
+        if (!state.showTopicTransitionModal) return;
+        if (event.key === "Escape") {
+          state.pendingNextTopic = null;
+          state.showTopicTransitionModal = false;
+          state.phase = state.topicTransitionSource === "topic-summary" ? "topic-summary" : "diagnosis";
+          state.view = state.topicTransitionSource === "topic-summary" ? "topic-summary" : "diagnosis";
+          setAnnouncement(state.topicTransitionSource === "topic-summary" ? "Returned to the topic summary." : "Returned to the response feedback.");
+          render();
+          return;
+        }
+        if (event.key !== "Tab") return;
+        const focusable = [...app.querySelectorAll(".topic-modal button:not([disabled])")];
+        if (!focusable.length) return;
+        const currentIndex = focusable.indexOf(document.activeElement);
+        const nextIndex = event.shiftKey
+          ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
+          : (currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
+        event.preventDefault();
+        focusable[nextIndex].focus();
+      });
+
+      document.addEventListener("change", event => {
+        if (event.target.dataset.field === "diagnostic-goal") state.diagnosticGoal = event.target.value;
+        if (event.target.dataset.field === "stage-target") state.stageTarget = event.target.value;
+        if (event.target.dataset.field === "history-year") { state.historyYear = event.target.value; render(); }
+        if (event.target.dataset.field === "history-scope") { state.historyScope = event.target.value; render(); }
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
