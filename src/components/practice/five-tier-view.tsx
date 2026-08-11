@@ -83,7 +83,7 @@ export function FiveTierView({
             {loading ? t("fiveTier.generating") : t("fiveTier.generate")}
           </Button>
           {error ? (
-            <p className="text-sm text-[var(--filler-color)]">{error}</p>
+            <p className="text-sm text-[var(--danger-color)]">{error}</p>
           ) : null}
         </div>
       </div>

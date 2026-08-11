@@ -22,12 +22,21 @@ export function useStreamText() {
     setError(null);
   };
 
-  const stream = async (url: string, body: Record<string, unknown>) => {
+  const stream = async (
+    url: string,
+    body: Record<string, unknown>,
+  ): Promise<{ text: string; status: "done" | "error" }> => {
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
     setText("");
     setError(null);
     setStatus("streaming");
+    let accumulated = "";
+
+    const finish = (status: "done" | "error") => {
+      setStatus(status);
+      return { text: accumulated, status };
+    };
 
     try {
       const response = await fetch(url, {
@@ -63,20 +72,37 @@ export function useStreamText() {
           if (trimmed.startsWith("data:")) {
             const payload = trimmed.slice(5).trim();
             if (payload === "[DONE]") {
-              setStatus("done");
               continue;
             }
-            setText((prev) => prev + payload);
+            // 服务端 SSE 负载为 JSON（{"text": "..."} 或 {"error": "..."}），
+            // 解析后取 text 拼接，避免把 JSON 外壳带进渲染。
+            let piece = payload;
+            try {
+              const parsed = JSON.parse(payload) as {
+                text?: unknown;
+                error?: unknown;
+              };
+              if (typeof parsed.text === "string") {
+                piece = parsed.text;
+              } else if (typeof parsed.error === "string") {
+                setError(parsed.error);
+                return finish("error");
+              }
+            } catch {
+              /* 非 JSON 按原文 */
+            }
+            accumulated += piece;
+            setText(accumulated);
           }
         }
       }
-      setStatus("done");
+      return finish("done");
     } catch (err: any) {
       if (err?.name === "AbortError") {
-        return;
+        return finish("error");
       }
       setError(err?.message || "Stream failed");
-      setStatus("error");
+      return finish("error");
     }
   };
 

@@ -2,11 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpenText, LogOut, Mic, Settings2, TrendingUp } from "lucide-react";
+import {
+  BookMarked,
+  BookOpenText,
+  LogOut,
+  Mic,
+  Settings2,
+  TrendingUp,
+} from "lucide-react";
 
 import { authClient } from "@/auth-client";
 import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { useT } from "@/lib/i18n";
+import { buttonClass } from "@/components/ui/button";
 
 export function TopNav() {
   const { t } = useT();
@@ -17,7 +25,7 @@ export function TopNav() {
 
   const navItems = [
     { href: "/bank", label: t("nav.bank"), icon: BookOpenText },
-    { href: "/library", label: t("nav.library"), icon: BookOpenText },
+    { href: "/library", label: t("nav.library"), icon: BookMarked },
     { href: "/progress", label: t("nav.progress"), icon: TrendingUp },
     { href: "/settings", label: t("nav.settings"), icon: Settings2 },
   ];
@@ -82,7 +90,7 @@ export function TopNav() {
           ) : (
             <Link
               href="/login"
-              className="inline-flex min-h-10 items-center rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+              className={buttonClass("primary", "md")}
             >
               {t("nav.signIn")}
             </Link>

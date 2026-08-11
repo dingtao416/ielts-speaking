@@ -1,5 +1,5 @@
 import type { TextStats } from "@/lib/lexicon";
-import type { BandScores } from "@/persistence/schema";
+import type { BandScores, RoundFeedback } from "@/persistence/schema";
 
 export interface SessionRecordPayload {
   id: string;
@@ -15,6 +15,7 @@ export interface SessionRecordPayload {
   bands?: BandScores | null;
   bandEstimate?: number | null;
   reportMarkdown?: string | null;
+  feedback?: RoundFeedback | null;
   frameworkId?: string | null;
 }
 
@@ -30,5 +31,6 @@ export interface SaveSessionInput {
   bands?: BandScores;
   bandEstimate?: number;
   reportMarkdown?: string;
+  feedback?: RoundFeedback;
   frameworkId?: string;
 }

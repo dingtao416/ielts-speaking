@@ -462,4 +462,79 @@ export function getSingleResponseFeedbackPrompt(params: {
   return { system, user };
 }
 
+/** 话题总结 Prompt：训练预估分 + 判定依据 + 下次优化点（训练用途，非官方成绩） */
+export function getTopicSummaryPrompt(params: {
+  topic: string;
+  rounds: {
+    question: string;
+    transcript: string;
+    vocabularyHighlights: { original: string; suggestion: string }[];
+  }[];
+  currentBand?: number;
+}) {
+  const { topic, rounds, currentBand } = params;
+  const current = currentBand ?? 5.0;
+
+  const roundsText = rounds
+    .map((r, i) => {
+      const vocab =
+        r.vocabularyHighlights?.length
+          ? r.vocabularyHighlights
+              .map((v) => `${v.original} → ${v.suggestion}`)
+              .join("；")
+          : "无";
+      return `第 ${i + 1} 问：${r.question}\n回答：${(r.transcript ?? "").slice(0, 800)}\n词汇：${vocab}`;
+    })
+    .join("\n\n");
+
+  const system = `你是雅思口语教练。用户刚完成话题「${topic}」的练习，当前水平约 ${current} 分。请给出一份话题训练预估（训练用途，非官方成绩）。
+
+必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释）：
+{
+  "estimate": 5.5,
+  "basis": "判定依据（中文，2-3 句，说明为什么是这个分，要结合用户实际回答里的具体问题）",
+  "nextFocus": ["下次优化点1", "下次优化点2"]
+}
+
+要求：
+- estimate 是 0-9 之间的半分制数字（如 4.5、5.0、5.5、6.0），只输出数字
+- basis 结合用户回答里的具体问题（词汇、语法、信息展开程度），不要套话
+- nextFocus 给 1-2 条，具体可执行
+- 这是训练预估，不代表官方雅思成绩，不要给出单题分数`;
+
+  return { system, user: roundsText };
+}
+
+/** 语法/改写 Prompt：单题复盘详情（S5 复盘区） */
+export function getGrammarRewritePrompt(params: {
+  question: string;
+  transcript: string;
+  stageBand?: number;
+}) {
+  const { question, transcript, stageBand } = params;
+  const band = stageBand ?? 6.5;
+
+  const system = `你是雅思口语教练。用户回答了一道 Part 1 题，当前训练目标 ${band} 分。请给出语法与改写建议。
+
+必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释）：
+{
+  "grammarNotes": "语法与句子结构建议（中文，简要，1-3 条）",
+  "naturalRewrite": "保留原意的自然改写（整段，英文）"
+}
+
+要求：
+- grammarNotes 结合用户原文里的具体语法/结构问题，指出问题并给改法
+- naturalRewrite 在不改变原意的前提下改善表达，符合 ${band} 分水平
+- 不做单题评分`;
+
+  const user = `题目: ${question}
+
+用户的回答:
+---
+${(transcript ?? "").slice(0, 2000)}
+---`;
+
+  return { system, user };
+}
+
 export type { Question };

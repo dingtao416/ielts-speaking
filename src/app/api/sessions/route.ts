@@ -62,6 +62,7 @@ export async function POST(request: Request) {
           ? String(body.bandEstimate)
           : null,
       reportMarkdown: body.reportMarkdown?.slice(0, 30000) ?? null,
+      feedback: body.feedback ?? null,
       frameworkId: body.frameworkId ?? null,
     })
     .returning();

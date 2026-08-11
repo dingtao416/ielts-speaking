@@ -6,14 +6,26 @@
   --muted: #f5f5f5;
   --border: #e5e5e5;
   --secondary-text: #666666;
-  --tertiary-text: #999999;
+  --tertiary-text: #757575; /* 提升对比度（≥4.5:1，WCAG AA） */
   --accent: #111111;
 
-  /* 功能高亮（训练字幕用，不是装饰） */
-  --filler-color: #dc2626;    /* 填充词 · 红 */
-  --hedge-color: #ea580c;     /* 犹豫词 · 橙 */
+  /* 功能高亮（训练字幕用，不是装饰；与"错误红"分离） */
+  --filler-color: #b45309;    /* 填充词 · 琥珀 */
+  --hedge-color: #d97706;     /* 犹豫词 · 橙 */
   --vague-color: #a16207;     /* 笼统词 · 黄褐 */
-  --chinglish-color: #9333ea; /* 中式英语 · 紫 */
+  --chinglish-color: #7c3aed; /* 中式英语 · 紫 */
+  --grammar-color: #b91c1c;   /* 语法 · 红 */
+  --good-color: #15803d;      /* 高分 · 绿 */
+
+  /* 危险/错误（与词汇高亮分离） */
+  --danger-color: #dc2626;
+  --danger-soft: color-mix(in srgb, #dc2626 8%, transparent);
+
+  /* 录音中（红色状态） */
+  --recording-color: #dc2626;
+
+  /* 焦点环（浅色） */
+  --focus-ring: rgba(17, 17, 17, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,8 +35,23 @@
     --muted: #1a1a1a;
     --border: #2a2a2a;
     --secondary-text: #a3a3a3;
-    --tertiary-text: #737373;
+    --tertiary-text: #a1a1a1;
     --accent: #ededed;
+
+    /* 功能色在深色下提亮，保证对比度 */
+    --filler-color: #f59e0b;
+    --hedge-color: #fb923c;
+    --vague-color: #fde047;
+    --chinglish-color: #c084fc;
+    --grammar-color: #f87171;
+    --good-color: #4ade80;
+
+    --danger-color: #f87171;
+    --danger-soft: color-mix(in srgb, #f87171 12%, transparent);
+
+    --recording-color: #f87171;
+
+    --focus-ring: rgba(237, 237, 237, 0.18);
   }
 }
 
@@ -100,15 +127,15 @@ select:focus-visible {
   text-underline-offset: 4px;
 }
 .hl-grammar {
-  color: #b91c1c;
-  text-decoration: underline var(--filler-color);
+  color: var(--grammar-color);
+  text-decoration: underline var(--grammar-color);
   text-decoration-style: solid;
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--danger-soft);
 }
 .hl-good {
-  color: #16a34a;
+  color: var(--good-color);
 }
 
 /* 可交互的黄色词汇词（S5 反馈 / S6 话题总结联动） */
@@ -116,10 +143,13 @@ select:focus-visible {
   cursor: pointer;
   border-radius: 2px;
 }
-.hl-vague.hl-interactive:hover,
+.hl-vague.hl-interactive:hover {
+  background: color-mix(in srgb, var(--vague-color) 18%, transparent);
+}
 .hl-vague.hl-interactive:focus-visible {
-  background: rgb(243 214 95 / 35%);
-  outline: none;
+  background: color-mix(in srgb, var(--vague-color) 18%, transparent);
+  outline: 2px solid var(--vague-color);
+  outline-offset: 2px;
 }
 .hl-vague.hl-interactive:focus-visible {
   outline: 2px solid var(--vague-color);
@@ -242,7 +272,7 @@ select:focus-visible {
 .auth-field > input:focus {
   outline: none;
   border-color: var(--foreground);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .auth-field > small {
   font-size: 12px;

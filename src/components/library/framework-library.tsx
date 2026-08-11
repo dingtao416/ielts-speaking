@@ -7,7 +7,7 @@ import { BookOpen, Download, Pencil, Trash2 } from "lucide-react";
 import type { Framework } from "@/lib/frameworks";
 import { frameworkToMarkdown } from "@/lib/frameworks";
 import { useT } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 
 export function FrameworkLibrary() {
   const { t } = useT();
@@ -107,7 +107,7 @@ export function FrameworkLibrary() {
         <p className="text-secondary-text">{t("library.empty")}</p>
         <Link
           href="/bank"
-          className="rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className={buttonClass("primary", "md")}
         >
           {t("home.cta.browse")}
         </Link>
@@ -253,7 +253,7 @@ export function FrameworkLibrary() {
                       <button
                         type="button"
                         onClick={() => handleDelete(f.id)}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-[var(--filler-color)] active:scale-[0.95]"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-[var(--danger-color)] active:scale-[0.95]"
                         title={t("library.delete")}
                         aria-label={t("library.delete")}
                       >

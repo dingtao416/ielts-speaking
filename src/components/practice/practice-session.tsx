@@ -200,17 +200,16 @@ export function PracticeSession({ question }: { question: Question }) {
 
   async function generateReport() {
     store.setReportStatus("generating");
-    await reportStream.stream("/api/report", {
+    const { text, status } = await reportStream.stream("/api/report", {
       fullText: store.fullText,
       stats: { ...store.stats, duration: timer.elapsed },
       questionId: question.id,
     });
-    if (reportStream.text) {
-      store.setReport(reportStream.text);
+    if (text) {
+      store.setReport(text);
     }
-    // 同步流状态到 store：done/error 都结束 generating，
-    // 只有 done 才触发 saveSession（把 bands + 报告一起入库）。
-    store.setReportStatus(reportStream.status === "done" ? "done" : "error");
+    // done/error 都结束 generating；只有 done 才触发 saveSession（把 bands + 报告一起入库）。
+    store.setReportStatus(status);
   }
 
   async function extractFramework() {
@@ -569,8 +568,8 @@ export function PracticeSession({ question }: { question: Question }) {
 
           {/* 麦克风权限错误提示 + 重试 */}
           {speech.error && speech.state === "error" ? (
-            <div className="mx-auto max-w-md rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 px-4 py-3 text-center">
-              <p className="text-sm text-[var(--filler-color)]">
+            <div className="mx-auto max-w-md rounded-xl border border-[var(--danger-color)]/30 bg-[var(--danger-color)]/5 px-4 py-3 text-center">
+              <p className="text-sm text-[var(--danger-color)]">
                 {t(speechErrorMessageKey(speech.error))}
               </p>
               <Button
@@ -718,7 +717,7 @@ export function PracticeSession({ question }: { question: Question }) {
                   {t("practice.report.generating")}
                 </p>
               ) : store.reportStatus === "error" ? (
-                <p className="text-sm text-[var(--filler-color)]">
+                <p className="text-sm text-[var(--danger-color)]">
                   {t("practice.report.failed")}
                 </p>
               ) : (

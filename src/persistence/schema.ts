@@ -177,6 +177,7 @@ export const sessionRecords = pgTable(
     bands: jsonb("bands").$type<BandScores>(),  // 四维 + overall band 评估
     bandEstimate: numeric("band_estimate", { precision: 3, scale: 1 }),
     reportMarkdown: text("report_markdown"),
+    feedback: jsonb("feedback").$type<RoundFeedback>(), // 单题表达反馈（推荐回答/词汇/语法/改写）
     frameworkId: varchar("framework_id", { length: 64 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -209,6 +210,15 @@ export interface BandScores {
   grammar: number;         // 语法范围与准确性
   pronunciation: number;   // 发音与可理解度
   overall: number;         // 综合
+}
+
+// 单题表达反馈（AI 教练流程，不包含数值评分）
+export interface RoundFeedback {
+  recommendedAnswer?: string;
+  vocabularyHighlights?: { original: string; suggestion: string; note?: string }[];
+  grammarNotes?: string;
+  naturalRewrite?: string;
+  degraded?: boolean;
 }
 
 // 个人能力档案

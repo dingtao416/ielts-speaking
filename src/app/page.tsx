@@ -1,15 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpen,
-  Mic,
-  Sparkles,
-  Target,
-} from "lucide-react";
+import { Mic, Sparkles, Target, TrendingUp } from "lucide-react";
 
 import { useT } from "@/lib/i18n";
+import { buttonClass } from "@/components/ui/button";
 
 export default function HomePage() {
   const { t } = useT();
@@ -48,17 +43,17 @@ export default function HomePage() {
         <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/bank"
-            className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
+            className={buttonClass("primary", "lg")}
           >
-            <BookOpen className="h-5 w-5" aria-hidden="true" />
-            {t("home.cta.browse")}
+            <Mic className="h-5 w-5" aria-hidden="true" />
+            {t("home.cta.start")}
           </Link>
           <Link
-            href="/bank"
-            className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-base font-medium transition-colors hover:bg-muted"
+            href="/progress"
+            className={buttonClass("secondary", "lg")}
           >
-            {t("home.cta.start")}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <TrendingUp className="h-5 w-5" aria-hidden="true" />
+            {t("home.cta.progress")}
           </Link>
         </div>
       </section>

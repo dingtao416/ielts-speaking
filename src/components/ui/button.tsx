@@ -14,7 +14,7 @@ const VARIANTS: Record<Variant, string> = {
   ghost:
     "text-secondary-text hover:bg-muted hover:text-foreground",
   danger:
-    "border border-[var(--filler-color)]/30 text-[var(--filler-color)] hover:bg-[var(--filler-color)]/5",
+    "border border-[var(--danger-color)]/30 text-[var(--danger-color)] hover:bg-[var(--danger-color)]/5",
 };
 
 const SIZES: Record<Size, string> = {
@@ -24,6 +24,18 @@ const SIZES: Record<Size, string> = {
 };
 
 const RADIUS = "rounded-xl";
+
+/**
+ * 全站统一的按钮/链接按钮样式。
+ * 供 Button 组件与「以按钮外观渲染的 <Link>」共用，避免手写样式分裂。
+ */
+export function buttonClass(
+  variant: Variant = "primary",
+  size: Size = "md",
+  extra = "",
+) {
+  return `inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${RADIUS} ${VARIANTS[variant]} ${SIZES[size]} ${extra}`;
+}
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -51,7 +63,7 @@ export function Button({
     <button
       type="button"
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${RADIUS} ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={buttonClass(variant, size, className)}
       {...rest}
     >
       {loading ? (

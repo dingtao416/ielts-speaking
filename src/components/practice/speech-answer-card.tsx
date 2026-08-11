@@ -124,9 +124,9 @@ export function SpeechAnswerCard({
       {speech.error && speech.state === "error" ? (
         <div
           role="alert"
-          className="flex flex-col items-start gap-2 rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 p-3"
+          className="flex flex-col items-start gap-2 rounded-xl border border-[var(--danger-color)]/30 bg-[var(--danger-color)]/5 p-3"
         >
-          <p className="text-xs leading-relaxed text-[var(--filler-color)]">
+          <p className="text-xs leading-relaxed text-[var(--danger-color)]">
             {t(speechErrorMessageKey(speech.error))}
           </p>
           <Button

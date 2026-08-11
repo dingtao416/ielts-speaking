@@ -314,8 +314,8 @@ export function ReciteSession({ question }: { question: Question }) {
 
           {/* 麦克风权限错误提示 + 重试 */}
           {speech.error && speech.state === "error" ? (
-            <div className="mx-auto max-w-md rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 px-4 py-3 text-center">
-              <p className="text-sm text-[var(--filler-color)]">
+            <div className="mx-auto max-w-md rounded-xl border border-[var(--danger-color)]/30 bg-[var(--danger-color)]/5 px-4 py-3 text-center">
+              <p className="text-sm text-[var(--danger-color)]">
                 {t(speechErrorMessageKey(speech.error))}
               </p>
               <Button

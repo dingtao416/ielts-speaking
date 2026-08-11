@@ -121,14 +121,10 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setStep("answer")}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
-        >
+        <Button size="lg" onClick={() => setStep("answer")}>
           {t("onboarding.step1.start")}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </button>
+        </Button>
       </div>
     );
   }
@@ -200,39 +196,35 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
         {/* 导航 */}
         <div className="flex justify-end">
           {isLast ? (
-            <button
-              type="button"
+            <Button
+              size="lg"
               onClick={finishDiagnostic}
-              disabled={generating || doneCount < 2}
-              className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
+              disabled={doneCount < 2}
+              loading={generating}
             >
               {generating ? (
-                <>
-                  <Sparkles className="h-4 w-4 animate-pulse" aria-hidden="true" />
-                  {t("onboarding.answer.assessing")}
-                </>
+                t("onboarding.answer.assessing")
               ) : (
                 <>
                   <Check className="h-4 w-4" aria-hidden="true" />
                   {t("onboarding.answer.finish")}
                 </>
               )}
-            </button>
+            </Button>
           ) : (
-            <button
-              type="button"
+            <Button
+              size="lg"
               onClick={() => setCurrentIdx((i) => i + 1)}
               disabled={!answeredCurrent}
-              className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
             >
               {t("onboarding.answer.next")}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
 
         {error ? (
-          <p className="text-center text-sm text-[var(--filler-color)]">
+          <p className="text-center text-sm text-[var(--danger-color)]">
             {error}
           </p>
         ) : null}
@@ -329,14 +321,10 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
           </div>
         ) : null}
 
-        <button
-          type="button"
-          onClick={() => router.push("/bank")}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-base font-medium text-background transition-opacity hover:opacity-90"
-        >
+        <Button size="lg" onClick={() => router.push("/bank")}>
           {t("onboarding.result.startPractice")}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </button>
+        </Button>
       </div>
     );
   }

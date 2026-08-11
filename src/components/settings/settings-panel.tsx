@@ -90,7 +90,7 @@ export function SettingsPanel() {
             {llmStatus.configured ? (
               <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" aria-hidden="true" />
             ) : (
-              <XCircle className="h-4 w-4 text-[var(--filler-color)]" aria-hidden="true" />
+              <XCircle className="h-4 w-4 text-[var(--danger-color)]" aria-hidden="true" />
             )}
             <span className="text-secondary-text">
               {t("settings.llm.provider")}: {llmStatus.provider} ·{" "}

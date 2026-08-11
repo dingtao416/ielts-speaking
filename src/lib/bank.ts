@@ -104,6 +104,19 @@ export function getYears(category: "real" | "predicted"): number[] {
   return getBankIndex()[category].years;
 }
 
+/**
+ * 下一话题：按「2026 当季预测题 → 历年真题」的话题列表，取当前话题的下一个（循环）。
+ * 找不到当前话题返回 null（调用方应回题库）。
+ */
+export function getNextTopic(topic: string): string | null {
+  const index = getBankIndex();
+  const ordered = [...index.predicted.topics, ...index.real.topics];
+  const i = ordered.indexOf(topic);
+  if (i === -1) return null;
+  const next = ordered[(i + 1) % ordered.length];
+  return next === topic ? null : next;
+}
+
 /** 相似题：同 topic 或 Part 家族（Part2 故事题可映射 Part3 讨论题） */
 export function getSimilarQuestions(question: Question): Question[] {
   const index = getBankIndex();

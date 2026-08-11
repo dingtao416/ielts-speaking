@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { BookOpen, CalendarDays, FolderOpen, Mic } from "lucide-react";
+import { BookOpen, CalendarDays, FolderOpen, Lock, Mic } from "lucide-react";
 
 import { getQuestions, getTopicsByYear } from "@/lib/bank";
 import type { Question } from "@/lib/bank";
 import { useT } from "@/lib/i18n";
 import { authClient } from "@/auth-client";
+import { buttonClass } from "@/components/ui/button";
 
 const PARTS = [1, 2, 3] as const;
 
@@ -229,7 +230,12 @@ export function BankBrowser({
 
       {/* 题目列表 */}
       {year !== 0 ? (
-        questions.length === 0 ? (
+        part !== 0 && part !== 1 ? (
+          <div className="animate-fade-in flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border py-16 text-center">
+            <Lock className="h-8 w-8 text-tertiary-text" aria-hidden="true" />
+            <p className="text-sm text-secondary-text">{t("bank.partLockedHint")}</p>
+          </div>
+        ) : questions.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border py-16 text-center">
             <BookOpen className="h-8 w-8 text-tertiary-text" aria-hidden="true" />
             <p className="text-sm text-secondary-text">{t("bank.empty")}</p>
@@ -268,17 +274,24 @@ export function BankBrowser({
                   ) : null}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <Link
-                    href={practiceHref(q)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
-                  >
-                    <Mic className="h-4 w-4" aria-hidden="true" />
-                    {isAuthed ? t("bank.practice") : t("bank.needSignIn")}
-                  </Link>
+                  {q.part !== 1 ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium text-tertiary-text">
+                      <Lock className="h-4 w-4" aria-hidden="true" />
+                      {t("bank.partLocked")}
+                    </span>
+                  ) : (
+                    <Link
+                      href={practiceHref(q)}
+                      className={buttonClass("primary", "md")}
+                    >
+                      <Mic className="h-4 w-4" aria-hidden="true" />
+                      {isAuthed ? t("bank.practice") : t("bank.needSignIn")}
+                    </Link>
+                  )}
                   {q.predicted ? (
                     <Link
                       href={reciteHref(q)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                      className={buttonClass("secondary", "md")}
                     >
                       {t("bank.recite")}
                     </Link>

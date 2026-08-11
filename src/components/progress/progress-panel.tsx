@@ -14,7 +14,7 @@ import {
 import type { AbilityProfile } from "@/persistence/schema";
 import { DIMENSION_LABELS, DIMENSION_LABELS_EN } from "@/lib/profile";
 import { useT } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 import { BandTrendChart, type TrendPoint } from "@/components/progress/band-trend-chart";
 
 interface ProfilePayload {
@@ -249,7 +249,7 @@ export function ProgressPanel() {
             </p>
             <Link
               href="/onboarding"
-              className="rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className={buttonClass("primary", "md")}
             >
               {t("progress.profile.goDiagnostic")}
             </Link>
@@ -299,7 +299,7 @@ export function ProgressPanel() {
             </p>
             <Link
               href="/bank"
-              className="rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className={buttonClass("primary", "md")}
             >
               {t("progress.history.goPractice")}
             </Link>
