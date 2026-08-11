@@ -306,6 +306,59 @@ ${fullText.slice(0, 6000)}
   return { system, user };
 }
 
+/** 五层目标级回答 Prompt */
+export function getFiveTierPrompt(
+  question: Question,
+  fullText: string,
+  context?: {
+    targetBand?: number;
+    currentBand?: number;
+    framework?: { structure?: string[]; keyPoints?: string[]; expressions?: { phrase: string; meaning: string }[]; stories?: { title: string; events: string[] }[] } | null;
+    mainIssues?: string[];
+  },
+) {
+  const target = context?.targetBand ?? 6.5;
+  const current = context?.currentBand ?? 5.0;
+  const fwBlock = context?.framework
+    ? `
+已有的答题框架:
+- 结构: ${(context.framework.structure ?? []).join(" → ") || "无"}
+- 要点: ${(context.framework.keyPoints ?? []).join("; ") || "无"}
+- 高分表达: ${(context.framework.expressions ?? []).map((e) => e.phrase).join("; ") || "无"}
+${context.framework.stories?.length ? `- 故事素材: ${context.framework.stories.map((s) => `${s.title}(${s.events.join("/")})`).join("; ")}` : ""}`
+    : "";
+  const issuesBlock = context?.mainIssues?.length
+    ? `\n重点改进方向: ${context.mainIssues.join("; ")}`
+    : "";
+
+  const system = `你是雅思口语教练。用户当前口语水平约 ${current} 分，目标 ${target} 分。请把用户的回答升级为 5 层目标级回答（全部用英文输出）。
+
+只输出一个 JSON 对象：
+{
+  "original": "用户原文（直接引用，不改动）",
+  "structured": "结构化版本：不改变原意，但调整顺序和连接，逻辑更清晰，适合 ${current} 分水平",
+  "improvable": "可改进版本：在保持用户能理解的前提下，修正明显语法错误、补充原因和例子、替换重复低分词（不要用超出用户水平的生僻词）",
+  "target": "目标级回答：达到 ${target} 分要求的完整回答，结构清晰、有具体细节、词汇适当升级、句式有变化",
+  "steps": ["具体提升步骤1", "步骤2", "步骤3"],
+  "focus": "一句话说明本次重点（中文）"
+}
+
+关键原则：
+- 所有版本都要用用户能掌握的词汇句式，循序渐进，不硬塞生僻词
+- structured 和 improvable 的水平接近用户当前 ${current} 分，target 才接近 ${target} 分
+- 优先帮用户：减少语法错误、补充原因/例子、自然连接、替换重复词、提高完整性
+- 如果用户原文很短（<50词），所有版本都可以适度扩写，但不要编造用户没说过的事实${issuesBlock}`;
+
+  const user = `${question.part === 2 && question.cueCard ? `Cue Card:\n${question.cueCard.map((c) => `- ${c}`).join("\n")}\n\n` : ""}题目: ${question.question}${fwBlock}
+
+用户的回答：
+---
+${fullText.slice(0, 8000)}
+---`;
+
+  return { system, user };
+}
+
 /** AI 逐题追问 Prompt：生成当前话题的下一道英文 Part 1 问题 */
 export function getFollowUpQuestionPrompt(params: {
   topic: string;

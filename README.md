@@ -81,12 +81,13 @@ npm run dev
 # 若不需要 HTTPS：npm run dev:http  →  http://localhost:3000
 ```
 
-> **本地 HTTPS（mkcert）**：Web Speech API 需要安全上下文（HTTPS 或 localhost）。
+> **本地 HTTPS**：`npm run dev` 使用项目内本地证书。首次访问时，浏览器会提示确认自签名的 `localhost` 证书。
+> Web Speech API 需要安全上下文（HTTPS 或 localhost）。
 > 手机通过局域网 IP 访问时，HTTP 下语音识别不可用，必须 HTTPS。
-> 首次需生成证书：
+> 若需要让手机信任局域网 HTTPS，可自行使用 mkcert 生成包含局域网 IP 的证书：
 > ```bash
-> ./tools/mkcert -install                                   # 装本地根 CA（信任）
-> ./tools/mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem \
+> mkcert -install                                   # 装本地根 CA（信任）
+> mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem \
 >   localhost 127.0.0.1 <你的局域网IP> ::1
 > cat certs/localhost.pem <mkcert根CA路径> > certs/localhost-chain.pem
 > ```
@@ -99,7 +100,7 @@ npm run dev
 
 | 用户名 | 密码 | 邮箱 |
 |---|---|---|
-| `root` | `12345678` | `root@ielts.local` |
+| `root` | `11111111` | `root@ielts.local` |
 
 创建测试账号：
 
@@ -116,7 +117,7 @@ npm run seed:test-user
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript 检查 |
 | `npm run db:generate` / `db:migrate` / `db:studio` | Drizzle 迁移 / 可视化 |
-| `npm run seed:test-user` | 创建测试账号 root / 12345678 |
+| `npm run seed:test-user` | 创建或重置测试账号 root / 11111111 |
 
 ## 本地 OTP 邮件说明
 

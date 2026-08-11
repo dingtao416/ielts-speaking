@@ -193,6 +193,7 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
         <SpeechAnswerCard
           key={currentQuestion.id}
           question={currentQuestion.question}
+          lang="en-US"
           onResult={(text) => handleAnswer(text)}
         />
 
