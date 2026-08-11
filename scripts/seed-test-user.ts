@@ -1,4 +1,4 @@
-// 创建测试账号（root / 123456），可直接登录，无需邮箱验证。
+// 创建或重置测试账号（root / 11111111），可直接登录，无需邮箱验证。
 // 用法: npx tsx scripts/seed-test-user.mjs  （或用 tsx 跑 TS）
 // 说明: better-auth 默认 requireEmailVerification，创建后强制置为已验证。
 import "dotenv/config";
@@ -7,7 +7,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { hashPassword } from "better-auth/crypto";
 import * as schema from "../src/persistence/schema";
 
 const DATABASE_URL =
@@ -18,7 +19,7 @@ const db = drizzle(client, { schema });
 
 const TEST_EMAIL = "root@ielts.local";
 const TEST_USERNAME = "root";
-const TEST_PASSWORD = "12345678";
+const TEST_PASSWORD = "11111111";
 
 const auth = betterAuth({
   appName: "IELTS Speaking Trainer",
@@ -40,33 +41,65 @@ async function main() {
     .where(eq(schema.user.email, TEST_EMAIL))
     .limit(1);
 
-  if (existing.length > 0) {
-    console.log("✓ 测试账号已存在，跳过创建");
-    return;
-  }
+  const existingUser = existing[0];
 
-  const result = await auth.api.signUpEmail({
-    body: {
-      email: TEST_EMAIL,
-      password: TEST_PASSWORD,
-      name: "Test Admin",
-      username: TEST_USERNAME,
-      displayUsername: TEST_USERNAME,
-    },
-  });
+  if (!existingUser) {
+    const result = await auth.api.signUpEmail({
+      body: {
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
+        name: "Test Admin",
+        username: TEST_USERNAME,
+        displayUsername: TEST_USERNAME,
+      },
+    });
 
-  if (result.token || result.user) {
-    // 强制标记为已验证（跳过邮箱验证）
-    await db
-      .update(schema.user)
-      .set({ emailVerified: true })
-      .where(eq(schema.user.email, TEST_EMAIL));
-    console.log(`✓ 测试账号已创建: ${TEST_USERNAME} / ${TEST_PASSWORD}`);
-    console.log(`  邮箱: ${TEST_EMAIL}（已自动验证，可直接登录）`);
+    if (!result.token && !result.user) {
+      console.error("✗ 创建失败:", result);
+      process.exit(1);
+    }
+
+    console.log("✓ 测试账号已创建");
   } else {
-    console.error("✗ 创建失败:", result);
-    process.exit(1);
+    const passwordHash = await hashPassword(TEST_PASSWORD);
+    const credentialAccount = await db
+      .select({ id: schema.account.id })
+      .from(schema.account)
+      .where(
+        and(
+          eq(schema.account.userId, existingUser.id),
+          eq(schema.account.providerId, "credential"),
+        ),
+      )
+      .limit(1);
+
+    if (credentialAccount[0]) {
+      await db
+        .update(schema.account)
+        .set({ password: passwordHash })
+        .where(eq(schema.account.id, credentialAccount[0].id));
+    } else {
+      await db.insert(schema.account).values({
+        id: crypto.randomUUID(),
+        accountId: existingUser.id,
+        providerId: "credential",
+        userId: existingUser.id,
+        password: passwordHash,
+      });
+    }
+
+    console.log("✓ 测试账号密码已重置");
   }
+
+  // 测试账号可直接登录，无需完成邮箱验证。
+  await db
+    .update(schema.user)
+    .set({ emailVerified: true })
+    .where(eq(schema.user.email, TEST_EMAIL));
+
+  console.log(`  用户名: ${TEST_USERNAME}`);
+  console.log(`  密码: ${TEST_PASSWORD}`);
+  console.log(`  邮箱: ${TEST_EMAIL}（已自动验证）`);
 }
 
 main()
