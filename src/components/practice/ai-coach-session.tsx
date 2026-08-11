@@ -79,6 +79,131 @@ type Phase =
   | "summary" // S6 话题总结
   | "end"; // S7/S8 结束页
 
+interface AiCoachSessionSnapshot {
+  version: 1;
+  phase: Phase;
+  round: number;
+  currentTopic: string;
+  question: string;
+  records: RoundRecord[];
+  stageBand: number;
+  sessionTopics: string[];
+  topicSummaries: Record<string, TopicSummaryData>;
+  summary: TopicSummaryData | null;
+  followUpUsed: boolean;
+}
+
+const SESSION_STORAGE_PREFIX = "ielts-ai-coach-session:v1:";
+const RESTORABLE_PHASES: Phase[] = [
+  "loading",
+  "question",
+  "recording",
+  "feedback",
+  "summary",
+];
+
+function isTopicSummaryData(value: unknown): value is TopicSummaryData {
+  if (!value || typeof value !== "object") return false;
+  const summary = value as Record<string, unknown>;
+  return (
+    typeof summary.estimate === "number" &&
+    typeof summary.basis === "string" &&
+    Array.isArray(summary.nextFocus) &&
+    summary.nextFocus.every((item) => typeof item === "string")
+  );
+}
+
+function isRoundRecord(value: unknown): value is RoundRecord {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.id === "string" &&
+    typeof record.topic === "string" &&
+    typeof record.question === "string" &&
+    typeof record.transcript === "string" &&
+    typeof record.recommendedAnswer === "string" &&
+    Array.isArray(record.vocabularyHighlights) &&
+    typeof record.grammarNotes === "string" &&
+    typeof record.naturalRewrite === "string" &&
+    typeof record.degraded === "boolean" &&
+    typeof record.durationSec === "number" &&
+    typeof record.startTime === "string"
+  );
+}
+
+function readSessionSnapshot(storageKey: string): AiCoachSessionSnapshot | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = window.sessionStorage.getItem(storageKey);
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    const candidate = parsed as Record<string, unknown>;
+
+    if (
+      candidate.version !== 1 ||
+      !RESTORABLE_PHASES.includes(candidate.phase as Phase) ||
+      !Number.isInteger(candidate.round) ||
+      Number(candidate.round) < 1 ||
+      typeof candidate.currentTopic !== "string" ||
+      typeof candidate.question !== "string" ||
+      !Array.isArray(candidate.records) ||
+      !candidate.records.every(isRoundRecord) ||
+      typeof candidate.stageBand !== "number" ||
+      !Array.isArray(candidate.sessionTopics) ||
+      !candidate.sessionTopics.every((topic) => typeof topic === "string") ||
+      !candidate.topicSummaries ||
+      typeof candidate.topicSummaries !== "object"
+    ) {
+      return null;
+    }
+
+    const topicSummaries = Object.fromEntries(
+      Object.entries(candidate.topicSummaries).filter((entry) =>
+        isTopicSummaryData(entry[1]),
+      ),
+    );
+    const savedSummary = candidate.summary;
+
+    return {
+      version: 1,
+      phase: candidate.phase as Phase,
+      round: candidate.round as number,
+      currentTopic: candidate.currentTopic,
+      question: candidate.question,
+      records: candidate.records,
+      stageBand: candidate.stageBand,
+      sessionTopics: candidate.sessionTopics,
+      topicSummaries,
+      summary: isTopicSummaryData(savedSummary) ? savedSummary : null,
+      followUpUsed: candidate.followUpUsed === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionSnapshot(
+  storageKey: string,
+  snapshot: AiCoachSessionSnapshot,
+) {
+  if (typeof window === "undefined") return;
+
+  try {
+    const records = snapshot.records.map((record) => ({
+      ...record,
+      audioUrl: undefined,
+    }));
+    window.sessionStorage.setItem(
+      storageKey,
+      JSON.stringify({ ...snapshot, records }),
+    );
+  } catch {
+    // 存储不可用或空间不足时不阻塞练习。
+  }
+}
+
 function uid() {
   return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
@@ -114,6 +239,9 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
   const [showNextTopicModal, setShowNextTopicModal] = useState(false);
   // 针对性追问（第 4 问）是否已用
   const [followUpUsed, setFollowUpUsed] = useState(false);
+  const storageKey = `${SESSION_STORAGE_PREFIX}${encodeURIComponent(initialTopic)}`;
+  const initializedStorageKeyRef = useRef<string | null>(null);
+  const [hydratedStorageKey, setHydratedStorageKey] = useState<string | null>(null);
 
   // 实时转写状态（S4 录音中）
   const [liveText, setLiveText] = useState("");
@@ -156,8 +284,11 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
   }, []);
   /* eslint-enable react-hooks/exhaustive-deps */
 
-  // 首题加载
+  // 恢复当前标签页中的进行中练习；没有快照时才加载首题。
   useEffect(() => {
+    if (initializedStorageKeyRef.current === storageKey) return;
+    initializedStorageKeyRef.current = storageKey;
+
     fetch("/api/profile")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -170,14 +301,95 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
       .catch(() => {
         /* 静默 */
       });
-    void loadQuestion(1, initialTopic);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTopic]);
 
-  async function loadQuestion(roundNum: number, topicArg?: string) {
+    const saved = readSessionSnapshot(storageKey);
+    if (!saved) {
+      setHydratedStorageKey(storageKey);
+      void loadQuestion(1, initialTopic);
+      return;
+    }
+
+    const latestRecord = [...saved.records]
+      .reverse()
+      .find((record) => record.topic === saved.currentTopic);
+    const restoredPhase =
+      saved.phase === "recording" || (saved.phase === "feedback" && !latestRecord)
+        ? "question"
+        : saved.phase;
+
+    setRound(saved.round);
+    setCurrentTopic(saved.currentTopic);
+    setQuestion(saved.question);
+    setRecords(saved.records);
+    setStageBand(saved.stageBand);
+    setSessionTopics(saved.sessionTopics);
+    setTopicSummaries(saved.topicSummaries);
+    setSummary(saved.summary);
+    setFollowUpUsed(saved.followUpUsed);
+    setFeedback(restoredPhase === "feedback" ? latestRecord ?? null : null);
+    setPhase(restoredPhase);
+    setHydratedStorageKey(storageKey);
+
+    if (saved.phase === "loading" || !saved.question) {
+      void loadQuestion(
+        saved.round,
+        saved.currentTopic,
+        latestRecord,
+        saved.stageBand,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTopic, storageKey]);
+
+  // 每次关键状态变化后保存快照；明确结束练习后清除快照。
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey) return;
+    if (phase === "end") {
+      window.sessionStorage.removeItem(storageKey);
+      return;
+    }
+
+    writeSessionSnapshot(storageKey, {
+      version: 1,
+      phase,
+      round,
+      currentTopic,
+      question,
+      records,
+      stageBand,
+      sessionTopics,
+      topicSummaries,
+      summary,
+      followUpUsed,
+    });
+  }, [
+    currentTopic,
+    followUpUsed,
+    hydratedStorageKey,
+    phase,
+    question,
+    records,
+    round,
+    sessionTopics,
+    stageBand,
+    storageKey,
+    summary,
+    topicSummaries,
+  ]);
+
+  async function loadQuestion(
+    roundNum: number,
+    topicArg?: string,
+    previousRecord?: RoundRecord,
+    stageBandArg: number = stageBand,
+  ) {
     const topicForRound = topicArg ?? currentTopic;
+    const previousRound =
+      previousRecord ??
+      [...records].reverse().find((record) => record.topic === topicForRound);
     setPhase("loading");
     setFeedback(null);
+    setQuestion("");
     setLiveText("");
     liveTextRef.current = "";
     try {
@@ -187,7 +399,9 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
         body: JSON.stringify({
           topic: topicForRound,
           round: roundNum,
-          stageBand,
+          stageBand: stageBandArg,
+          currentQuestion: roundNum > 1 ? previousRound?.question : undefined,
+          lastAnswer: roundNum > 1 ? previousRound?.transcript : undefined,
         }),
       });
       const data = await res.json();

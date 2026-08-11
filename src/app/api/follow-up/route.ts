@@ -21,6 +21,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "topic is required" }, { status: 400 });
   }
 
+  if (
+    round > 1 &&
+    (typeof currentQuestion !== "string" || typeof lastAnswer !== "string")
+  ) {
+    return NextResponse.json(
+      { error: "currentQuestion and lastAnswer are required for follow-ups" },
+      { status: 400 },
+    );
+  }
+
   try {
     const prompt = getFollowUpQuestionPrompt({
       topic,
@@ -48,7 +58,16 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ question, fallback: false });
   } catch {
-    // 回退到题库安全问题
+    // 后续轮次仍保持追问语义；首题才回退到题库安全问题。
+    if (round > 1 && currentQuestion) {
+      return NextResponse.json({
+        question: lastAnswer?.trim()
+          ? "Could you tell me more about why you feel that way?"
+          : "Could you give me a reason or an example?",
+        fallback: true,
+      });
+    }
+
     const safeQuestions = getQuestions("real", { part: 1, topic }).slice(0, 10);
     const fallbackQuestion =
       safeQuestions[Math.floor(Math.random() * safeQuestions.length)]?.question ??

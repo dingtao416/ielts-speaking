@@ -1,12 +1,20 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { TopNav } from "@/components/layout/top-nav";
 import { useT } from "@/lib/i18n";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useT();
+  const locale = useSettingsStore((s) => s.locale);
+
+  // 让 <html lang> 与当前界面语言一致（屏幕阅读器 / 浏览器语言）
+  useEffect(() => {
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
+  }, [locale]);
+
   return (
     <>
       <TopNav />

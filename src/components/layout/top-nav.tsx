@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 
 import { authClient } from "@/auth-client";
-import { LocaleToggle } from "@/components/layout/locale-toggle";
 import { useT } from "@/lib/i18n";
 import { buttonClass } from "@/components/ui/button";
 
@@ -78,7 +77,6 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <LocaleToggle />
           {isPending ? null : user ? (
             <div className="flex items-center gap-2">
               <div className="hidden text-right md:block">

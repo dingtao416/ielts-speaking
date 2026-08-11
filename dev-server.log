@@ -149,3 +149,159 @@
  POST /api/follow-up 200 in 1424ms (next.js: 28ms, application-code: 1396ms)
  POST /api/follow-up 200 in 1977ms (next.js: 3ms, application-code: 1974ms)
  GET /api/auth/get-session 200 in 41ms (next.js: 14ms, application-code: 27ms)
+ GET /login 200 in 100ms (next.js: 8ms, application-code: 92ms)
+ GET /api/auth/get-session 200 in 24ms (next.js: 15ms, application-code: 10ms)
+[2m2026-08-11T08:22:02.641Z[0m [33mWARN[0m [1m[Better Auth]:[0m Invalid password
+ POST /api/auth/sign-in/username 401 in 140ms (next.js: 7ms, application-code: 133ms)
+ GET /practice/topic/Activity 200 in 79ms (next.js: 14ms, application-code: 65ms)
+✓ Compiled in 103ms
+ GET /practice/topic/Activity 200 in 118ms (next.js: 20ms, application-code: 98ms)
+ GET /practice/topic/Activity 200 in 50ms (next.js: 13ms, application-code: 36ms)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 4ms, application-code: 49ms)
+ GET /practice/topic/Activity 200 in 108ms (next.js: 52ms, application-code: 56ms)
+ GET /practice/topic/Activity 200 in 118ms (next.js: 21ms, application-code: 98ms)
+ GET /practice/topic/Activity 200 in 52ms (next.js: 3ms, application-code: 49ms)
+ GET /api/auth/get-session 200 in 33ms (next.js: 14ms, application-code: 19ms)
+✓ Compiled in 86ms
+ GET /practice/topic/Activity 200 in 115ms (next.js: 61ms, application-code: 54ms)
+ GET /practice/topic/Activity 200 in 152ms (next.js: 28ms, application-code: 124ms)
+ GET /practice/topic/Activity 200 in 56ms (next.js: 5ms, application-code: 51ms)
+✓ Compiled in 98ms
+ GET /practice/topic/Activity 200 in 218ms (next.js: 31ms, application-code: 187ms)
+ GET /practice/topic/Activity 200 in 205ms (next.js: 91ms, application-code: 114ms)
+ GET /practice/topic/Activity 200 in 102ms (next.js: 9ms, application-code: 93ms)
+ GET /api/profile 200 in 177ms (next.js: 31ms, application-code: 146ms)
+ GET /api/profile 200 in 87ms (next.js: 26ms, application-code: 61ms)
+ GET /api/profile 200 in 25ms (next.js: 4ms, application-code: 21ms)
+ GET /api/profile 200 in 15ms (next.js: 2ms, application-code: 13ms)
+ GET /api/profile 200 in 20ms (next.js: 3ms, application-code: 18ms)
+ GET /api/profile 200 in 25ms (next.js: 5ms, application-code: 21ms)
+ GET /api/profile 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET /api/profile 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ POST /api/follow-up 200 in 1643ms (next.js: 31ms, application-code: 1612ms)
+ POST /api/follow-up 200 in 1827ms (next.js: 14ms, application-code: 1813ms)
+ POST /api/follow-up 200 in 2.2s (next.js: 23ms, application-code: 2.2s)
+ POST /api/follow-up 200 in 2.1s (next.js: 19ms, application-code: 2.1s)
+✓ Compiled in 67ms
+ GET /practice/topic/Activity 200 in 125ms (next.js: 72ms, application-code: 53ms)
+ GET /practice/topic/Activity 200 in 137ms (next.js: 32ms, application-code: 106ms)
+ GET /practice/topic/Activity 200 in 51ms (next.js: 4ms, application-code: 47ms)
+✓ Compiled in 236ms
+⨯ ReferenceError: LocaleToggle is not defined
+    at TopNav (src\components\layout\top-nav.tsx:80:12)
+  78 |
+  79 |         <div className="flex items-center gap-2 sm:gap-3">
+> 80 |           <LocaleToggle />
+     |            ^
+  81 |           {isPending ? null : user ? (
+  82 |             <div className="flex items-center gap-2">
+  83 |               <div className="hidden text-right md:block"> {
+  digest: '3211834999'
+}
+[browser] Uncaught ReferenceError: LocaleToggle is not defined
+    at TopNav (src/components/layout/top-nav.tsx:80:12)
+    at Set.forEach (<anonymous>)
+    at AppShell (src/components/layout/app-shell.tsx:7:1)
+    at RootLayout (src\app\layout.tsx:40:9)
+  78 |
+  79 |         <div className="flex items-center gap-2 sm:gap-3">
+> 80 |           <LocaleToggle />
+     |            ^
+  81 |           {isPending ? null : user ? (
+  82 |             <div className="flex items-center gap-2">
+  83 |               <div className="hidden text-right md:block">
+⨯ ReferenceError: LocaleToggle is not defined
+    at TopNav (src\components\layout\top-nav.tsx:80:12)
+  78 |
+  79 |         <div className="flex items-center gap-2 sm:gap-3">
+> 80 |           <LocaleToggle />
+     |            ^
+  81 |           {isPending ? null : user ? (
+  82 |             <div className="flex items-center gap-2">
+  83 |               <div className="hidden text-right md:block"> {
+  digest: '3211834999'
+}
+ GET /practice/topic/Activity 500 in 128ms (next.js: 10ms, application-code: 118ms)
+ GET /practice/topic/Activity 500 in 291ms (next.js: 28ms, application-code: 263ms)
+⨯ ReferenceError: LocaleToggle is not defined
+    at TopNav (src\components\layout\top-nav.tsx:80:12)
+  78 |
+  79 |         <div className="flex items-center gap-2 sm:gap-3">
+> 80 |           <LocaleToggle />
+     |            ^
+  81 |           {isPending ? null : user ? (
+  82 |             <div className="flex items-center gap-2">
+  83 |               <div className="hidden text-right md:block"> {
+  digest: '3211834999'
+}
+ GET /practice/topic/Activity 500 in 153ms (next.js: 11ms, application-code: 142ms)
+ GET /api/auth/get-session 200 in 40ms (next.js: 13ms, application-code: 27ms)
+[browser] Uncaught ReferenceError: LocaleToggle is not defined
+    at TopNav (src/components/layout/top-nav.tsx:80:12)
+    at AppShell (src/components/layout/app-shell.tsx:20:7)
+    at RootLayout (src\app\layout.tsx:40:9)
+  78 |
+  79 |         <div className="flex items-center gap-2 sm:gap-3">
+> 80 |           <LocaleToggle />
+     |            ^
+  81 |           {isPending ? null : user ? (
+  82 |             <div className="flex items-center gap-2">
+  83 |               <div className="hidden text-right md:block">
+ GET /api/auth/get-session 200 in 55ms (next.js: 18ms, application-code: 36ms)
+ GET /practice/topic/Activity 200 in 281ms (next.js: 26ms, application-code: 255ms)
+ GET /practice/topic/Activity 200 in 332ms (next.js: 20ms, application-code: 313ms)
+ GET /practice/topic/Activity 200 in 178ms (next.js: 11ms, application-code: 167ms)
+ GET /api/auth/get-session 200 in 41ms (next.js: 16ms, application-code: 25ms)
+ GET /api/profile 200 in 40ms (next.js: 4ms, application-code: 36ms)
+ GET /api/profile 200 in 41ms (next.js: 3ms, application-code: 38ms)
+ GET /api/profile 200 in 38ms (next.js: 3ms, application-code: 35ms)
+ GET /api/auth/get-session 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /api/profile 200 in 32ms (next.js: 3ms, application-code: 29ms)
+ GET /api/profile 200 in 21ms (next.js: 4ms, application-code: 17ms)
+ GET /api/profile 200 in 23ms (next.js: 3ms, application-code: 20ms)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RenderFromTemplateContext>
+      <ScrollAndMaybeFocusHandler cacheNode={{rsc:{...}, ...}}>
+        <InnerScrollHandlerNew focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>
+          <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
+            <LoadingBoundary name="Activity/" loading={null}>
+              <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+                <RedirectBoundary>
+                  <RedirectErrorBoundary router={{...}}>
+                    <InnerLayoutRouter url="/practice/..." tree={[...]} params={{topic:"Act..."}} ...>
+                      <SegmentViewNode type="page" pagePath="practice/t...">
+                        <SegmentTrieNode>
+                        <PracticeTopicPage>
+                          <SessionBoundary serverAuthenticated={false}>
+                            <AiCoachSession topic="Activity">
++                             <div className="mx-auto flex max-w-3xl flex-col gap-6 py-8">
+-                             <main className="flex min-h-[60vh] items-center justify-center" id="main-content">
+                      ...
+                    ...
+          ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+    at AiCoachSession (src/components/practice/ai-coach-session.tsx:744:7)
+    at PracticeTopicPage (src\app\practice\topic\[topic]\page.tsx:22:7)
+  742 |   if (phase === "question" || phase === "loading") {
+  743 |     return (
+> 744 |       <div className="mx-auto flex max-w-3xl flex-col gap-6 py-8">
+      |       ^
+  745 |         <TopBar topic={currentTopic} />
+  746 |         <section className="flex flex-col gap-6 rounded-2xl border border-border p-6">
+  747 |           <div className="flex flex-wrap items-center gap-2 text-sm text-secondary-text">
+ POST /api/follow-up 200 in 1575ms (next.js: 2ms, application-code: 1572ms)
+ POST /api/follow-up 200 in 1899ms (next.js: 8ms, application-code: 1892ms)

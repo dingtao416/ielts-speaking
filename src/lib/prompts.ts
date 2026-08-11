@@ -377,7 +377,7 @@ export function getFollowUpQuestionPrompt(params: {
     stageBand,
   } = params;
 
-  const isFollowUp = round > 1 && lastAnswer?.trim();
+  const isFollowUp = round > 1 && currentQuestion?.trim();
 
   const system = `你是雅思口语考官。用户在练习雅思口语 Part 1，话题是「${topic}」。${year ? `考季 ${year}。` : ""}你负责用英文逐题提问，模拟真实 Part 1 面试节奏。
 
@@ -390,7 +390,7 @@ export function getFollowUpQuestionPrompt(params: {
 - 保持问题的多样性和递进感，避免重复问同一件事。${stageBand ? `用户当前训练目标是 ${stageBand} 分，问题难度匹配该水平。` : ""}`;
 
   const user = isFollowUp
-    ? `当前是第 ${round} 问。上一题: "${currentQuestion}"\n用户上一轮的回答: "${lastAnswer?.slice(0, 600)}"\n\n请基于以上内容,提出下一道与话题「${topic}」相关的英文问题。若用户回答信息不足以自然衔接，可提一道针对性追问；否则换一个新角度。`
+    ? `当前是第 ${round} 问。上一题: "${currentQuestion}"\n用户上一轮的回答: "${lastAnswer?.slice(0, 600) ?? ""}"\n\n请同时依据上一题和用户回答，提出一道自然、具体的英文追问。优先追问回答中提到的原因、细节、例子或感受，不得忽略上一轮信息另起一道无关问题。若回答过短或为空，则围绕上一题请用户补充原因或例子。`
     : `当前是第 1 问。请提出话题「${topic}」的第一道英文 Part 1 问题。`;
 
   return { system, user };
