@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mic, Square } from "lucide-react";
 
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import {
+  speechErrorMessageKey,
+  useSpeechRecognition,
+} from "@/hooks/useSpeechRecognition";
 import { countUnits, highlightTokens, langFromAsr } from "@/lib/lexicon";
 import { useT } from "@/lib/i18n";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -16,15 +19,19 @@ import { Button } from "@/components/ui/button";
 export function SpeechAnswerCard({
   question: _question,
   onResult,
+  lang,
 }: {
   question: string;
   onResult: (text: string) => void;
+  lang?: string;
 }) {
   const { t } = useT();
-  const asrLang = useSettingsStore((s) => s.asrLang);
+  const configuredAsrLang = useSettingsStore((s) => s.asrLang);
+  const asrLang = lang ?? configuredAsrLang;
   const speech = useSpeechRecognition(asrLang);
   const fullTextRef = useRef("");
   const interimRef = useRef("");
+  const [displayText, setDisplayText] = useState("");
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
 
@@ -35,9 +42,13 @@ export function SpeechAnswerCard({
           ? `${fullTextRef.current} ${result.text}`
           : result.text;
         interimRef.current = "";
+        setDisplayText(fullTextRef.current);
         onResultRef.current(fullTextRef.current);
       } else {
         interimRef.current = result.text;
+        setDisplayText(
+          `${fullTextRef.current}${fullTextRef.current && result.text ? " " : ""}${result.text}`,
+        );
       }
     });
   }, [speech]);
@@ -45,11 +56,12 @@ export function SpeechAnswerCard({
   function handleStart() {
     fullTextRef.current = "";
     interimRef.current = "";
+    setDisplayText("");
     onResultRef.current("");
     speech.start();
   }
 
-  const showText = fullTextRef.current || interimRef.current;
+  const showText = displayText;
 
   return (
     <div className="flex flex-col gap-3">
@@ -60,7 +72,7 @@ export function SpeechAnswerCard({
               className="text-base leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: highlightTokens(
-                  `${fullTextRef.current}${interimRef.current ? " " + interimRef.current : ""}`,
+                  showText,
                   langFromAsr(asrLang),
                 ),
               }}
@@ -110,7 +122,22 @@ export function SpeechAnswerCard({
       </div>
 
       {speech.error && speech.state === "error" ? (
-        <p className="text-xs text-[var(--filler-color)]">{speech.error}</p>
+        <div
+          role="alert"
+          className="flex flex-col items-start gap-2 rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 p-3"
+        >
+          <p className="text-xs leading-relaxed text-[var(--filler-color)]">
+            {t(speechErrorMessageKey(speech.error))}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleStart}
+          >
+            <Mic className="h-4 w-4" aria-hidden="true" />
+            {t("common.retry")}
+          </Button>
+        </div>
       ) : null}
     </div>
   );

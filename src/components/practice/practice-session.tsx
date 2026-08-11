@@ -19,7 +19,10 @@ import { getSimilarQuestions } from "@/lib/bank";
 import type { AbilityProfile } from "@/persistence/schema";
 import { FiveTierView, type FiveTierData } from "@/components/practice/five-tier-view";
 import { Button } from "@/components/ui/button";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import {
+  speechErrorMessageKey,
+  useSpeechRecognition,
+} from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { useStreamText } from "@/hooks/useStreamText";
 import {
@@ -568,17 +571,8 @@ export function PracticeSession({ question }: { question: Question }) {
           {speech.error && speech.state === "error" ? (
             <div className="mx-auto max-w-md rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 px-4 py-3 text-center">
               <p className="text-sm text-[var(--filler-color)]">
-                {speech.error}
+                {t(speechErrorMessageKey(speech.error))}
               </p>
-              {speech.micPermission === "denied" ? (
-                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
-                  {t("practice.micDenied")}
-                </p>
-              ) : (
-                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
-                  {t("practice.micPrompt")}
-                </p>
-              )}
               <Button
                 onClick={handleStart}
                 className="mt-3"

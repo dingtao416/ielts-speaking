@@ -5,7 +5,10 @@ import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff, Mic, Square, Wand2 } from "lucide-react";
 
 import type { Question } from "@/lib/bank";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import {
+  speechErrorMessageKey,
+  useSpeechRecognition,
+} from "@/hooks/useSpeechRecognition";
 import { useTimer } from "@/hooks/useTimer";
 import { analyzeText, highlightTokens, langFromAsr } from "@/lib/lexicon";
 import type { Framework } from "@/lib/frameworks";
@@ -313,17 +316,8 @@ export function ReciteSession({ question }: { question: Question }) {
           {speech.error && speech.state === "error" ? (
             <div className="mx-auto max-w-md rounded-xl border border-[var(--filler-color)]/30 bg-[var(--filler-color)]/5 px-4 py-3 text-center">
               <p className="text-sm text-[var(--filler-color)]">
-                {speech.error}
+                {t(speechErrorMessageKey(speech.error))}
               </p>
-              {speech.micPermission === "denied" ? (
-                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
-                  {t("practice.micDenied")}
-                </p>
-              ) : (
-                <p className="mt-2 text-xs leading-relaxed text-secondary-text">
-                  {t("practice.micPrompt")}
-                </p>
-              )}
               <Button
                 onClick={handleStart}
                 className="mt-3"
