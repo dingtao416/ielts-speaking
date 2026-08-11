@@ -1,0 +1,1 @@
+ALTER TABLE "session_record" ALTER COLUMN "band_estimate" SET DATA TYPE numeric(3, 1);

@@ -111,6 +111,21 @@ select:focus-visible {
   color: #16a34a;
 }
 
+/* 可交互的黄色词汇词（S5 反馈 / S6 话题总结联动） */
+.hl-vague.hl-interactive {
+  cursor: pointer;
+  border-radius: 2px;
+}
+.hl-vague.hl-interactive:hover,
+.hl-vague.hl-interactive:focus-visible {
+  background: rgb(243 214 95 / 35%);
+  outline: none;
+}
+.hl-vague.hl-interactive:focus-visible {
+  outline: 2px solid var(--vague-color);
+  outline-offset: 2px;
+}
+
 /* 切换内容淡入动画 */
 @keyframes fade-in {
   from {

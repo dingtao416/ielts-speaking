@@ -1,0 +1,460 @@
+⚠ Self-signed certificates are currently an experimental feature, use with caution.
+▲ Next.js 16.3.0 (Turbopack)
+- Local:         https://localhost:3000
+- Network:       https://10.1.1.235:3000
+- Environments: .env.local
+✓ Ready in 749ms
+✓ Running next.config.ts took 40ms
+
+ GET /practice/topic/Hometown 200 in 1360ms (next.js: 1171ms, application-code: 189ms)
+ POST /api/auth/sign-in/username 200 in 1052ms (next.js: 667ms, application-code: 385ms)
+ POST /api/auth/sign-in/username 200 in 105ms (next.js: 11ms, application-code: 94ms)
+ POST /api/auth/sign-in/username 200 in 101ms (next.js: 13ms, application-code: 88ms)
+ GET /practice/topic/Hometown 200 in 303ms (next.js: 14ms, application-code: 290ms)
+ GET /api/auth/get-session 200 in 196ms (next.js: 16ms, application-code: 180ms)
+ GET /api/profile 200 in 176ms (next.js: 145ms, application-code: 31ms)
+ GET /api/profile 200 in 17ms (next.js: 4ms, application-code: 13ms)
+ POST /api/follow-up 200 in 1681ms (next.js: 73ms, application-code: 1608ms)
+ POST /api/follow-up 200 in 1780ms (next.js: 90ms, application-code: 1690ms)
+ GET / 200 in 72ms (next.js: 23ms, application-code: 49ms)
+ GET /bank 200 in 86ms (next.js: 22ms, application-code: 63ms)
+ GET /settings 200 in 59ms (next.js: 17ms, application-code: 42ms)
+ GET /progress 200 in 56ms (next.js: 20ms, application-code: 37ms)
+ GET /practice/topic/Hometown 200 in 71ms (next.js: 15ms, application-code: 56ms)
+ POST /api/auth/sign-in/username 200 in 122ms (next.js: 14ms, application-code: 108ms)
+ GET /practice/topic/Food 200 in 92ms (next.js: 10ms, application-code: 82ms)
+ GET /api/auth/get-session 200 in 68ms (next.js: 15ms, application-code: 54ms)
+ GET /api/profile 200 in 48ms (next.js: 4ms, application-code: 44ms)
+ GET /api/profile 200 in 17ms (next.js: 3ms, application-code: 14ms)
+ GET /api/profile 200 in 17ms (next.js: 1.6ms, application-code: 15ms)
+ GET /api/profile 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ POST /api/follow-up 200 in 1664ms (next.js: 20ms, application-code: 1644ms)
+ POST /api/follow-up 200 in 2.6s (next.js: 10ms, application-code: 2.6s)
+ GET / 200 in 45ms (next.js: 3ms, application-code: 42ms)
+ GET /api/auth/get-session 200 in 19ms (next.js: 12ms, application-code: 7ms)
+ GET /bank 200 in 22ms (next.js: 4ms, application-code: 18ms)
+ GET /practice/topic/Person 200 in 41ms (next.js: 10ms, application-code: 31ms)
+ GET /login?returnTo=%2Fpractice%2Ftopic%2FPerson 200 in 76ms (next.js: 27ms, application-code: 50ms)
+ GET /login?returnTo=%2Fpractice%2Ftopic%2FPerson 200 in 27ms (next.js: 2ms, application-code: 25ms)
+ POST /api/auth/sign-in/username 200 in 125ms (next.js: 14ms, application-code: 111ms)
+ GET /api/auth/get-session 200 in 75ms (next.js: 4ms, application-code: 71ms)
+ GET /practice/topic/Person 200 in 79ms (next.js: 12ms, application-code: 68ms)
+ GET /api/auth/get-session 200 in 48ms (next.js: 3ms, application-code: 45ms)
+ GET /api/profile 200 in 38ms (next.js: 5ms, application-code: 33ms)
+ GET /api/profile 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /api/profile 200 in 17ms (next.js: 3ms, application-code: 14ms)
+ GET /api/profile 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ POST /api/follow-up 200 in 2.4s (next.js: 9ms, application-code: 2.4s)
+ POST /api/follow-up 200 in 2.4s (next.js: 14ms, application-code: 2.4s)
+ GET /bank 200 in 26ms (next.js: 5ms, application-code: 21ms)
+ GET /api/auth/get-session 200 in 27ms (next.js: 12ms, application-code: 15ms)
+ GET /library 200 in 59ms (next.js: 30ms, application-code: 29ms)
+ GET /api/profile 200 in 59ms (next.js: 2ms, application-code: 57ms)
+ GET /api/frameworks 200 in 67ms (next.js: 43ms, application-code: 24ms)
+ GET /api/profile 200 in 26ms (next.js: 2ms, application-code: 24ms)
+ GET /api/frameworks 200 in 26ms (next.js: 4ms, application-code: 22ms)
+ GET /bank 200 in 22ms (next.js: 3ms, application-code: 19ms)
+ GET /practice/topic/Activity 200 in 44ms (next.js: 10ms, application-code: 34ms)
+ GET /api/profile 200 in 34ms (next.js: 2ms, application-code: 31ms)
+ GET /api/profile 200 in 17ms (next.js: 2ms, application-code: 14ms)
+ GET /api/profile 200 in 19ms (next.js: 2ms, application-code: 16ms)
+ GET /api/profile 200 in 18ms (next.js: 1.7ms, application-code: 16ms)
+ POST /api/follow-up 200 in 1770ms (next.js: 7ms, application-code: 1763ms)
+ POST /api/follow-up 200 in 2.2s (next.js: 2ms, application-code: 2.2s)
+ GET /bank 200 in 26ms (next.js: 5ms, application-code: 21ms)
+ GET /bank 200 in 39ms (next.js: 13ms, application-code: 26ms)
+ GET /practice/topic/Activity 200 in 61ms (next.js: 15ms, application-code: 46ms)
+ GET /api/profile 200 in 35ms (next.js: 3ms, application-code: 32ms)
+ GET /api/profile 200 in 28ms (next.js: 4ms, application-code: 24ms)
+ GET /api/profile 200 in 24ms (next.js: 4ms, application-code: 20ms)
+ GET /api/profile 200 in 18ms (next.js: 2ms, application-code: 16ms)
+ POST /api/follow-up 200 in 2.2s (next.js: 2ms, application-code: 2.2s)
+ POST /api/follow-up 200 in 2.3s (next.js: 11ms, application-code: 2.3s)
+ POST /api/response-feedback 400 in 50ms (next.js: 44ms, application-code: 6ms)
+ GET /bank 200 in 40ms (next.js: 6ms, application-code: 34ms)
+ GET /bank 200 in 381ms (next.js: 2ms, application-code: 379ms)
+ GET /bank 200 in 355ms (next.js: 2ms, application-code: 353ms)
+ GET /api/auth/get-session 200 in 15ms (next.js: 10ms, application-code: 5ms)
+ GET /bank 200 in 454ms (next.js: 3ms, application-code: 451ms)
+ GET /api/auth/get-session 200 in 16ms (next.js: 10ms, application-code: 6ms)
+ GET / 200 in 32ms (next.js: 4ms, application-code: 29ms)
+ GET /api/auth/get-session 200 in 12ms (next.js: 9ms, application-code: 4ms)
+ GET /bank 200 in 19ms (next.js: 4ms, application-code: 15ms)
+ GET /practice/topic/Activity 200 in 27ms (next.js: 12ms, application-code: 15ms)
+ GET /login?returnTo=%2Fpractice%2Ftopic%2FActivity 200 in 24ms (next.js: 4ms, application-code: 20ms)
+ GET /login?returnTo=%2Fpractice%2Ftopic%2FActivity 200 in 20ms (next.js: 3ms, application-code: 16ms)
+ POST /api/auth/sign-in/username 200 in 90ms (next.js: 11ms, application-code: 80ms)
+ GET /api/auth/get-session 200 in 16ms (next.js: 1.9ms, application-code: 14ms)
+ GET /practice/topic/Activity 200 in 58ms (next.js: 8ms, application-code: 50ms)
+ GET /api/auth/get-session 200 in 48ms (next.js: 11ms, application-code: 37ms)
+ GET /api/profile 200 in 38ms (next.js: 3ms, application-code: 35ms)
+ GET /api/profile 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ GET /api/profile 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /api/profile 200 in 15ms (next.js: 2ms, application-code: 13ms)
+ POST /api/follow-up 200 in 1671ms (next.js: 2ms, application-code: 1669ms)
+ POST /api/follow-up 200 in 2.0s (next.js: 9ms, application-code: 2.0s)
+ POST /api/response-feedback 400 in 8ms (next.js: 3ms, application-code: 4ms)
+ GET /bank 200 in 28ms (next.js: 4ms, application-code: 24ms)
+ GET /practice/topic/Activity 200 in 37ms (next.js: 10ms, application-code: 27ms)
+ GET /api/profile 200 in 20ms (next.js: 7ms, application-code: 13ms)
+ GET /api/profile 200 in 14ms (next.js: 3ms, application-code: 12ms)
+ GET /api/profile 200 in 12ms (next.js: 1.8ms, application-code: 11ms)
+ GET /api/profile 200 in 13ms (next.js: 2ms, application-code: 10ms)
+ POST /api/follow-up 200 in 1581ms (next.js: 1.7ms, application-code: 1580ms)
+ POST /api/follow-up 200 in 1704ms (next.js: 1.8ms, application-code: 1703ms)
+ GET /practice/topic/Activity 200 in 55ms (next.js: 9ms, application-code: 47ms)
+ POST /api/response-feedback 200 in 14.1s (next.js: 3ms, application-code: 14.1s)
+ GET /api/auth/get-session 200 in 31ms (next.js: 7ms, application-code: 25ms)
+ GET /api/profile 200 in 21ms (next.js: 6ms, application-code: 15ms)
+ GET /api/profile 200 in 11ms (next.js: 1.6ms, application-code: 9ms)
+ GET /api/profile 200 in 14ms (next.js: 1.5ms, application-code: 12ms)
+ GET /api/profile 200 in 11ms (next.js: 1.6ms, application-code: 10ms)
+ POST /api/follow-up 200 in 1702ms (next.js: 9ms, application-code: 1692ms)
+ POST /api/response-feedback 400 in 9ms (next.js: 3ms, application-code: 6ms)
+ POST /api/follow-up 200 in 10.5s (next.js: 2ms, application-code: 10.5s)
+ POST /api/response-feedback 400 in 6ms (next.js: 3ms, application-code: 4ms)
+ POST /api/follow-up 200 in 1551ms (next.js: 6ms, application-code: 1545ms)
+ POST /api/response-feedback 400 in 7ms (next.js: 4ms, application-code: 3ms)
+ POST /api/follow-up 200 in 2.5s (next.js: 3ms, application-code: 2.5s)
+ POST /api/response-feedback 200 in 8.5s (next.js: 1.7ms, application-code: 8.5s)
+ GET /bank 200 in 24ms (next.js: 9ms, application-code: 15ms)
+ GET /practice/topic/Activity 200 in 43ms (next.js: 17ms, application-code: 26ms)
+ GET /api/profile 200 in 17ms (next.js: 7ms, application-code: 10ms)
+ GET /api/profile 200 in 12ms (next.js: 1.8ms, application-code: 10ms)
+ GET /api/profile 200 in 14ms (next.js: 3ms, application-code: 12ms)
+ GET /api/profile 200 in 18ms (next.js: 2ms, application-code: 16ms)
+ POST /api/follow-up 200 in 1758ms (next.js: 2.0ms, application-code: 1756ms)
+ POST /api/follow-up 200 in 2.1s (next.js: 1.5ms, application-code: 2.1s)
+ POST /api/response-feedback 200 in 13.5s (next.js: 3ms, application-code: 13.5s)
+ GET /bank 200 in 32ms (next.js: 3ms, application-code: 28ms)
+ GET /api/auth/get-session 200 in 29ms (next.js: 9ms, application-code: 20ms)
+ POST /api/follow-up 200 in 1407ms (next.js: 3ms, application-code: 1405ms)
+ POST /api/response-feedback 200 in 14.5s (next.js: 4ms, application-code: 14.5s)
+ GET /bank 200 in 418ms (next.js: 2ms, application-code: 416ms)
+ POST /api/response-feedback 200 in 5.4s (next.js: 3ms, application-code: 5.4s)
+ GET /api/auth/get-session 200 in 20ms (next.js: 8ms, application-code: 12ms)
+ POST /api/follow-up 200 in 2.1s (next.js: 2ms, application-code: 2.1s)
+ GET /bank 200 in 829ms (next.js: 6ms, application-code: 823ms)
+ GET /api/auth/get-session 200 in 36ms (next.js: 16ms, application-code: 20ms)
+ GET /bank 200 in 640ms (next.js: 4ms, application-code: 636ms)
+ GET /api/auth/get-session 200 in 35ms (next.js: 14ms, application-code: 20ms)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 14ms, application-code: 39ms)
+ GET /api/profile 200 in 40ms (next.js: 4ms, application-code: 35ms)
+ GET /api/profile 200 in 22ms (next.js: 4ms, application-code: 18ms)
+ GET /api/profile 200 in 16ms (next.js: 1.9ms, application-code: 14ms)
+ GET /api/profile 200 in 16ms (next.js: 3ms, application-code: 13ms)
+ POST /api/follow-up 200 in 1990ms (next.js: 3ms, application-code: 1987ms)
+ POST /api/follow-up 200 in 2.3s (next.js: 8ms, application-code: 2.3s)
+ POST /api/response-feedback 400 in 7ms (next.js: 2ms, application-code: 5ms)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 9ms, application-code: 45ms)
+ GET /api/auth/get-session 200 in 47ms (next.js: 12ms, application-code: 34ms)
+ GET /api/profile 200 in 32ms (next.js: 3ms, application-code: 29ms)
+ GET /api/profile 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /api/profile 200 in 16ms (next.js: 2ms, application-code: 14ms)
+ GET /api/profile 200 in 14ms (next.js: 2ms, application-code: 12ms)
+ POST /api/follow-up 200 in 2.4s (next.js: 3ms, application-code: 2.4s)
+ POST /api/follow-up 200 in 2.7s (next.js: 7ms, application-code: 2.7s)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 10ms, application-code: 43ms)
+ GET /practice/topic/Activity 200 in 39ms (next.js: 4ms, application-code: 35ms)
+ GET /practice/topic/Activity 200 in 140ms (next.js: 13ms, application-code: 127ms)
+ GET /practice/topic/Activity 200 in 100ms (next.js: 6ms, application-code: 94ms)
+ POST /api/response-feedback 200 in 7.9s (next.js: 5ms, application-code: 7.9s)
+ POST /api/auth/sign-in/username 200 in 138ms (next.js: 14ms, application-code: 124ms)
+ GET /practice/topic/Hometown 200 in 140ms (next.js: 19ms, application-code: 121ms)
+ GET /api/auth/get-session 200 in 40ms (next.js: 16ms, application-code: 24ms)
+ GET /api/profile 200 in 66ms (next.js: 6ms, application-code: 60ms)
+ GET /api/profile 200 in 30ms (next.js: 4ms, application-code: 26ms)
+ GET /api/profile 200 in 29ms (next.js: 5ms, application-code: 24ms)
+ GET /api/profile 200 in 26ms (next.js: 4ms, application-code: 22ms)
+ POST /api/follow-up 200 in 1019ms (next.js: 3ms, application-code: 1016ms)
+ POST /api/follow-up 200 in 1692ms (next.js: 11ms, application-code: 1680ms)
+ GET /practice/topic/Hometown 200 in 97ms (next.js: 14ms, application-code: 82ms)
+ GET /api/auth/get-session 200 in 27ms (next.js: 13ms, application-code: 14ms)
+ GET /api/profile 200 in 35ms (next.js: 11ms, application-code: 24ms)
+ GET /api/profile 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /api/profile 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ GET /api/profile 200 in 12ms (next.js: 1.7ms, application-code: 10ms)
+ POST /api/follow-up 200 in 1732ms (next.js: 3ms, application-code: 1729ms)
+ POST /api/follow-up 200 in 1876ms (next.js: 3ms, application-code: 1874ms)
+ POST /api/response-feedback 400 in 8ms (next.js: 3ms, application-code: 5ms)
+ GET /api/auth/get-session 200 in 39ms (next.js: 16ms, application-code: 23ms)
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+ GET /practice/topic/Activity 200 in 94ms (next.js: 16ms, application-code: 78ms)
+ GET /practice/topic/Activity 200 in 64ms (next.js: 4ms, application-code: 60ms)
+✓ Compiled in 112ms
+ GET /practice/topic/Activity 200 in 80ms (next.js: 19ms, application-code: 61ms)
+ GET /practice/topic/Activity 200 in 38ms (next.js: 7ms, application-code: 31ms)
+✓ Compiled in 147ms
+ GET /api/profile 200 in 113ms (next.js: 6ms, application-code: 107ms)
+ GET /practice/topic/Activity 200 in 134ms (next.js: 24ms, application-code: 110ms)
+ GET /api/profile 200 in 48ms (next.js: 20ms, application-code: 28ms)
+ GET /api/profile 200 in 75ms (next.js: 2ms, application-code: 73ms)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 3ms, application-code: 50ms)
+ GET /api/profile 200 in 22ms (next.js: 3ms, application-code: 19ms)
+ POST /api/follow-up 200 in 1514ms (next.js: 11ms, application-code: 1503ms)
+ POST /api/follow-up 200 in 1527ms (next.js: 10ms, application-code: 1517ms)
+ POST /api/follow-up 200 in 1702ms (next.js: 4ms, application-code: 1698ms)
+ POST /api/follow-up 200 in 2.3s (next.js: 15ms, application-code: 2.3s)
+✓ Compiled in 296ms
+ GET /practice/topic/Activity 200 in 96ms (next.js: 22ms, application-code: 74ms)
+ GET /practice/topic/Activity 200 in 109ms (next.js: 6ms, application-code: 104ms)
+✓ Compiled in 69ms
+ GET /practice/topic/Activity 200 in 63ms (next.js: 17ms, application-code: 46ms)
+ GET /practice/topic/Activity 200 in 36ms (next.js: 3ms, application-code: 33ms)
+ GET /practice/topic/Activity 200 in 67ms (next.js: 14ms, application-code: 53ms)
+ GET /practice/topic/Activity 200 in 54ms (next.js: 4ms, application-code: 50ms)
+ POST /api/response-feedback 200 in 8.3s (next.js: 16ms, application-code: 8.3s)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 12ms, application-code: 41ms)
+ GET /practice/topic/Activity 200 in 53ms (next.js: 3ms, application-code: 50ms)
+ GET /api/auth/get-session 200 in 35ms (next.js: 14ms, application-code: 21ms)
+ GET /practice/topic/Activity 200 in 44ms (next.js: 10ms, application-code: 35ms)
+ GET /practice/topic/Activity 200 in 41ms (next.js: 3ms, application-code: 38ms)
+ POST /api/response-feedback 200 in 3.9s (next.js: 3ms, application-code: 3.9s)
+ GET /practice/topic/Hometown 200 in 71ms (next.js: 12ms, application-code: 60ms)
+ GET /api/auth/get-session 200 in 42ms (next.js: 13ms, application-code: 29ms)
+ GET /api/profile 200 in 50ms (next.js: 4ms, application-code: 46ms)
+ GET /api/profile 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET /api/profile 200 in 18ms (next.js: 2ms, application-code: 16ms)
+ GET /api/profile 200 in 25ms (next.js: 3ms, application-code: 22ms)
+ POST /api/follow-up 200 in 1583ms (next.js: 20ms, application-code: 1563ms)
+ POST /api/follow-up 200 in 1616ms (next.js: 1.9ms, application-code: 1614ms)
+ POST /api/response-feedback 200 in 2.9s (next.js: 1.8ms, application-code: 2.9s)
+ GET / 200 in 48ms (next.js: 5ms, application-code: 42ms)
+ GET /bank 200 in 388ms (next.js: 4ms, application-code: 384ms)
+ GET /practice/topic/Hometown 200 in 48ms (next.js: 11ms, application-code: 38ms)
+ GET /api/auth/get-session 200 in 28ms (next.js: 11ms, application-code: 17ms)
+ POST /api/auth/sign-in/username 200 in 134ms (next.js: 15ms, application-code: 119ms)
+ GET /practice/topic/Hometown 200 in 128ms (next.js: 15ms, application-code: 113ms)
+ GET /api/auth/get-session 200 in 41ms (next.js: 19ms, application-code: 22ms)
+ GET /api/profile 200 in 44ms (next.js: 6ms, application-code: 38ms)
+ GET /api/profile 200 in 33ms (next.js: 4ms, application-code: 29ms)
+ GET /api/profile 200 in 25ms (next.js: 4ms, application-code: 21ms)
+ GET /api/profile 200 in 31ms (next.js: 4ms, application-code: 27ms)
+ POST /api/follow-up 200 in 1592ms (next.js: 2ms, application-code: 1589ms)
+ POST /api/follow-up 200 in 1765ms (next.js: 3ms, application-code: 1762ms)
+ POST /api/auth/sign-in/username 200 in 126ms (next.js: 14ms, application-code: 112ms)
+ GET /practice/topic/Hometown 200 in 108ms (next.js: 13ms, application-code: 95ms)
+ GET /api/auth/get-session 200 in 39ms (next.js: 13ms, application-code: 26ms)
+ GET /api/profile 200 in 53ms (next.js: 5ms, application-code: 49ms)
+ GET /api/profile 200 in 26ms (next.js: 4ms, application-code: 22ms)
+ GET /api/profile 200 in 25ms (next.js: 4ms, application-code: 22ms)
+ GET /api/profile 200 in 31ms (next.js: 3ms, application-code: 28ms)
+ POST /api/follow-up 200 in 1864ms (next.js: 3ms, application-code: 1861ms)
+ POST /api/follow-up 200 in 3.4s (next.js: 12ms, application-code: 3.4s)
+✓ Compiled in 56ms
+ GET /practice/topic/Activity 200 in 69ms (next.js: 17ms, application-code: 52ms)
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+[browser] ./src/app/api/response-feedback/route.ts:2:1
+Error: Export getRecommendedAnswerPrompt doesn't exist in target module
+  1 | import { chatCompleteStream } from "@/lib/llm";
+> 2 | import { getRecommendedAnswerPrompt } from "@/lib/prompts";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 |
+  4 | export const runtime = "nodejs";
+  5 |
+
+The export getRecommendedAnswerPrompt was not found in module [project]/src/lib/prompts.ts [app-route] (ecmascript).
+Did you mean to import getModelAnswerPrompt?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist. 
+ GET /api/auth/get-session 200 in 81ms (next.js: 12ms, application-code: 70ms)
+ GET /practice/topic/Activity 200 in 110ms (next.js: 16ms, application-code: 94ms)
+ GET /api/profile 200 in 23ms (next.js: 3ms, application-code: 21ms)
+ GET /api/profile 200 in 28ms (next.js: 10ms, application-code: 18ms)
+ POST /api/follow-up 200 in 1985ms (next.js: 3ms, application-code: 1982ms)
+ POST /api/follow-up 200 in 1936ms (next.js: 3ms, application-code: 1933ms)
+ GET /practice/topic/Activity 200 in 96ms (next.js: 13ms, application-code: 83ms)
+ GET /api/auth/get-session 200 in 49ms (next.js: 11ms, application-code: 38ms)
+ GET /api/profile 200 in 38ms (next.js: 4ms, application-code: 34ms)
+ GET /api/profile 200 in 44ms (next.js: 3ms, application-code: 41ms)
+ GET /api/profile 200 in 24ms (next.js: 4ms, application-code: 20ms)
+ GET /api/profile 200 in 17ms (next.js: 4ms, application-code: 13ms)
+ POST /api/follow-up 200 in 1579ms (next.js: 8ms, application-code: 1571ms)
+ POST /api/follow-up 200 in 2.0s (next.js: 3ms, application-code: 2.0s)
+ POST /api/response-feedback 200 in 4.3s (next.js: 2ms, application-code: 4.3s)
+ GET /settings 200 in 24ms (next.js: 7ms, application-code: 17ms)
+ GET /api/llm/health 200 in 37ms (next.js: 34ms, application-code: 4ms)
+ GET /api/llm/health 200 in 5ms (next.js: 2ms, application-code: 3ms)
+ GET /bank 200 in 19ms (next.js: 3ms, application-code: 15ms)
+ GET /practice/topic/Activity 200 in 44ms (next.js: 14ms, application-code: 29ms)
+ GET /api/profile 200 in 23ms (next.js: 6ms, application-code: 17ms)
+ GET /api/profile 200 in 15ms (next.js: 1.6ms, application-code: 13ms)
+ GET /api/profile 200 in 35ms (next.js: 2ms, application-code: 33ms)
+ GET /api/profile 200 in 18ms (next.js: 2ms, application-code: 15ms)
+ POST /api/follow-up 200 in 1829ms (next.js: 2ms, application-code: 1826ms)
+ POST /api/follow-up 200 in 1868ms (next.js: 1.8ms, application-code: 1866ms)
+ POST /api/response-feedback 200 in 10.2s (next.js: 2ms, application-code: 10.2s)
+ POST /api/follow-up 200 in 2.1s (next.js: 3ms, application-code: 2.1s)
+ GET /practice/topic/Activity 200 in 70ms (next.js: 11ms, application-code: 60ms)
+ GET /api/auth/get-session 200 in 30ms (next.js: 13ms, application-code: 17ms)
+ GET /api/profile 200 in 26ms (next.js: 3ms, application-code: 23ms)
+ GET /api/profile 200 in 24ms (next.js: 10ms, application-code: 15ms)
+ GET /api/profile 200 in 20ms (next.js: 3ms, application-code: 18ms)
+ GET /api/profile 200 in 12ms (next.js: 2ms, application-code: 10ms)
+ POST /api/follow-up 200 in 1628ms (next.js: 2.0ms, application-code: 1626ms)
+ POST /api/follow-up 200 in 1866ms (next.js: 3ms, application-code: 1863ms)
+ POST /api/response-feedback 200 in 10.5s (next.js: 1.9ms, application-code: 10.5s)
+ GET /practice/topic/Activity 200 in 73ms (next.js: 14ms, application-code: 60ms)
+✓ Compiled in 44ms
+ GET /api/profile 200 in 39ms (next.js: 3ms, application-code: 36ms)
+ GET /api/profile 200 in 16ms (next.js: 1.7ms, application-code: 14ms)
+ GET /practice/topic/Activity 200 in 72ms (next.js: 3ms, application-code: 69ms)
+ GET /practice/topic/Activity 200 in 71ms (next.js: 4ms, application-code: 67ms)
+ GET /api/profile 200 in 39ms (next.js: 8ms, application-code: 31ms)
+ GET /api/profile 200 in 20ms (next.js: 3ms, application-code: 16ms)
+ GET /api/profile 200 in 39ms (next.js: 15ms, application-code: 24ms)
+ GET /api/profile 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ POST /api/follow-up 200 in 2.2s (next.js: 5ms, application-code: 2.2s)
+ POST /api/follow-up 200 in 2.1s (next.js: 4ms, application-code: 2.1s)
+ POST /api/follow-up 200 in 2.2s (next.js: 7ms, application-code: 2.1s)
+ POST /api/follow-up 200 in 2.4s (next.js: 10ms, application-code: 2.3s)
+ POST /api/follow-up 200 in 2.8s (next.js: 2ms, application-code: 2.8s)
+ POST /api/follow-up 200 in 3.4s (next.js: 8ms, application-code: 3.4s)
+ POST /api/auth/sign-in/username 200 in 83ms (next.js: 7ms, application-code: 76ms)
+ GET /settings 200 in 68ms (next.js: 4ms, application-code: 65ms)
+ GET /api/llm/health 200 in 9ms (next.js: 3ms, application-code: 6ms)
+ GET /api/llm/health 200 in 10ms (next.js: 3ms, application-code: 7ms)
+ GET /api/auth/get-session 200 in 57ms (next.js: 15ms, application-code: 41ms)
+ GET /practice/topic/Hometown 200 in 61ms (next.js: 10ms, application-code: 51ms)
+ GET /api/auth/get-session 200 in 57ms (next.js: 12ms, application-code: 45ms)
+ GET /api/profile 200 in 40ms (next.js: 4ms, application-code: 35ms)
+ GET /api/profile 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /api/profile 200 in 19ms (next.js: 1.7ms, application-code: 18ms)
+ GET /api/profile 200 in 15ms (next.js: 2ms, application-code: 13ms)
+ POST /api/follow-up 200 in 2.9s (next.js: 12ms, application-code: 2.9s)
+ POST /api/follow-up 200 in 2.9s (next.js: 20ms, application-code: 2.9s)
+ GET /settings 200 in 25ms (next.js: 3ms, application-code: 22ms)
+ GET /practice/topic/Hometown 200 in 42ms (next.js: 11ms, application-code: 31ms)
+ GET /api/auth/get-session 200 in 23ms (next.js: 8ms, application-code: 14ms)
+ GET /api/auth/get-session 200 in 24ms (next.js: 9ms, application-code: 15ms)
+ GET /api/auth/get-session 200 in 31ms (next.js: 12ms, application-code: 19ms)
+ GET / 200 in 236ms (next.js: 49ms, application-code: 186ms)

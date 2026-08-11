@@ -722,12 +722,14 @@ export function collectVagueHits(
 export function highlightVagueOnly(
   text: string,
   lang: AnalysisLang = "en",
+  opts?: { interactive?: boolean },
 ): string {
   const hits = collectVagueHits(text, lang);
   if (hits.length === 0) {
     return escapeHtml(text);
   }
 
+  const interactive = opts?.interactive ?? false;
   const parts: string[] = [];
   let cursor = 0;
   for (const hit of hits) {
@@ -737,8 +739,11 @@ export function highlightVagueOnly(
     }
     const raw = text.slice(hit.start, hit.end);
     const title = escapeAttr(hit.suggestion);
+    const extra = interactive
+      ? ` tabindex="0" role="button" aria-label="${title}"`
+      : "";
     parts.push(
-      `<mark class="hl-vague" title="${title}" data-vague="${escapeAttr(hit.original)}" data-suggestion="${title}">${escapeHtml(raw)}</mark>`,
+      `<mark class="hl-vague${interactive ? " hl-interactive" : ""}" title="${title}" data-vague="${escapeAttr(hit.original)}" data-suggestion="${title}"${extra}>${escapeHtml(raw)}</mark>`,
     );
     cursor = hit.end;
   }
