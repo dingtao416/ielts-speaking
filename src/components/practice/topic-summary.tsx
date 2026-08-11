@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Loader2, Mic } from "lucide-react";
 
 import { useT } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { AudioPlayback } from "@/components/ui/audio-playback";
 import type {
   RoundRecord,
   TopicSummaryData,
@@ -156,13 +157,7 @@ function TopicQuestionReview({ rec, index }: { rec: RoundRecord; index: number }
           <h4 className="mb-1 text-xs font-semibold text-secondary-text">
             {t("aiCoach.originalRecording")}
           </h4>
-          <audio
-            controls
-            preload="none"
-            src={rec.audioUrl}
-            className="h-9 w-full max-w-xs"
-            aria-label={t("aiCoach.playRecording")}
-          />
+          <AudioPlayback src={rec.audioUrl} className="w-full max-w-xs" />
         </div>
       ) : null}
 

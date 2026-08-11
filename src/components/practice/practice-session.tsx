@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ArrowLeft,
   FileText,
+  Loader2,
   Mic,
   Pause,
   Play,
@@ -28,7 +29,7 @@ import { useStreamText } from "@/hooks/useStreamText";
 import {
   analyzeText,
   collectIssues,
-  highlightTokens,
+  highlightVagueOnly,
   langFromAsr,
   type HighlightCategory,
 } from "@/lib/lexicon";
@@ -491,14 +492,14 @@ export function PracticeSession({ question }: { question: Question }) {
                   <p
                     key={i}
                     className="text-lg leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: highlightTokens(s, analysisLang) }}
+                    dangerouslySetInnerHTML={{ __html: highlightVagueOnly(s, analysisLang) }}
                   />
                 ))}
                 {store.interimText ? (
                   <p
                     className="text-lg leading-relaxed opacity-60"
                     dangerouslySetInnerHTML={{
-                      __html: highlightTokens(store.interimText, analysisLang),
+                      __html: highlightVagueOnly(store.interimText, analysisLang),
                     }}
                   />
                 ) : null}
@@ -671,11 +672,16 @@ export function PracticeSession({ question }: { question: Question }) {
               </div>
             ) : (
               <p className="text-xs text-tertiary-text">
-                {store.frameworkStatus === "extracting"
-                  ? t("practice.framework.extractingLong")
-                  : store.frameworkStatus === "error"
-                    ? t("practice.framework.error")
-                    : t("practice.frameworkEmpty")}
+                {store.frameworkStatus === "extracting" ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                    {t("practice.framework.extractingLong")}
+                  </span>
+                ) : store.frameworkStatus === "error" ? (
+                  t("practice.framework.error")
+                ) : (
+                  t("practice.frameworkEmpty")
+                )}
               </p>
             )}
           </div>

@@ -70,8 +70,6 @@ export function BandTrendChart({
     "var(--band-trend-color, #256abf)";
   const seriesColorDark = "#3987e5";
 
-  if (points.length < 2) return null;
-
   function handleMove(e: React.PointerEvent<SVGSVGElement>) {
     const rect = svgRef.current?.getBoundingClientRect();
     if (!rect) return;

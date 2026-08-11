@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 text-sm text-tertiary-text sm:px-6">
-          <span>IELTS Speaking Trainer</span>
+          <span>{t("brand.name")}</span>
           <span>{t("appShell.tagline")}</span>
         </div>
       </footer>

@@ -10,7 +10,7 @@ import {
   Square,
 } from "lucide-react";
 
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import { speechErrorMessageKey, useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useCountdown } from "@/hooks/useTimer";
 import { useStreamText } from "@/hooks/useStreamText";
 import {
@@ -25,6 +25,8 @@ import { activeStageBand, roundHalf } from "@/lib/profile";
 import { getNextTopic } from "@/lib/bank";
 import { saveAudio } from "@/lib/local-audio";
 import { Button, buttonClass } from "@/components/ui/button";
+import { AudioPlayback } from "@/components/ui/audio-playback";
+import { Modal } from "@/components/ui/modal";
 import { TopicSummary } from "@/components/practice/topic-summary";
 import {
   VocabLinkedTranscript,
@@ -153,25 +155,6 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
     };
   }, []);
   /* eslint-enable react-hooks/exhaustive-deps */
-
-  // 弹窗打开时聚焦主按钮 + Escape 关闭
-  useEffect(() => {
-    if (!showNextTopicModal) return;
-    const frame = requestAnimationFrame(() =>
-      document.getElementById("next-topic-confirm")?.focus(),
-    );
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowNextTopicModal(false);
-        setPendingNextTopic(null);
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      cancelAnimationFrame(frame);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [showNextTopicModal]);
 
   // 首题加载
   useEffect(() => {
@@ -566,7 +549,11 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
               <h3 className="text-sm font-semibold text-secondary-text">
                 {t("aiCoach.ready")}
               </h3>
-              <span className="font-mono text-2xl font-bold tabular-nums text-foreground">
+              <span
+                className="font-mono text-2xl font-bold tabular-nums text-foreground"
+                role="timer"
+                aria-label={t("aiCoach.secondsRemaining", { seconds: RECORD_SECONDS })}
+              >
                 00:{String(RECORD_SECONDS).padStart(2, "0")}
               </span>
             </div>
@@ -580,6 +567,22 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
               </Button>
             </div>
           </div>
+
+          {/* 麦克风/识别错误 + 重试 */}
+          {speech.error && speech.state === "error" ? (
+            <div
+              role="alert"
+              className="flex flex-col items-start gap-2 rounded-xl border border-[var(--danger-color)]/30 bg-[var(--danger-color)]/5 p-4"
+            >
+              <p className="text-sm leading-relaxed text-[var(--danger-color)]">
+                {t(speechErrorMessageKey(speech.error))}
+              </p>
+              <Button variant="secondary" size="sm" onClick={handleStart}>
+                <Mic className="h-4 w-4" aria-hidden="true" />
+                {t("common.retry")}
+              </Button>
+            </div>
+          ) : null}
         </section>
       </div>
     );
@@ -616,7 +619,11 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
                 />
                 {t("aiCoach.recording")}
               </h3>
-              <span className="font-mono text-3xl font-bold tabular-nums text-foreground">
+              <span
+                className="font-mono text-3xl font-bold tabular-nums text-foreground"
+                role="timer"
+                aria-label={t("aiCoach.secondsRemaining", { seconds: remaining })}
+              >
                 00:{String(remaining).padStart(2, "0")}
               </span>
             </div>
@@ -679,26 +686,26 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
         {rec ? (
           <>
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-tertiary-text">
-                {t("aiCoach.saved")} ✓
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t("aiCoach.saved")}
+                </span>
+                <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-secondary-text">
+                  {t("aiCoach.stageTarget", { band: stageBand.toFixed(1) })}
+                </span>
+              </div>
               <h1 className="text-xl font-semibold">{rec.question}</h1>
             </div>
 
             {/* 双栏：左转录稿 + 右推荐回答 */}
             <div className="grid gap-4 md:grid-cols-2">
               {/* 转录稿（黄色词汇标记，联动） */}
-              <div className="rounded-2xl border border-border p-5">
+              <div className="rounded-2xl border border-border p-6">
                 <h3 className="mb-3 flex items-center justify-between gap-3 text-sm font-semibold text-secondary-text">
                   <span>{t("aiCoach.transcript")}</span>
                   {rec.audioUrl ? (
-                    <audio
-                      controls
-                      preload="none"
-                      src={rec.audioUrl}
-                      className="h-9 w-44"
-                      aria-label={t("aiCoach.playRecording")}
-                    />
+                    <AudioPlayback src={rec.audioUrl} className="w-52" />
                   ) : null}
                 </h3>
                 <VocabLinkedTranscript
@@ -709,13 +716,16 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
               </div>
 
               {/* 推荐回答 */}
-              <div className="rounded-2xl border border-border bg-muted/20 p-5">
+              <div className="rounded-2xl border border-border bg-muted/20 p-6">
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-secondary-text">
                   {t("aiCoach.recommendedAnswer")}
                   {recommendStream.status === "streaming" ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                   ) : null}
                 </h3>
+                <p className="-mt-2 mb-3 text-xs text-tertiary-text">
+                  {t("aiCoach.recommendedNote", { band: stageBand.toFixed(1) })}
+                </p>
                 {recommendStream.status === "streaming" ? (
                   <p className="whitespace-pre-wrap text-base leading-relaxed">
                     {recommendStream.text}
@@ -731,7 +741,7 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
             </div>
 
             {/* 标黄词汇汇总（联动：只显示对应词条） */}
-            <div className="rounded-2xl border border-border p-5">
+            <div className="rounded-2xl border border-border p-6">
               <h3 className="mb-3 text-sm font-semibold text-secondary-text">
                 {t("aiCoach.vocabSummary")}
               </h3>
@@ -747,10 +757,13 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
             {rec.grammarNotes || rec.naturalRewrite || grammarLoading ? (
               <div className="flex flex-col gap-4">
                 {grammarLoading && !rec.grammarNotes && !rec.naturalRewrite ? (
-                  <p className="text-sm text-tertiary-text">{t("aiCoach.generating")}</p>
+                  <p className="inline-flex items-center gap-2 text-sm text-tertiary-text">
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    {t("aiCoach.generating")}
+                  </p>
                 ) : null}
                 {rec.grammarNotes ? (
-                  <div className="rounded-2xl border border-border p-5">
+                  <div className="rounded-2xl border border-border p-6">
                     <h3 className="mb-2 text-sm font-semibold text-secondary-text">
                       {t("aiCoach.grammarNotes")}
                     </h3>
@@ -760,7 +773,7 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
                   </div>
                 ) : null}
                 {rec.naturalRewrite ? (
-                  <div className="rounded-2xl border border-border p-5">
+                  <div className="rounded-2xl border border-border p-6">
                     <h3 className="mb-2 text-sm font-semibold text-secondary-text">
                       {t("aiCoach.naturalRewrite")}
                     </h3>
@@ -818,62 +831,54 @@ export function AiCoachSession({ topic: initialTopic }: { topic: string }) {
           onEnd={endFromSummary}
           onNextTopic={handleNextTopicClick}
         />
-        {showNextTopicModal && pendingNextTopic ? (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-            onClick={() => {
-              setShowNextTopicModal(false);
-              setPendingNextTopic(null);
-            }}
-          >
-            <section
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="next-topic-title"
-              aria-describedby="next-topic-desc"
-              className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p className="text-xs font-semibold uppercase tracking-wide text-secondary-text">
-                {t("aiCoach.topicTransitionTitle")}
-              </p>
-              <h2 id="next-topic-title" className="mt-1 text-xl font-bold">
-                {currentTopic} {t("aiCoach.topicCompleted")}
-              </h2>
-              <p id="next-topic-desc" className="mt-2 text-sm text-secondary-text">
-                {t("aiCoach.topicTransitionDesc", {
-                  count: records.filter((r) => r.topic === currentTopic).length,
-                })}
-              </p>
-              <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
-                <span className="text-xs text-tertiary-text">
-                  {t("aiCoach.nextTopicLabel")}
-                </span>
-                <strong className="block text-lg">{pendingNextTopic}</strong>
-                <small className="text-tertiary-text">
-                  {t("aiCoach.startFromFirst")}
-                </small>
-              </div>
-              <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setShowNextTopicModal(false);
-                    setPendingNextTopic(null);
-                  }}
-                >
-                  {t("aiCoach.returnToSummary")}
-                </Button>
-                <Button variant="danger" onClick={endFromSummary}>
-                  {t("aiCoach.endSession")}
-                </Button>
-                <Button id="next-topic-confirm" onClick={confirmNextTopic}>
-                  {t("aiCoach.startTopic", { topic: pendingNextTopic })}
-                </Button>
-              </div>
-            </section>
+        <Modal
+          open={showNextTopicModal && Boolean(pendingNextTopic)}
+          onClose={() => {
+            setShowNextTopicModal(false);
+            setPendingNextTopic(null);
+          }}
+          labelledBy="next-topic-title"
+          describedBy="next-topic-desc"
+          maxWidth="max-w-md"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wide text-secondary-text">
+            {t("aiCoach.topicTransitionTitle")}
+          </p>
+          <h2 id="next-topic-title" className="mt-1 text-xl font-bold">
+            {currentTopic} {t("aiCoach.topicCompleted")}
+          </h2>
+          <p id="next-topic-desc" className="mt-2 text-sm text-secondary-text">
+            {t("aiCoach.topicTransitionDesc", {
+              count: records.filter((r) => r.topic === currentTopic).length,
+            })}
+          </p>
+          <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
+            <span className="text-xs text-tertiary-text">
+              {t("aiCoach.nextTopicLabel")}
+            </span>
+            <strong className="block text-lg">{pendingNextTopic}</strong>
+            <small className="text-tertiary-text">
+              {t("aiCoach.startFromFirst")}
+            </small>
           </div>
-        ) : null}
+          <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowNextTopicModal(false);
+                setPendingNextTopic(null);
+              }}
+            >
+              {t("aiCoach.returnToSummary")}
+            </Button>
+            <Button variant="danger" onClick={endFromSummary}>
+              {t("aiCoach.endSession")}
+            </Button>
+            <Button data-autofocus onClick={confirmNextTopic}>
+              {t("aiCoach.startTopic", { topic: pendingNextTopic ?? "" })}
+            </Button>
+          </div>
+        </Modal>
       </>
     );
   }

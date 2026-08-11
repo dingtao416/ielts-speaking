@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/*
+ * 设计尺度（约束组件只用这些值）：
+ * - 圆角：卡片 2xl(16px)；输入/按钮 xl(12px)；小徽标 lg(8px)
+ * - 内边距：section 卡片 p-6(24px)；列表项/子卡 p-5(20px) 或 p-4/p-3
+ * - 标题：页面 h1 text-2xl font-bold；section h2 text-base font-semibold
+ * - 次级文字：secondary-text / tertiary-text（对比度已达标）
+ */
+
 :root {
   --background: #ffffff;
   --foreground: #111111;

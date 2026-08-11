@@ -280,7 +280,14 @@ export function OnboardingFlow({ questions }: { questions: Question[] }) {
                   {locale === "zh" ? DIMENSION_LABELS[key] : DIMENSION_LABELS_EN[key]}
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-40 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-2 flex-1 overflow-hidden rounded-full bg-muted"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={9}
+                    aria-valuenow={val}
+                    aria-label={locale === "zh" ? DIMENSION_LABELS[key] : DIMENSION_LABELS_EN[key]}
+                  >
                     <div
                       className="h-full bg-foreground"
                       style={{ width: `${(val / 9) * 100}%` }}

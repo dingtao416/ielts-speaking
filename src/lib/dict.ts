@@ -22,6 +22,9 @@ const zh: Dict = {
   "nav.signIn": "登录",
   "nav.signOut": "退出",
   "nav.signUp": "注册",
+  "nav.openMenu": "打开菜单",
+  "nav.closeMenu": "关闭菜单",
+  "nav.label": "主导航",
 
   // ===== 落地页 =====
   "home.hero.title": "练出你的雅思口语答题框架",
@@ -95,6 +98,7 @@ const zh: Dict = {
   "bank.empty": "该筛选条件下暂无题目",
   "bank.partLocked": "暂未开放",
   "bank.partLockedHint": "Part 2 / Part 3 暂未开放。当前 MVP 仅提供 Part 1 练习。",
+  "bank.currentSelection": "当前选择",
 
   // ===== 练习 =====
   "practice.title": "口语练习",
@@ -193,6 +197,9 @@ const zh: Dict = {
   "aiCoach.sessionEstimateNote": "基于已完成话题的回答得出，仅用于训练，不代表官方雅思成绩。",
   "aiCoach.viewTopicSummary": "查看话题总结",
   "aiCoach.noIssues": "暂无跨话题共同问题。",
+  "aiCoach.stageTarget": "当前训练目标 {band}",
+  "aiCoach.recommendedNote": "保留你的原意，按 {band} 分训练目标调整表达。",
+  "aiCoach.secondsRemaining": "剩余 {seconds} 秒",
 
   // ===== 素材本 =====
   "library.title": "我的素材本",
@@ -312,6 +319,8 @@ const zh: Dict = {
   "common.loading": "加载中…",
   "common.back": "返回",
   "common.close": "关闭",
+  "common.play": "播放",
+  "common.pause": "暂停",
   "common.cancel": "取消",
   "common.confirm": "确认",
   "common.error": "出错了",
@@ -358,6 +367,9 @@ const en: Dict = {
   "nav.signIn": "Sign in",
   "nav.signOut": "Sign out",
   "nav.signUp": "Sign up",
+  "nav.openMenu": "Open menu",
+  "nav.closeMenu": "Close menu",
+  "nav.label": "Main navigation",
 
   "home.hero.title": "Build your IELTS speaking framework",
   "home.hero.subtitle":
@@ -428,6 +440,7 @@ const en: Dict = {
   "bank.empty": "No questions match this filter",
   "bank.partLocked": "Coming soon",
   "bank.partLockedHint": "Part 2 / Part 3 are not available yet. The MVP currently offers Part 1 practice only.",
+  "bank.currentSelection": "Current selection",
 
   "practice.title": "Speaking practice",
   "practice.prepTime": "Preparation",
@@ -525,6 +538,9 @@ const en: Dict = {
   "aiCoach.sessionEstimateNote": "Based on your answers across these topics. For training only, not an official IELTS score.",
   "aiCoach.viewTopicSummary": "View topic summary",
   "aiCoach.noIssues": "No common issues across topics yet.",
+  "aiCoach.stageTarget": "Training target {band}",
+  "aiCoach.recommendedNote": "Keeps your meaning, adjusted to a {band} training target.",
+  "aiCoach.secondsRemaining": "{seconds} seconds remaining",
 
   "library.title": "My Frameworks",
   "library.subtitle": "Answer frameworks organized by topic",
@@ -640,6 +656,8 @@ const en: Dict = {
   "common.loading": "Loading…",
   "common.back": "Back",
   "common.close": "Close",
+  "common.play": "Play",
+  "common.pause": "Pause",
   "common.cancel": "Cancel",
   "common.confirm": "Confirm",
   "common.error": "Something went wrong",

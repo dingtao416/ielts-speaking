@@ -105,6 +105,31 @@ export function BankBrowser({
         </button>
       </div>
 
+      {/* 当前选择（面包屑）：让用户知道处在筛选的哪一层 */}
+      <div className="flex flex-wrap items-center gap-1.5 text-sm text-secondary-text" aria-label={t("bank.currentSelection")}>
+        <span className="font-medium">
+          {category === "real" ? t("bank.real") : t("bank.predicted")}
+        </span>
+        {year ? (
+          <>
+            <span className="text-tertiary-text" aria-hidden="true">/</span>
+            <span className="font-medium">{year}</span>
+          </>
+        ) : null}
+        {topic ? (
+          <>
+            <span className="text-tertiary-text" aria-hidden="true">/</span>
+            <span className="font-medium">{topic}</span>
+          </>
+        ) : null}
+        {part ? (
+          <>
+            <span className="text-tertiary-text" aria-hidden="true">/</span>
+            <span className="font-medium">Part {part}</span>
+          </>
+        ) : null}
+      </div>
+
       {/* 层级 1：年份 */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
@@ -245,7 +270,7 @@ export function BankBrowser({
             {questions.map((q) => (
               <div
                 key={q.id}
-                className="flex flex-col gap-3 rounded-2xl border border-border p-5 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-2xl border border-border p-6 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-2">

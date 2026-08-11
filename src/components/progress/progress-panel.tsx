@@ -15,6 +15,7 @@ import type { AbilityProfile } from "@/persistence/schema";
 import { DIMENSION_LABELS, DIMENSION_LABELS_EN } from "@/lib/profile";
 import { useT } from "@/lib/i18n";
 import { Button, buttonClass } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
 import { BandTrendChart, type TrendPoint } from "@/components/progress/band-trend-chart";
 
 interface ProfilePayload {
@@ -42,13 +43,6 @@ interface SessionRow {
   } | null;
   bandEstimate?: number | null;
   reportMarkdown?: string | null;
-}
-
-function formatDuration(sec: number, t: (k: string, vars?: Record<string, string>) => string) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  if (m === 0) return `${s}${t("common.seconds")}`;
-  return `${m}${t("common.minutes")} ${s}${t("common.seconds")}`;
 }
 
 function formatDate(iso: string, locale: string) {
@@ -198,7 +192,14 @@ export function ProgressPanel() {
                       {dimLabels[key]}
                     </span>
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-40 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-2 flex-1 overflow-hidden rounded-full bg-muted"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={9}
+                        aria-valuenow={val}
+                        aria-label={dimLabels[key]}
+                      >
                         <div
                           className="h-full bg-foreground"
                           style={{ width: `${(val / 9) * 100}%` }}
@@ -313,33 +314,38 @@ export function ProgressPanel() {
               return (
                 <li
                   key={s.id}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-border p-3.5 transition-colors hover:bg-muted/40"
+                  className="flex flex-col gap-1.5 rounded-xl border border-border p-3.5 transition-colors hover:bg-muted/40"
                 >
-                  <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-secondary-text">
-                    {label}
-                    {s.part ? ` · Part ${s.part}` : ""}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-sm">
-                    {s.topic ? `${s.topic} — ` : ""}
-                    {s.fullText ? `${s.fullText.slice(0, 60)}${s.fullText.length > 60 ? "…" : ""}` : t("progress.noBand")}
-                  </span>
-                  <span className="text-xs text-tertiary-text">
-                    {formatDuration(s.durationSec, t)}
-                  </span>
-                  <span className="text-xs text-tertiary-text">
-                    {formatDate(s.startTime, locale)}
-                  </span>
-                  <span className="w-16 text-right text-sm font-bold tabular-nums">
-                    {typeof band === "number" ? band.toFixed(1) : <span className="font-normal text-tertiary-text">{t("progress.noBand")}</span>}
-                  </span>
-                  {s.reportMarkdown ? (
-                    <button
-                      type="button"
-                      onClick={() => setViewingReport(s)}
-                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.98]"
-                    >
-                      {t("progress.session.report")}
-                    </button>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-secondary-text">
+                      {label}
+                      {s.part ? ` · Part ${s.part}` : ""}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                      {s.topic ?? "—"}
+                    </span>
+                    <span className="text-xs text-tertiary-text">
+                      {formatDate(s.startTime, locale)}
+                    </span>
+                    {typeof band === "number" ? (
+                      <span className="rounded-md bg-muted px-2 py-0.5 text-sm font-bold tabular-nums">
+                        {band.toFixed(1)}
+                      </span>
+                    ) : null}
+                    {s.reportMarkdown ? (
+                      <button
+                        type="button"
+                        onClick={() => setViewingReport(s)}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.98]"
+                      >
+                        {t("progress.session.report")}
+                      </button>
+                    ) : null}
+                  </div>
+                  {s.fullText ? (
+                    <p className="line-clamp-2 text-xs leading-relaxed text-secondary-text">
+                      {s.fullText}
+                    </p>
                   ) : null}
                 </li>
               );
@@ -349,32 +355,28 @@ export function ProgressPanel() {
       </section>
 
       {/* 报告弹窗 */}
-      {viewingReport ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => setViewingReport(null)}
-        >
-          <div
-            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-background p-6"
-            onClick={(e) => e.stopPropagation()}
+      <Modal
+        open={Boolean(viewingReport)}
+        onClose={() => setViewingReport(null)}
+        labelledBy="report-modal-title"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 id="report-modal-title" className="text-base font-semibold">
+            {t("progress.session.report")}
+          </h3>
+          <button
+            type="button"
+            onClick={() => setViewingReport(null)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.98]"
+            aria-label={t("common.close")}
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-semibold">{t("progress.session.report")}</h3>
-              <button
-                type="button"
-                onClick={() => setViewingReport(null)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-secondary-text transition-all duration-150 hover:bg-muted hover:text-foreground active:scale-[0.98]"
-                aria-label={t("common.close")}
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-              {viewingReport.reportMarkdown}
-            </pre>
-          </div>
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
-      ) : null}
+        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+          {viewingReport?.reportMarkdown}
+        </pre>
+      </Modal>
     </div>
   );
 }

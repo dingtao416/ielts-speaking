@@ -1,0 +1,1 @@
+ALTER TABLE "session_record" ADD COLUMN "feedback" jsonb;
