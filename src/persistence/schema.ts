@@ -30,6 +30,13 @@ export const user = pgTable(
     profile: jsonb("profile").$type<AbilityProfile>(), // 能力档案
     onboarded: boolean("onboarded").default(false).notNull(),
     onboardedAt: timestamp("onboarded_at"),
+    // V1：标准题诊断/复测维护的档案（PRD §7 UserProfile）
+    finalGoalBand: numeric("final_goal_band", { precision: 3, scale: 1 }), // 最终目标分
+    currentBand: numeric("current_band", { precision: 3, scale: 1 }),      // 当前综合水平
+    activeStageBand: numeric("active_stage_band", { precision: 3, scale: 1 }), // 当前训练目标
+    stagePlan: jsonb("stage_plan").$type<string[]>().default(sql`'[]'::jsonb`), // 阶段路径
+    diagnosticStatus: varchar("diagnostic_status", { length: 16 })
+      .default("none"), // none | in_progress | completed
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -238,4 +245,231 @@ export interface StoryMaterial {
   setting: string;            // 场景/地点
   events: string[];           // 事件经过
   applyToTopics: string[];    // 可应用于的话题
+}
+
+// ===== V1 练习模型（PRD §7）=====
+
+// 练习会话：创建时冻结题组（PRD 4.3 / FR-002 / FR-003）
+export const practiceSessions = pgTable(
+  "practice_session",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // 'personal_background' | 'standard_topic'（PRD 4.1）
+    mode: varchar("mode", { length: 32 }).notNull(),
+    // 熟悉话题：大类 id（work_study/hometown/residence）；标准话题：题组 id（st-*）
+    topicSetKey: varchar("topic_set_key", { length: 200 }).notNull(),
+    bankVersion: varchar("bank_version", { length: 64 }).notNull(),
+    // 硬隔离：熟悉话题恒为 false，只有标准题可进诊断（FR-008）
+    diagnosticEligible: boolean("diagnostic_eligible")
+      .notNull()
+      .default(false),
+    // in_progress | completed | abandoned
+    status: varchar("status", { length: 16 }).notNull().default("in_progress"),
+    // 题组完成后的总结缓存（标准话题：训练预估/判定依据/优化点；熟悉话题：null）
+    summary: jsonb("summary").$type<SessionSummary>(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("practice_session_user_start_idx").on(table.userId, table.startedAt),
+  ],
+);
+
+// 冻结题目投递：会话创建时写死 questionId/顺序/题文快照/bankVersion（FR-003/004）
+export const questionDeliveries = pgTable(
+  "question_delivery",
+  {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => practiceSessions.id, { onDelete: "cascade" }),
+    questionId: varchar("question_id", { length: 200 }).notNull(),
+    orderNo: integer("order_no").notNull(),
+    textSnapshot: text("text_snapshot").notNull(),
+    // 冻结时的话题展示名（熟悉话题=大类 label；标准话题=题组 topic）
+    topic: varchar("topic", { length: 200 }).notNull(),
+    bankVersion: varchar("bank_version", { length: 64 }).notNull(),
+    // 'personal_background_fixed' | 'standard_published'
+    deliverySource: varchar("delivery_source", { length: 40 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("question_delivery_session_order_uq").on(
+      table.sessionId,
+      table.orderNo,
+    ),
+  ],
+);
+
+// 单题回答：同一回答可重试反馈，但不得重复建答（FR-007）
+export const responseAttempts = pgTable(
+  "response_attempt",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => practiceSessions.id, { onDelete: "cascade" }),
+    questionDeliveryId: text("question_delivery_id")
+      .notNull()
+      .references(() => questionDeliveries.id, { onDelete: "cascade" }),
+    // 本地 IndexedDB 音频键（音频默认本机保存）
+    audioRef: varchar("audio_ref", { length: 200 }),
+    finalTranscript: text("final_transcript").notNull(),
+    durationSec: integer("duration_sec").notNull().default(0),
+    // manual | timeout | asr_failed | manual_input | skipped
+    endedBy: varchar("ended_by", { length: 16 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("response_attempt_session_delivery_uq").on(
+      table.sessionId,
+      table.questionDeliveryId,
+    ),
+    index("response_attempt_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
+  ],
+);
+
+// 单题反馈：两种话题类型结构一致；熟悉话题不含 Band（FR-006）
+export const responseFeedback = pgTable(
+  "response_feedback",
+  {
+    id: text("id").primaryKey(),
+    responseAttemptId: text("response_attempt_id")
+      .notNull()
+      .references(() => responseAttempts.id, { onDelete: "cascade" })
+      .unique(),
+    activeStageBand: numeric("active_stage_band", { precision: 3, scale: 1 }),
+    vocabularyHighlights: jsonb("vocabulary_highlights")
+      .$type<VocabularyHighlight[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    naturalRewrite: text("natural_rewrite"),
+    // pending | ok | degraded（FR-007 降级）
+    status: varchar("status", { length: 16 }).notNull().default("pending"),
+    feedbackVersion: varchar("feedback_version", { length: 32 }),
+    modelVersion: varchar("model_version", { length: 64 }),
+    schemaVersion: varchar("schema_version", { length: 32 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("response_feedback_attempt_idx").on(table.responseAttemptId)],
+);
+
+// 诊断评估：只能引用标准题回答；未完成不得覆盖正式档案（FR-009）
+export const diagnosticAssessments = pgTable(
+  "diagnostic_assessment",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => practiceSessions.id, { onDelete: "cascade" }),
+    standardResponseIds: jsonb("standard_response_ids")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    bandEvidence: jsonb("band_evidence").$type<BandEvidence>(),
+    activeStageBand: numeric("active_stage_band", { precision: 3, scale: 1 }),
+    confidence: numeric("confidence", { precision: 3, scale: 2 }),
+    // in_progress | completed
+    status: varchar("status", { length: 16 }).notNull().default("in_progress"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("diagnostic_assessment_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
+  ],
+);
+
+export type PracticeSession = typeof practiceSessions.$inferSelect;
+export type NewPracticeSession = typeof practiceSessions.$inferInsert;
+export type QuestionDelivery = typeof questionDeliveries.$inferSelect;
+export type NewQuestionDelivery = typeof questionDeliveries.$inferInsert;
+export type ResponseAttempt = typeof responseAttempts.$inferSelect;
+export type NewResponseAttempt = typeof responseAttempts.$inferInsert;
+export type ResponseFeedback = typeof responseFeedback.$inferSelect;
+export type NewResponseFeedback = typeof responseFeedback.$inferInsert;
+export type DiagnosticAssessment = typeof diagnosticAssessments.$inferSelect;
+export type NewDiagnosticAssessment = typeof diagnosticAssessments.$inferInsert;
+
+// 核心埋点事件（PRD §8；不接收转写/音频/PII）
+export const analyticsEvents = pgTable(
+  "analytics_event",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 64 }).notNull(),
+    props: jsonb("props")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("analytics_event_user_created_idx").on(table.userId, table.createdAt),
+  ],
+);
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type NewAnalyticsEvent = typeof analyticsEvents.$inferInsert;
+
+// 词汇建议（最多 3 项，FR-006）
+export interface VocabularyHighlight {
+  original: string;
+  suggestion: string;
+  note?: string;
+}
+
+// 会话总结缓存（标准话题：训练用途预估；熟悉话题不生成 Band）
+export interface SessionSummary {
+  estimate?: number | null; // 标准话题训练预估；熟悉话题恒为 null
+  basis?: string;           // 判定依据
+  nextFocus?: string[];     // 下次优化点
+  generatedAt?: string;
+}
+
+// 诊断证据：无有效音频证据的维度为 null（显示"未评估"），不生成数值（FR-009 / NFR）
+export interface BandEvidence {
+  dimensions: {
+    fluency: number | null;
+    lexical: number | null;
+    grammar: number | null;
+    pronunciation: number | null;
+  };
+  overall: number;
+  notes: string[];
 }

@@ -1,17 +1,28 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
+import { readAuthenticatedActor } from "@/application/authentication";
+import { readStageState } from "@/application/stage-reader";
+import { getDatabase } from "@/persistence/database";
+import {
+  practiceSessions,
+  questionDeliveries,
+  responseAttempts,
+  responseFeedback,
+  type SessionSummary,
+} from "@/persistence/schema";
 import { chatComplete, parseJsonFromLlm } from "@/lib/llm";
 import { getTopicSummaryPrompt } from "@/lib/prompts";
-import { roundHalf } from "@/lib/profile";
-import { readAuthenticatedActor } from "@/application/authentication";
-import { getDatabase } from "@/persistence/database";
-import { user } from "@/persistence/schema";
+import { topicSummarySchema } from "@/lib/feedback-schemas";
 
 export const runtime = "nodejs";
 
-// 话题训练预估（训练用途，非官方成绩）：
-// 汇总话题内全部回答，LLM 生成预估分 + 判定依据 + 下次优化点。
+/**
+ * V1 标准话题总结（D-3 已确认：显示"训练用途预估"）：
+ * - 输入 practice_session id，服务端取冻结题目与回答，LLM 生成 预估分+判定依据+下次优化点
+ * - zod schema 校验后写入会话 summary 缓存，并将会话置为 completed
+ * - 熟悉话题不得调用本接口（不生成 Band/预估，FR-008）
+ */
 export async function POST(request: Request) {
   try {
     const actor = await readAuthenticatedActor(request.headers);
@@ -19,58 +30,125 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const topic: string | undefined = body?.topic;
-    const rounds: {
-      question: string;
-      transcript: string;
-      vocabularyHighlights: { original: string; suggestion: string }[];
-    }[] = body?.rounds;
-
-    if (!topic || !Array.isArray(rounds) || rounds.length === 0) {
+    const body = (await request.json().catch(() => null)) as {
+      sessionId?: string;
+    } | null;
+    const sessionId = body?.sessionId;
+    if (!sessionId || typeof sessionId !== "string") {
       return NextResponse.json(
-        { error: "topic and rounds are required" },
+        { error: "sessionId is required" },
         { status: 400 },
       );
     }
 
-    // 读当前综合水平作为预估上下文
     const db = getDatabase().db;
-    const [userRow] = await db
-      .select({ profile: user.profile })
-      .from(user)
-      .where(eq(user.id, actor.userId))
-      .limit(1);
-    const currentBand = userRow?.profile?.overallBand ?? 5.0;
 
-    const prompt = getTopicSummaryPrompt({ topic, rounds, currentBand });
+    const [session] = await db
+      .select()
+      .from(practiceSessions)
+      .where(
+        and(
+          eq(practiceSessions.id, sessionId),
+          eq(practiceSessions.userId, actor.userId),
+        ),
+      )
+      .limit(1);
+    if (!session) {
+      return NextResponse.json({ error: "session not found" }, { status: 404 });
+    }
+    if (session.mode !== "standard_topic" || session.topicSetKey === "diagnostic") {
+      return NextResponse.json(
+        { error: "familiar sessions do not generate band summaries" },
+        { status: 400 },
+      );
+    }
+
+    const deliveries = await db
+      .select()
+      .from(questionDeliveries)
+      .where(eq(questionDeliveries.sessionId, sessionId))
+      .orderBy(asc(questionDeliveries.orderNo));
+
+    const attempts = await db
+      .select()
+      .from(responseAttempts)
+      .where(eq(responseAttempts.sessionId, sessionId))
+      .orderBy(asc(responseAttempts.createdAt));
+
+    const attemptIds = attempts.map((a) => a.id);
+    const feedbackRows =
+      attemptIds.length > 0
+        ? await db
+            .select()
+            .from(responseFeedback)
+            .where(inArray(responseFeedback.responseAttemptId, attemptIds))
+        : [];
+    const feedbackByAttempt = new Map(
+      feedbackRows.map((f) => [f.responseAttemptId, f]),
+    );
+
+    const validAnswers = attempts
+      .filter((a) => a.endedBy !== "skipped" && a.finalTranscript.trim())
+      .map((a) => {
+        const delivery = deliveries.find((d) => d.id === a.questionDeliveryId);
+        const feedback = feedbackByAttempt.get(a.id);
+        return {
+          question: delivery?.textSnapshot ?? "",
+          transcript: a.finalTranscript,
+          vocabularyHighlights:
+            feedback?.vocabularyHighlights?.map((v) => ({
+              original: v.original,
+              suggestion: v.suggestion,
+            })) ?? [],
+        };
+      })
+      .filter((r) => r.question && r.transcript);
+
+    if (validAnswers.length === 0) {
+      return NextResponse.json(
+        { error: "no valid answers to summarize" },
+        { status: 400 },
+      );
+    }
+
+    const topic = deliveries[0]?.topic ?? session.topicSetKey;
+    const stage = await readStageState(actor.userId);
+
+    const prompt = getTopicSummaryPrompt({
+      topic,
+      rounds: validAnswers,
+      currentBand: stage.currentBand ?? undefined,
+    });
     const content = await chatComplete(
       [
         { role: "system", content: prompt.system },
         { role: "user", content: prompt.user },
       ],
-      { maxTokens: 500, temperature: 0.3 },
+      { maxTokens: 2048, temperature: 0.3 },
     );
 
-    const parsed = parseJsonFromLlm<{
-      estimate?: number;
-      basis?: string;
-      nextFocus?: string[];
-    }>(content);
+    const parsed = parseJsonFromLlm<unknown>(content);
+    const result = topicSummarySchema.safeParse(parsed);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "summary schema validation failed" },
+        { status: 502 },
+      );
+    }
 
-    const rawEstimate = Number(parsed.estimate);
-    const estimate = roundHalf(
-      Number.isFinite(rawEstimate) ? Math.max(0, Math.min(9, rawEstimate)) : currentBand,
-    );
-    const basis =
-      typeof parsed.basis === "string" && parsed.basis.trim()
-        ? parsed.basis
-        : "";
-    const nextFocus = Array.isArray(parsed.nextFocus)
-      ? parsed.nextFocus.filter((s) => typeof s === "string" && s.trim()).slice(0, 2)
-      : [];
+    const summary: SessionSummary = {
+      estimate: result.data.estimate,
+      basis: result.data.basis,
+      nextFocus: result.data.nextFocus,
+      generatedAt: new Date().toISOString(),
+    };
 
-    return NextResponse.json({ estimate, basis, nextFocus });
+    await db
+      .update(practiceSessions)
+      .set({ summary, status: "completed", endedAt: new Date() })
+      .where(eq(practiceSessions.id, sessionId));
+
+    return NextResponse.json({ summary });
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message ?? "话题总结失败" },

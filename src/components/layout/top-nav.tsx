@@ -27,6 +27,7 @@ export function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
+    { href: "/practice", label: t("nav.practice"), icon: Mic },
     { href: "/bank", label: t("nav.bank"), icon: BookOpenText },
     { href: "/library", label: t("nav.library"), icon: BookMarked },
     { href: "/progress", label: t("nav.progress"), icon: TrendingUp },

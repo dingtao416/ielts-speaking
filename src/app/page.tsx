@@ -42,7 +42,7 @@ export default function HomePage() {
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
           <Link
-            href="/bank"
+            href="/practice"
             className={buttonClass("primary", "lg")}
           >
             <Mic className="h-5 w-5" aria-hidden="true" />

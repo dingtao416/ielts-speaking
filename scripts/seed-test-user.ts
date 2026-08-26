@@ -1,7 +1,7 @@
 // 创建或重置测试账号（root / 11111111），可直接登录，无需邮箱验证。
 // 用法: npx tsx scripts/seed-test-user.mjs  （或用 tsx 跑 TS）
 // 说明: better-auth 默认 requireEmailVerification，创建后强制置为已验证。
-import "dotenv/config";
+import dotenv from "dotenv";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
@@ -10,6 +10,10 @@ import postgres from "postgres";
 import { and, eq } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";
 import * as schema from "../src/persistence/schema";
+
+// 优先读 .env.local（本机真实配置），再回退 .env
+dotenv.config({ path: ".env.local", quiet: true });
+dotenv.config();
 
 const DATABASE_URL =
   process.env.DATABASE_URL ||

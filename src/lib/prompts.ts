@@ -359,109 +359,6 @@ ${fullText.slice(0, 8000)}
   return { system, user };
 }
 
-/** AI 逐题追问 Prompt：生成当前话题的下一道英文 Part 1 问题 */
-export function getFollowUpQuestionPrompt(params: {
-  topic: string;
-  year?: number;
-  currentQuestion?: string;
-  lastAnswer?: string;
-  round: number; // 1-3 当前是第几问
-  stageBand?: number; // 当前训练目标
-}) {
-  const {
-    topic,
-    year,
-    currentQuestion,
-    lastAnswer,
-    round,
-    stageBand,
-  } = params;
-
-  const isFollowUp = round > 1 && currentQuestion?.trim();
-
-  const system = `你是雅思口语考官。用户在练习雅思口语 Part 1，话题是「${topic}」。${year ? `考季 ${year}。` : ""}你负责用英文逐题提问，模拟真实 Part 1 面试节奏。
-
-要求：
-- 只输出一道英文问题（JSON），不要任何解释。
-- 输出格式：{"question": "..."}
-- 问题必须符合 Part 1 风格：关于熟悉、日常的话题，简短、直接、自然。
-- 不提前给出答案，不把用户没说过的事实写进问题。
-- 所有问题必须围绕「${topic}」这一话题，不跳到其他话题。
-- 保持问题的多样性和递进感，避免重复问同一件事。${stageBand ? `用户当前训练目标是 ${stageBand} 分，问题难度匹配该水平。` : ""}`;
-
-  const user = isFollowUp
-    ? `当前是第 ${round} 问。上一题: "${currentQuestion}"\n用户上一轮的回答: "${lastAnswer?.slice(0, 600) ?? ""}"\n\n请同时依据上一题和用户回答，提出一道自然、具体的英文追问。优先追问回答中提到的原因、细节、例子或感受，不得忽略上一轮信息另起一道无关问题。若回答过短或为空，则围绕上一题请用户补充原因或例子。`
-    : `当前是第 1 问。请提出话题「${topic}」的第一道英文 Part 1 问题。`;
-
-  return { system, user };
-}
-
-/** 推荐回答流式 Prompt：只生成阶段匹配的推荐回答（精简，加快输出） */
-export function getRecommendedAnswerPrompt(params: {
-  topic: string;
-  question: string;
-  transcript: string;
-  stageBand?: number;
-}) {
-  const { topic, question, transcript, stageBand } = params;
-  const band = stageBand ?? 6.5;
-
-  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」）。请生成一段符合用户当前训练目标（${band} 分）的推荐回答。
-
-要求：
-- 直接输出英文推荐回答本身，不要任何解释、引号或 markdown 标记。
-- 保留用户原意和主要信息，结构清晰、有具体细节、词汇适当升级，但不超出 ${band} 分水平。
-- 控制在 60-100 词左右，一段话。
-- 不做单题评分。`;
-
-  const user = `题目: ${question}
-
-用户的回答:
----
-${transcript.slice(0, 2000)}
----`;
-
-  return { system, user };
-}
-
-/** 单题表达反馈 Prompt：生成阶段匹配的推荐回答 + 词汇建议（不做单题判分） */
-export function getSingleResponseFeedbackPrompt(params: {
-  topic: string;
-  question: string;
-  transcript: string;
-  stageBand?: number;
-}) {
-  const { topic, question, transcript, stageBand } = params;
-  const band = stageBand ?? 6.5;
-
-  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」）。请生成符合用户当前训练目标（${band} 分）的单题表达反馈。
-
-必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释、不要尾随逗号）：
-{
-  "recommendedAnswer": "...",
-  "vocabularyHighlights": [
-    {"original": "...", "suggestion": "...", "note": "..."}
-  ],
-  "grammarNotes": "...",
-  "naturalRewrite": "..."
-}
-
-字段要求：
-- recommendedAnswer: 按 ${band} 分水平生成的推荐回答，保留用户原意和主要信息，结构清晰、有具体细节、词汇适当升级，但不超出该水平
-- vocabularyHighlights: 从用户转录稿中挑选 2-5 个可提升的词汇表达，数组每个元素必须是 {"original","suggestion","note"} 三键，键名和值都必须是双引号字符串，元素间用逗号分隔
-- grammarNotes: 语法与句子结构建议(中文，简要)
-- naturalRewrite: 保留原意的自然改写（整句，英文）
-
-关键原则：
-- recommendedAnswer 保留用户原回答的意图和主要信息，不是从零写高分范文
-- 不输出单题分数、四维评分或"优点/优先改进"卡片
-- 所有字段都要有内容，不要空字符串`;
-
-  const user = `题目: ${question}\n\n用户的回答:\n---\n${transcript.slice(0, 2000)}\n---`;
-
-  return { system, user };
-}
-
 /** 话题总结 Prompt：训练预估分 + 判定依据 + 下次优化点（训练用途，非官方成绩） */
 export function getTopicSummaryPrompt(params: {
   topic: string;
@@ -505,26 +402,102 @@ export function getTopicSummaryPrompt(params: {
   return { system, user: roundsText };
 }
 
-/** 语法/改写 Prompt：单题复盘详情（S5 复盘区） */
-export function getGrammarRewritePrompt(params: {
-  question: string;
-  transcript: string;
-  stageBand?: number;
+/** V1 诊断 Prompt：8 道标准题回答 → 四维 band + 证据（训练用途） */
+export function getV1DiagnosticPrompt(params: {
+  answers: {
+    question: string;
+    transcript: string;
+    vocabularyHighlights: { original: string; suggestion: string }[];
+  }[];
+  targetBand: number;
 }) {
-  const { question, transcript, stageBand } = params;
-  const band = stageBand ?? 6.5;
+  const { answers, targetBand } = params;
 
-  const system = `你是雅思口语教练。用户回答了一道 Part 1 题，当前训练目标 ${band} 分。请给出语法与改写建议。
+  const answersText = answers
+    .map((a, i) => {
+      const vocab =
+        a.vocabularyHighlights?.length
+          ? a.vocabularyHighlights
+              .map((v) => `${v.original} → ${v.suggestion}`)
+              .join("；")
+          : "无";
+      return `第 ${i + 1} 题：${a.question}\n回答：${(a.transcript ?? "").slice(0, 800)}\n词汇：${vocab}`;
+    })
+    .join("\n\n");
 
-必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释）：
+  const system = `你是雅思口语考官。用户完成了 8 道 Part 1 标准题的回答，最终目标分 ${targetBand.toFixed(1)}。请给出训练用途的四维评估（非官方成绩）。
+
+必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释、不要尾随逗号）：
 {
-  "grammarNotes": "语法与句子结构建议（中文，简要，1-3 条）",
-  "naturalRewrite": "保留原意的自然改写（整段，英文）"
+  "dimensions": {
+    "fluency": 5.5,
+    "lexical": 5.0,
+    "grammar": 5.5,
+    "pronunciation": 5.5
+  },
+  "overall": 5.5,
+  "notes": ["维度证据说明1（结合具体回答，中文）", "维度证据说明2"]
 }
 
 要求：
-- grammarNotes 结合用户原文里的具体语法/结构问题，指出问题并给改法
-- naturalRewrite 在不改变原意的前提下改善表达，符合 ${band} 分水平
+- 每个维度是 0-9 之间的半分制数字（如 4.5、5.0、5.5）
+- overall 是四维综合，也是半分制数字
+- notes 给 3-5 条，必须结合用户实际回答里的具体问题（词汇、语法、流利度、信息展开），不要套话
+- 这是训练预估，不代表官方雅思成绩
+- 发音维度：若用户回答中没有可评估的发音表现信息，给出基于文字可判断的保守估计即可（服务端会在无音频证据时标记为"未评估"）`;
+
+  return { system, user: answersText };
+}
+
+/** V1 单题反馈 Prompt（词汇建议 + 自然改写）：结构输出，供服务端 zod 校验 */
+export function getV1FeedbackPrompt(params: {
+  topic: string;
+  question: string;
+  transcript: string;
+  stageBand: number;
+}) {
+  const { topic, question, transcript, stageBand } = params;
+
+  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」），当前训练目标 ${stageBand.toFixed(1)} 分。
+
+必须输出一个严格的 JSON 对象，不要输出任何其他内容（不要 markdown 代码块、不要解释、不要尾随逗号）：
+{
+  "vocabularyHighlights": [
+    {"original": "用户原词", "suggestion": "更自然的替代表达", "note": "简短说明（中文，可选）"}
+  ],
+  "naturalRewrite": "保留原意的自然改写（整段英文）"
+}
+
+字段要求：
+- vocabularyHighlights: 从用户转录稿中挑选最多 3 个值得提升的词汇/表达，按优先级排序；数组可以为空数组
+- naturalRewrite: 在完全保留用户原意和主要信息的前提下，用符合 ${stageBand.toFixed(1)} 分水平的自然英文重写整段回答；不是从零写高分范文，不添加用户没说过的事实
+- 不做单题评分、不给分数、不给四维评价`;
+
+  const user = `题目: ${question}
+
+用户的回答:
+---
+${(transcript ?? "").slice(0, 2000)}
+---`;
+
+  return { system, user };
+}
+
+/** V1 自然改写流式 Prompt：只输出改写文本本身（保留原意，阶段匹配） */
+export function getV1RewritePrompt(params: {
+  topic: string;
+  question: string;
+  transcript: string;
+  stageBand: number;
+}) {
+  const { topic, question, transcript, stageBand } = params;
+
+  const system = `你是雅思口语教练。用户刚回答了一道 Part 1 题（话题「${topic}」），当前训练目标 ${stageBand.toFixed(1)} 分。
+
+请直接输出这段回答的英文自然改写，要求：
+- 保留用户原意和所有主要信息，只改善表达的自然度和准确度
+- 难度匹配 ${stageBand.toFixed(1)} 分水平，不强行堆砌生僻词
+- 直接输出改写后的英文文本本身，不要任何解释、引号或 markdown 标记
 - 不做单题评分`;
 
   const user = `题目: ${question}

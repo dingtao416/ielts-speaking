@@ -17,6 +17,7 @@ import { useT } from "@/lib/i18n";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { BandTrendChart, type TrendPoint } from "@/components/progress/band-trend-chart";
+import { V1HistoryPanel } from "@/components/progress/v1-history-panel";
 
 interface ProfilePayload {
   targetBand: number | null;
@@ -277,6 +278,9 @@ export function ProgressPanel() {
           </p>
         )}
       </section>
+
+      {/* V1 日常练习（熟悉话题 / 标准话题，按类型分组） */}
+      <V1HistoryPanel />
 
       {/* 历史列表 */}
       <section className="rounded-2xl border border-border p-6">

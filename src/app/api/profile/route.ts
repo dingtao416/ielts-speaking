@@ -22,6 +22,11 @@ export async function GET(request: Request) {
       profile: user.profile,
       onboarded: user.onboarded,
       onboardedAt: user.onboardedAt,
+      finalGoalBand: user.finalGoalBand,
+      currentBand: user.currentBand,
+      activeStageBand: user.activeStageBand,
+      stagePlan: user.stagePlan,
+      diagnosticStatus: user.diagnosticStatus,
     })
     .from(user)
     .where(eq(user.id, actor.userId))
@@ -36,6 +41,11 @@ export async function GET(request: Request) {
     profile: row.profile ?? null,
     onboarded: row.onboarded,
     onboardedAt: row.onboardedAt,
+    finalGoalBand: row.finalGoalBand ? Number(row.finalGoalBand) : null,
+    currentBand: row.currentBand ? Number(row.currentBand) : null,
+    activeStageBand: row.activeStageBand ? Number(row.activeStageBand) : null,
+    stagePlan: row.stagePlan ?? [],
+    diagnosticStatus: row.diagnosticStatus ?? "none",
   });
 }
 
@@ -60,6 +70,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid target band" }, { status: 400 });
     }
     updates.targetBand = String(band);
+  }
+
+  // V1：最终目标分 / 当前训练目标
+  if (typeof body.finalGoalBand === "number") {
+    const band = Number(body.finalGoalBand);
+    if (band < 4 || band > 9) {
+      return NextResponse.json({ error: "Invalid final goal band" }, { status: 400 });
+    }
+    updates.finalGoalBand = String(band);
+    updates.targetBand = String(band);
+  }
+
+  if (typeof body.activeStageBand === "number") {
+    const band = Number(body.activeStageBand);
+    if (band < 4 || band > 9) {
+      return NextResponse.json({ error: "Invalid active stage band" }, { status: 400 });
+    }
+    updates.activeStageBand = String(band);
   }
 
   if (body.profile && typeof body.profile === "object") {
@@ -97,6 +125,11 @@ export async function POST(request: Request) {
       profile: user.profile,
       onboarded: user.onboarded,
       onboardedAt: user.onboardedAt,
+      finalGoalBand: user.finalGoalBand,
+      currentBand: user.currentBand,
+      activeStageBand: user.activeStageBand,
+      stagePlan: user.stagePlan,
+      diagnosticStatus: user.diagnosticStatus,
     });
 
   return NextResponse.json({
@@ -104,5 +137,10 @@ export async function POST(request: Request) {
     profile: row.profile ?? null,
     onboarded: row.onboarded,
     onboardedAt: row.onboardedAt,
+    finalGoalBand: row.finalGoalBand ? Number(row.finalGoalBand) : null,
+    currentBand: row.currentBand ? Number(row.currentBand) : null,
+    activeStageBand: row.activeStageBand ? Number(row.activeStageBand) : null,
+    stagePlan: row.stagePlan ?? [],
+    diagnosticStatus: row.diagnosticStatus ?? "none",
   });
 }

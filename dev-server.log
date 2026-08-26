@@ -305,3 +305,39 @@ https://react.dev/link/hydration-mismatch
   747 |           <div className="flex flex-wrap items-center gap-2 text-sm text-secondary-text">
  POST /api/follow-up 200 in 1575ms (next.js: 2ms, application-code: 1572ms)
  POST /api/follow-up 200 in 1899ms (next.js: 8ms, application-code: 1892ms)
+ GET /api/auth/get-session 200 in 25ms (next.js: 13ms, application-code: 12ms)
+ GET /settings 200 in 27ms (next.js: 9ms, application-code: 18ms)
+ GET /api/llm/health 200 in 8ms (next.js: 3ms, application-code: 5ms)
+ GET /api/llm/health 200 in 5ms (next.js: 3ms, application-code: 3ms)
+ GET /api/auth/get-session 200 in 35ms (next.js: 13ms, application-code: 23ms)
+ GET / 200 in 197ms (next.js: 75ms, application-code: 122ms)
+Error: write EPIPE
+    at ignore-listed frames {
+  errno: -4047,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+⨯ uncaughtException: Error: write EPIPE
+    at ignore-listed frames {
+  errno: -4047,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+⨯ uncaughtException:  Error: write EPIPE
+    at ignore-listed frames {
+  errno: -4047,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+ GET /api/auth/get-session 200 in 422ms (next.js: 147ms, application-code: 275ms)
+⨯ Failed to generate static paths for /api/auth/[...all]:
+Error: Jest worker encountered 2 child process exceptions, exceeding retry limit
+    at ignore-listed frames {
+  type: 'WorkerError'
+}
+⨯ Error: Jest worker encountered 2 child process exceptions, exceeding retry limit
+    at ignore-listed frames {
+  type: 'WorkerError',
+  page: '/api/auth/get-session'
+}
+ GET /api/auth/get-session 500 in 839ms (next.js: 672ms, application-code: 167ms)
