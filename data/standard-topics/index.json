@@ -1,0 +1,308 @@
+{
+  "bankVersion": "1.0.0",
+  "note": "标准话题题组清单（V1）。topic 为按题目实际内容策展后的展示名（源数据 topic 标签与内容存在错配，故按内容重新命名）；source 保留原始出处。仅 status=published 的题组可被学习端使用。新增/修改题组需升 bankVersion 并过教研审核。",
+  "sets": [
+    {
+      "id": "st-2021-computers",
+      "scope": "year",
+      "year": 2021,
+      "part": 1,
+      "topic": "Computers",
+      "source": "real-2021-Public Place",
+      "status": "published",
+      "questionIds": [
+        "r-2021-11741083-p1-0",
+        "r-2021-11741083-p1-1",
+        "r-2021-11741083-p1-2",
+        "r-2021-11741083-p1-3"
+      ]
+    },
+    {
+      "id": "st-2021-weather",
+      "scope": "year",
+      "year": 2021,
+      "part": 1,
+      "topic": "Weather",
+      "source": "real-2021-Skill",
+      "status": "published",
+      "questionIds": [
+        "r-2021-11742028-p1-0",
+        "r-2021-11742028-p1-1",
+        "r-2021-11742028-p1-2",
+        "r-2021-11742028-p1-3"
+      ]
+    },
+    {
+      "id": "st-2021-alone",
+      "scope": "year",
+      "year": 2021,
+      "part": 1,
+      "topic": "Time Alone",
+      "source": "real-2021-Place",
+      "status": "published",
+      "questionIds": [
+        "r-2021-11741632-p1-0",
+        "r-2021-11741632-p1-1",
+        "r-2021-11741632-p1-2",
+        "r-2021-11741632-p1-3"
+      ]
+    },
+    {
+      "id": "st-2022-hometown",
+      "scope": "year",
+      "year": 2022,
+      "part": 1,
+      "topic": "Hometown",
+      "source": "real-2022-Quiet Place",
+      "status": "published",
+      "questionIds": [
+        "r-2022-18822748-p1-0",
+        "r-2022-18822748-p1-1",
+        "r-2022-18822748-p1-2",
+        "r-2022-18822748-p1-3"
+      ]
+    },
+    {
+      "id": "st-2022-leisure",
+      "scope": "year",
+      "year": 2022,
+      "part": 1,
+      "topic": "Leisure Activities",
+      "source": "real-2022-Quiet Place",
+      "status": "published",
+      "questionIds": [
+        "r-2022-18822748-p1-4",
+        "r-2022-18822748-p1-5",
+        "r-2022-18822748-p1-6",
+        "r-2022-18822748-p1-7"
+      ]
+    },
+    {
+      "id": "st-2022-reading",
+      "scope": "year",
+      "year": 2022,
+      "part": 1,
+      "topic": "Reading Books",
+      "source": "real-2022-Quiet Place",
+      "status": "published",
+      "questionIds": [
+        "r-2022-18822748-p1-8",
+        "r-2022-18822748-p1-9",
+        "r-2022-18822748-p1-10",
+        "r-2022-18822748-p1-11"
+      ]
+    },
+    {
+      "id": "st-2022-sitting",
+      "scope": "year",
+      "year": 2022,
+      "part": 1,
+      "topic": "Sitting Down",
+      "source": "real-2022-River Country",
+      "status": "published",
+      "questionIds": [
+        "r-2022-18822541-p1-0",
+        "r-2022-18822541-p1-1",
+        "r-2022-18822541-p1-2",
+        "r-2022-18822541-p1-3"
+      ]
+    },
+    {
+      "id": "st-2023-education",
+      "scope": "year",
+      "year": 2023,
+      "part": 1,
+      "topic": "Education",
+      "source": "real-2023-Website",
+      "status": "published",
+      "questionIds": [
+        "r-2023-18874781-p1-1",
+        "r-2023-18874781-p1-2",
+        "r-2023-18874781-p1-3",
+        "r-2023-18874781-p1-4"
+      ]
+    },
+    {
+      "id": "st-2023-home",
+      "scope": "year",
+      "year": 2023,
+      "part": 1,
+      "topic": "Home",
+      "source": "real-2023-Movie",
+      "status": "published",
+      "questionIds": [
+        "r-2023-18865965-p1-0",
+        "r-2023-18865965-p1-1",
+        "r-2023-18865965-p1-2",
+        "r-2023-18865965-p1-3"
+      ]
+    },
+    {
+      "id": "st-2023-snacks",
+      "scope": "year",
+      "year": 2023,
+      "part": 1,
+      "topic": "Snacks",
+      "source": "real-2023-Movie",
+      "status": "published",
+      "questionIds": [
+        "r-2023-18865965-p1-5",
+        "r-2023-18865965-p1-6",
+        "r-2023-18865965-p1-7",
+        "r-2023-18865965-p1-8"
+      ]
+    },
+    {
+      "id": "st-2024-holidays",
+      "scope": "year",
+      "year": 2024,
+      "part": 1,
+      "topic": "Holidays",
+      "source": "real-2024-Natural Place",
+      "status": "published",
+      "questionIds": [
+        "r-2024-18969329-p1-3",
+        "r-2024-18969329-p1-4",
+        "r-2024-18969329-p1-5",
+        "r-2024-18969329-p1-6"
+      ]
+    },
+    {
+      "id": "st-2024-transport",
+      "scope": "year",
+      "year": 2024,
+      "part": 1,
+      "topic": "Public Transport",
+      "source": "real-2024-Natural Place",
+      "status": "published",
+      "questionIds": [
+        "r-2024-18969329-p1-7",
+        "r-2024-18969329-p1-8",
+        "r-2024-18969329-p1-9",
+        "r-2024-18969329-p1-10"
+      ]
+    },
+    {
+      "id": "st-2024-tech-work",
+      "scope": "year",
+      "year": 2024,
+      "part": 1,
+      "topic": "Technology at Work",
+      "source": "real-2024-Digital Communication",
+      "status": "published",
+      "questionIds": [
+        "r-2024-19008504-p1-3",
+        "r-2024-19008504-p1-4",
+        "r-2024-19008504-p1-5",
+        "r-2024-19008504-p1-6"
+      ]
+    },
+    {
+      "id": "st-2025-home",
+      "scope": "year",
+      "year": 2025,
+      "part": 1,
+      "topic": "Home",
+      "source": "real-2025-Activity",
+      "status": "published",
+      "questionIds": [
+        "r-2025-19009710-p1-0",
+        "r-2025-19009710-p1-1",
+        "r-2025-19009710-p1-2",
+        "r-2025-19009710-p1-3"
+      ]
+    },
+    {
+      "id": "st-2025-films",
+      "scope": "year",
+      "year": 2025,
+      "part": 1,
+      "topic": "Films",
+      "source": "real-2025-Activity",
+      "status": "published",
+      "questionIds": [
+        "r-2025-19009710-p1-5",
+        "r-2025-19009710-p1-6",
+        "r-2025-19009710-p1-7",
+        "r-2025-19009710-p1-8"
+      ]
+    },
+    {
+      "id": "st-latest-hometown",
+      "scope": "latest",
+      "year": 2026,
+      "part": 1,
+      "topic": "Hometown",
+      "source": "predicted-2026",
+      "status": "published",
+      "diagnostic": true,
+      "questionIds": [
+        "p-2026-p1-hometown-01",
+        "p-2026-p1-hometown-02",
+        "p-2026-p1-hometown-03",
+        "p-2026-p1-hometown-04"
+      ]
+    },
+    {
+      "id": "st-latest-technology",
+      "scope": "latest",
+      "year": 2026,
+      "part": 1,
+      "topic": "Technology",
+      "source": "predicted-2026",
+      "status": "published",
+      "questionIds": [
+        "p-2026-p1-tech-01",
+        "p-2026-p1-tech-02",
+        "p-2026-p1-tech-03",
+        "p-2026-p1-tech-04"
+      ]
+    },
+    {
+      "id": "st-latest-food",
+      "scope": "latest",
+      "year": 2026,
+      "part": 1,
+      "topic": "Food",
+      "source": "predicted-2026",
+      "status": "published",
+      "questionIds": [
+        "p-2026-p1-food-01",
+        "p-2026-p1-food-02",
+        "p-2026-p1-food-03",
+        "p-2026-p1-food-04"
+      ]
+    },
+    {
+      "id": "st-latest-work",
+      "scope": "latest",
+      "year": 2026,
+      "part": 1,
+      "topic": "Work",
+      "source": "predicted-2026",
+      "status": "published",
+      "diagnostic": true,
+      "questionIds": [
+        "p-2026-p1-work-01",
+        "p-2026-p1-work-02",
+        "p-2026-p1-work-03",
+        "p-2026-p1-work-04"
+      ]
+    },
+    {
+      "id": "st-latest-education",
+      "scope": "latest",
+      "year": 2026,
+      "part": 1,
+      "topic": "Education",
+      "source": "predicted-2026",
+      "status": "published",
+      "questionIds": [
+        "p-2026-p1-edu-01",
+        "p-2026-p1-edu-02",
+        "p-2026-p1-edu-03",
+        "p-2026-p1-edu-04"
+      ]
+    }
+  ]
+}

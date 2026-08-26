@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "status": "placeholder",
+  "note": "V1 熟悉话题固定题集（占位版）。正式发布前需教研审核题文、题量与措辞，审核后替换为 status=published 并升版本号。",
+  "categories": {
+    "work_study": {
+      "id": "work_study",
+      "label": { "zh": "工作/学习", "en": "Work & Study" },
+      "questions": [
+        {
+          "id": "pb-work-study-01",
+          "question": "Do you work or are you a student?"
+        },
+        {
+          "id": "pb-work-study-02",
+          "question": "What do you enjoy most about your work or studies?"
+        },
+        {
+          "id": "pb-work-study-03",
+          "question": "What would you like to change about your work or studies?"
+        },
+        {
+          "id": "pb-work-study-04",
+          "question": "How do you usually relax after work or study?"
+        }
+      ]
+    },
+    "hometown": {
+      "id": "hometown",
+      "label": { "zh": "家乡", "en": "Hometown" },
+      "questions": [
+        {
+          "id": "pb-hometown-01",
+          "question": "Where is your hometown?"
+        },
+        {
+          "id": "pb-hometown-02",
+          "question": "What do you like most about your hometown?"
+        },
+        {
+          "id": "pb-hometown-03",
+          "question": "Has your hometown changed much in recent years?"
+        },
+        {
+          "id": "pb-hometown-04",
+          "question": "Would you recommend your hometown to tourists?"
+        }
+      ]
+    },
+    "residence": {
+      "id": "residence",
+      "label": { "zh": "住所", "en": "Residence" },
+      "questions": [
+        {
+          "id": "pb-residence-01",
+          "question": "Do you live in a house or an apartment?"
+        },
+        {
+          "id": "pb-residence-02",
+          "question": "Which room do you spend the most time in?"
+        },
+        {
+          "id": "pb-residence-03",
+          "question": "What can you see from the windows of your home?"
+        },
+        {
+          "id": "pb-residence-04",
+          "question": "Would you like to move to a different home in the future?"
+        }
+      ]
+    }
+  }
+}
